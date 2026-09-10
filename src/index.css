@@ -1,1 +1,187 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Poppins', sans-serif;
+  --color-brand-pink: #FC8BAD;
+  --color-brand-purple: #A654CD;
+  --color-brand-primary: #A654CD;
+  --color-brand-secondary: #FC8BAD;
+  --color-brand-dark: #8E3DB5;
+  --color-brand-gradient-start: #FC8BAD;
+  --color-brand-gradient-end: #A654CD;
+  --color-rp-button: #6952C6;
+  --color-rp-badge-bg: #F6D58B;
+  --color-rp-badge-border: #D69A33;
+  --color-rp-badge-text: #5F341A;
+  --color-star: #FFC514;
+  --color-discount-bg: #ECFDF5;
+  --color-discount-text: #16A34A;
+  --color-module-product: #5F341A;
+  --color-module-services: #4F6BFF;
+  --color-module-payments: #7C3AED;
+  --color-module-travel: #DC2626;
+  --color-module-fitness: #10B981;
+}
+
+@layer base {
+  *, ::before, ::after {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  html, body {
+    background-color: #F8FAFC;
+    color: #111827;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  }
+}
+
+/* Hide scrollbar globally across Chrome, Safari, Edge, Firefox, and Opera while retaining smooth scrolling */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Utility class for hidden scrollbar */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Smooth infinite brand marquee animations */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee-reverse 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+/* Rich text content renderer (Quill editor output, HTML descriptions) */
+.rich-text-content {
+  color: #374151;
+  font-size: 0.8125rem;
+  line-height: 1.625;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.5rem;
+  line-height: 1.625;
+}
+
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  padding-left: 1.35rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc !important;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal !important;
+}
+
+.rich-text-content li[data-list="bullet"],
+.rich-text-content ol li[data-list="bullet"] {
+  list-style-type: disc !important;
+}
+
+.rich-text-content li {
+  margin-bottom: 0.35rem;
+  line-height: 1.55;
+  color: #374151;
+}
+
+.rich-text-content li:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content .ql-ui {
+  display: none !important;
+}
+
+.rich-text-content strong,
+.rich-text-content b {
+  font-weight: 700;
+  color: #111827;
+}
+
+.rich-text-content em,
+.rich-text-content i {
+  font-style: italic;
+}
+
+.rich-text-content a {
+  color: #7C3AED;
+  text-decoration: underline;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3,
+.rich-text-content h4 {
+  font-weight: 700;
+  color: #111827;
+  margin-top: 0.75rem;
+  margin-bottom: 0.35rem;
+}
