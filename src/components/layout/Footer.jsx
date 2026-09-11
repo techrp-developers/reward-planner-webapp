@@ -1,7 +1,7 @@
 // src/components/layout/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import rpLogo from '../../assets/rp_logo.svg';
+import rpLogo from '../../assets/rplogo_nobg.svg';
 import { POLICIES_LIST } from '../../modules/policies/policiesData';
 
 // Material UI Icons
@@ -24,7 +24,7 @@ export const Footer = () => {
       }}
     >
       {/* ── TOP GRADIENT ACCENT LINE ────────────────────────────────────────── */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD]" />
+      <div className="h-[2px] w-full bg-gradient-to-r from-[#8b3ab5] to-[#a855f7]" />
 
       {/* Subtle Ambient soft glows */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/40 rounded-full blur-3xl pointer-events-none" />

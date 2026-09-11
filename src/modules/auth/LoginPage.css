@@ -26,17 +26,26 @@
   box-shadow: 0 24px 55px rgba(87, 71, 155, 0.2);
 }
 
-/* Left Column: attached card linear gradient with logo taking half space */
+/* Left Column: Header color theme (#180d26 with radial ambient glow and reflection) */
 .auth-showcase {
   padding: 40px 32px;
-  background: linear-gradient(135deg, #FFFFFF 0%, #FDF1F6 32%, #F698BD 72%, #EA4988 100%);
-  border-right: 1px solid rgba(234, 73, 136, 0.1);
+  background-color: #180d26;
+  background-image:
+    radial-gradient(circle at 14% 15%, rgba(168, 85, 247, 0.45), transparent 45%),
+    radial-gradient(circle at 86% 85%, rgba(252, 63, 120, 0.35), transparent 48%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12), transparent 40%, rgba(0, 0, 0, 0.25)),
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: auto, auto, auto, 32px 32px, 32px 32px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 }
 
 .brand-block {
@@ -45,19 +54,21 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 18px;
+  position: relative;
+  z-index: 2;
 }
 
 .brand-logo-wrap {
   width: 100%;
-  max-width: 260px;
-  height: 190px;
+  max-width: 240px;
+  height: 180px;
   background: transparent;
   border: none;
   box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 14px 28px rgba(234, 73, 136, 0.22));
+  filter: drop-shadow(0 14px 28px rgba(168, 85, 247, 0.4));
 }
 
 .brand-logo {
@@ -67,24 +78,26 @@
 }
 
 .brand-name {
-  color: #1a1528;
+  color: #ffffff;
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .showcase-copy {
   margin-top: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .auth-showcase h1 {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 28px;
   line-height: 1.18;
   font-weight: 800;
-  color: #1a1528;
+  color: #ffffff;
   letter-spacing: -0.02em;
 }
 
@@ -92,7 +105,7 @@
   margin: 0 auto;
   font-size: 13px;
   line-height: 1.5;
-  color: #4b4558;
+  color: #d8b4fe;
   font-weight: 500;
   max-width: 270px;
 }
@@ -122,7 +135,7 @@
   height: 180px;
   top: -40px;
   right: -30px;
-  background: radial-gradient(circle, rgba(252, 139, 173, 0.22) 0%, rgba(252, 139, 173, 0) 70%);
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.22) 0%, rgba(168, 85, 247, 0) 70%);
 }
 
 .glow-bottom {
@@ -130,7 +143,7 @@
   height: 220px;
   bottom: -60px;
   left: -40px;
-  background: radial-gradient(circle, rgba(166, 84, 205, 0.16) 0%, rgba(166, 84, 205, 0) 70%);
+  background: radial-gradient(circle, rgba(252, 63, 120, 0.18) 0%, rgba(252, 63, 120, 0) 70%);
 }
 
 
@@ -172,8 +185,8 @@
 }
 
 .form-group input:focus {
-  border-color: #ba79d0;
-  box-shadow: 0 0 0 3px rgba(203, 114, 195, 0.14);
+  border-color: #8b3ab5;
+  box-shadow: 0 0 0 3px rgba(139, 58, 181, 0.16);
   background: #ffffff;
 }
 
@@ -199,7 +212,7 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #8a56b0;
+  color: #8b3ab5;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -218,7 +231,7 @@
 }
 
 .options a {
-  color: #8a56b0;
+  color: #8b3ab5;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -233,12 +246,12 @@
   height: 46px;
   border: 0;
   border-radius: 10px;
-  background: linear-gradient(90deg, #FC8BAD 0%, #EA4988 50%, #A654CD 100%);
+  background: linear-gradient(90deg, #8b3ab5 0%, #a855f7 100%);
   color: #ffffff;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(234, 73, 136, 0.25);
+  box-shadow: 0 10px 20px rgba(139, 58, 181, 0.28);
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   display: flex;
   align-items: center;
@@ -248,7 +261,7 @@
 
 .auth-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(234, 73, 136, 0.32);
+  box-shadow: 0 14px 28px rgba(139, 58, 181, 0.38);
 }
 
 .auth-btn:disabled {

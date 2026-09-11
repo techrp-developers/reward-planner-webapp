@@ -288,7 +288,7 @@ export const PolicyPage = ({ policyId: defaultPolicyId }) => {
             <button
               type="button"
               onClick={handleAcknowledge}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD] text-white font-bold text-sm shadow-md hover:shadow-lg hover:brightness-105 active:scale-95 cursor-pointer transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white font-bold text-sm shadow-md hover:shadow-lg hover:opacity-95 active:scale-95 cursor-pointer transition-all flex items-center justify-center gap-2"
             >
               <CheckCircleOutlinedIcon sx={{ fontSize: 18 }} />
               <span>{acknowledged ? 'Acknowledged!' : 'Okay, I Understand'}</span>

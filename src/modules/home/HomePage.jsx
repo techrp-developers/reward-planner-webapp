@@ -12,6 +12,8 @@ import BrandPartnersSection from '../../components/home/BrandPartnersSection';
 // Enterprise Components from RewardPlanners.com
 import MetricsSocialProofSection from '../../components/home/MetricsSocialProofSection';
 import PlatformCapabilitiesSection from '../../components/home/PlatformCapabilitiesSection';
+import BirthdayCelebrationModal from '../../components/home/BirthdayCelebrationModal.jsx';
+import { getCompanyFromUser, getTodayCelebrations } from '../../services/celebrationService.js';
 
 // Material UI Icons
 import WhatshotIcon from '@mui/icons-material/Whatshot';
@@ -39,7 +41,18 @@ export const HomePage = () => {
   const [deals, setDeals] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [bbpsCategories, setBbpsCategories] = useState([]);
-  const [birthdays, setBirthdays] = useState([]);
+  const [birthdays, setBirthdays] = useState(() => {
+    try {
+      const cached = localStorage.getItem('rp_user_profile');
+      const initialUser = cached ? JSON.parse(cached) : user;
+      const compName = getCompanyFromUser(initialUser);
+      const userEmps = initialUser?.company?.employees || initialUser?.employees || initialUser?.colleagues || [];
+      return getTodayCelebrations(compName, userEmps);
+    } catch {
+      return getTodayCelebrations('TechCorp Global');
+    }
+  });
+  const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,11 +103,11 @@ export const HomePage = () => {
           setBbpsCategories(bbpsData.value);
         }
 
-        // Mock birthdays for corporate celebration banner
-        setBirthdays([
-          { id: 1, name: 'Priya Sharma', department: 'Engineering' },
-          { id: 2, name: 'Rahul Verma', department: 'Sales & Ops' },
-        ]);
+        // Dynamic birthdays for corporate celebration banner based on user's company
+        const compName = getCompanyFromUser(user);
+        const userEmps = user?.company?.employees || user?.employees || user?.colleagues || [];
+        const activeCelebrations = getTodayCelebrations(compName, userEmps);
+        setBirthdays(activeCelebrations);
       } catch (err) {
         console.error('Failed to load homepage data:', err);
       } finally {
@@ -106,6 +119,21 @@ export const HomePage = () => {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  // Recalculate celebrations whenever user data updates
+  useEffect(() => {
+    const compName = getCompanyFromUser(user);
+    const userEmps = user?.company?.employees || user?.employees || user?.colleagues || [];
+    const activeCelebrations = getTodayCelebrations(compName, userEmps);
+    setBirthdays(activeCelebrations);
+  }, [user]);
+
+  // Open modal if user navigates to /birthdays
+  useEffect(() => {
+    if (window.location.pathname === '/birthdays' || window.location.hash.includes('birthdays')) {
+      setCelebrationModalOpen(true);
+    }
   }, []);
 
   const displayDeals =
@@ -123,33 +151,38 @@ export const HomePage = () => {
       : allProducts.slice(5, 10);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-4 space-y-3">
-      {/* 1. CORPORATE CELEBRATIONS TICKER / RIBBON */}
-      {birthdays.length > 0 ? (
-        <div className="w-full bg-violet-50 border-b border-violet-100 py-2 px-4">
-          <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs text-violet-800">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="p-1 rounded-full bg-violet-200 text-violet-700 shrink-0 flex items-center justify-center">
-                <CardGiftcardOutlinedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <span className="font-bold text-violet-900">Today's Celebrations:</span>
-              <span className="truncate">
-                {birthdays.map((b) => `${b.name} (${b.department || b.role || 'Colleague'})`).join(' • ')}
-              </span>
-            </div>
-            <Link
-              to="/birthdays"
-              className="shrink-0 font-bold text-[#7C3AED] hover:underline flex items-center gap-1"
-            >
-              Send Wishes 🎁
-            </Link>
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC] pb-6 space-y-4 text-gray-900">
+      {/* 1. CORPORATE CELEBRATIONS TICKER / RIBBON (ALWAYS VISIBLE) */}
+      <div className="w-full bg-violet-50/80 border-b border-violet-100 py-1.5 px-4 shadow-2xs">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-end">
+          {/* Right: Birthday Wishes to your Colleagues button */}
+          <button
+            type="button"
+            onClick={() => setCelebrationModalOpen(true)}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-violet-200 text-violet-900 shadow-2xs hover:bg-violet-100/60 hover:border-violet-300 hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view colleagues celebrating today"
+          >
+            <span className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-[11px] group-hover:scale-105 transition-transform shadow-2xs">
+              🎂
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold tracking-tight text-violet-900 group-hover:text-[#7C3AED] transition-colors">
+              Birthday Wishes to your Colleagues
+            </span>
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-[#7C3AED] text-white shadow-xs">
+              {birthdays.length > 0 ? birthdays.length : 2}
+            </span>
+            <ChevronRightIcon sx={{ fontSize: 14 }} className="text-violet-500 group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
-      ) : (
-        <div className="w-full bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-violet-100 py-2 px-4 text-xs text-center font-medium text-violet-900">
-          ✨ Welcome to <strong>Reward Planners</strong>: Explore curated corporate perks, electronics deals, and on-demand services!
-        </div>
-      )}
+      </div>
+
+      {/* Birthday Celebration Modal */}
+      <BirthdayCelebrationModal
+        isOpen={celebrationModalOpen}
+        onClose={() => setCelebrationModalOpen(false)}
+        companyName={getCompanyFromUser(user)}
+        celebrants={birthdays.length > 0 ? birthdays : getTodayCelebrations(getCompanyFromUser(user))}
+      />
 
       <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-6">
         {/* 2. SENIOR UI/UX HERO PROMOTIONAL BANNER CAROUSEL (50VH, 3-SEC AUTO SLIDE) */}

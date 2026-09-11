@@ -1,0 +1,51 @@
+<svg viewBox="0 0 200 200" width="200" height="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-pay" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#EEF2FF"/>
+      <stop offset="50%" stop-color="#E0E7FF"/>
+      <stop offset="100%" stop-color="#C7D2FE"/>
+    </linearGradient>
+    <linearGradient id="wallet-grad" x1="55" y1="95" x2="145" y2="165" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3730A3"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="card-grad" x1="65" y1="72" x2="135" y2="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="coin-grad" x1="110" y1="112" x2="142" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="pay-shadow" x="35" y="152" width="130" height="28" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="pay-glow" x="40" y="60" width="120" height="120" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#3730A3" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="24" fill="url(#bg-pay)"/>
+  <circle cx="100" cy="118" r="52" fill="#A5B4FC" opacity="0.32"/>
+
+  <!-- Shadow -->
+  <ellipse cx="100" cy="166" rx="46" ry="9" fill="#1E1B4B" opacity="0.2" filter="url(#pay-shadow)"/>
+
+  <g filter="url(#pay-glow)">
+    <!-- Credit Card Peeking Out -->
+    <rect x="70" y="74" width="62" height="38" rx="6" fill="url(#card-grad)"/>
+    <rect x="75" y="82" width="10" height="7" rx="2" fill="#FDE047"/>
+    <!-- Contactless symbol -->
+    <path d="M120 84 C122 86 122 89 120 91" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M123 82 C126 85 126 91 123 94" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- Sleek Wallet Body -->
+    <rect x="56" y="96" width="88" height="64" rx="12" fill="url(#wallet-grad)"/>
+    <path d="M56 112 L144 112" stroke="#4F46E5" stroke-width="2" opacity="0.4"/>
+
+    <!-- Gold Rupee Coin / Clasp -->
+    <circle cx="126" cy="128" r="16" fill="url(#coin-grad)"/>
+    <text x="126" y="134" font-size="16" font-family="Arial, sans-serif" font-weight="bold" fill="#78350F" text-anchor="middle">₹</text>
+  </g>
+</svg>

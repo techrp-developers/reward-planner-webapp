@@ -82,7 +82,7 @@ export const CartDrawer = () => {
                 <span>🪙</span>
                 <span>Perks to Earn on Delivery:</span>
               </span>
-              <strong className="text-[#7C3AED] font-black">+{estimatedCoins} RP Coins</strong>
+              <strong className="text-[#8b3ab5] font-black">+{estimatedCoins} RP Coins</strong>
             </div>
 
             {/* Proceed to Checkout CTA */}
@@ -101,7 +101,7 @@ export const CartDrawer = () => {
                 closeCartDrawer();
                 navigate('/cart');
               }}
-              className="w-full py-2 rounded-xl border border-violet-200 text-[#7C3AED] hover:bg-violet-50 font-bold text-xs cursor-pointer transition-colors text-center"
+              className="w-full py-2 rounded-xl border border-purple-200 text-[#8b3ab5] hover:bg-purple-50 font-bold text-xs cursor-pointer transition-colors text-center"
             >
               View Shopping Cart
             </button>
@@ -118,7 +118,7 @@ export const CartDrawer = () => {
     >
       {items.length === 0 ? (
         <div className="h-full flex flex-col items-center justify-center py-20 text-center space-y-4 px-4">
-          <div className="w-20 h-20 rounded-3xl bg-violet-50 border border-violet-100 text-[#7C3AED] flex items-center justify-center shadow-xs">
+          <div className="w-20 h-20 rounded-3xl bg-purple-50 border border-purple-100 text-[#8b3ab5] flex items-center justify-center shadow-xs">
             <ShoppingBagOutlinedIcon sx={{ fontSize: 38 }} />
           </div>
           <div>
@@ -132,7 +132,7 @@ export const CartDrawer = () => {
               closeCartDrawer();
               navigate('/store');
             }}
-            className="px-5 py-2.5 bg-[#7C3AED] text-white text-xs font-bold rounded-xl hover:bg-[#6D28D9] transition-colors shadow-sm cursor-pointer"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-opacity shadow-sm cursor-pointer"
           >
             Explore Store Catalog →
           </button>
@@ -192,7 +192,7 @@ export const CartDrawer = () => {
                   <div className="flex-1 min-w-0">
                     <h5
                       onClick={() => handleItemClick(item.product_id)}
-                      className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug cursor-pointer hover:text-[#7C3AED] transition-colors"
+                      className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug cursor-pointer hover:text-[#8b3ab5] transition-colors"
                     >
                       {title}
                     </h5>

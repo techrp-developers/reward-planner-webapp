@@ -18,7 +18,7 @@ export const GradientButton = ({
       disabled={disabled || loading}
       className={`relative inline-flex items-center justify-center font-semibold text-white px-5 py-2.5 rounded-lg shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
       style={{
-        background: 'linear-gradient(135deg, #8665FF 0%, #5B47A3 100%)',
+        background: 'linear-gradient(90deg, #8b3ab5 0%, #a855f7 100%)',
       }}
     >
       {loading ? (

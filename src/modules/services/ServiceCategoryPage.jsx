@@ -185,7 +185,7 @@ export const ServiceCategoryPage = () => {
                       <span className="text-[10px] text-gray-400 block font-medium">all inclusive</span>
                     </div>
 
-                    <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
+                    <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
                       <span>Get Started</span>
                       <ArrowForwardIcon sx={{ fontSize: 13 }} />
                     </button>

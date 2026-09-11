@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { LocationProvider } from './context/LocationContext';
 import { CartProvider } from './context/CartContext';
+import { ServiceCartProvider } from './context/ServiceCartContext';
 import { ThemeProvider } from './context/ThemeContext';
 import AppRouter from './router/AppRouter';
 
@@ -25,9 +26,11 @@ export default function App() {
         <AuthProvider>
           <LocationProvider>
             <CartProvider>
-              <ThemeProvider>
-                <AppRouter />
-              </ThemeProvider>
+              <ServiceCartProvider>
+                <ThemeProvider>
+                  <AppRouter />
+                </ThemeProvider>
+              </ServiceCartProvider>
             </CartProvider>
           </LocationProvider>
         </AuthProvider>

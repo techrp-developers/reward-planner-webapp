@@ -9,7 +9,7 @@ export const PointsButton = ({ rewardCoins = 0, redeemCoins = 0, onClick, classN
       onClick={onClick}
       type="button"
       className={`w-full rounded-lg overflow-hidden shadow-xs hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer border-none text-left p-0 ${className}`}
-      style={{ backgroundColor: '#6952C6' }}
+      style={{ background: 'linear-gradient(90deg, #8b3ab5 0%, #a855f7 100%)' }}
     >
       <div className="flex items-center justify-between h-9 px-3 text-white">
         {/* Left: Earn */}

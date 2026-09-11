@@ -1,30 +1,47 @@
 // src/components/layout/TopHeader.jsx
+// Black Theme Executive Header (3-Tier Structure: Row 1 Main Bar, Row 2 Services & Location, Row 3 Sub Categories)
+// Row 1: Logo, Search Bar, Profile (Icon + First Name), Cart (Icon Only)
+// Row 2: Available Services Chips (Products, Services, Payments) + Location Selector + Coin Balance
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation as useRouterLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from '../../context/LocationContext';
 import { useCart } from '../../context/CartContext';
+import { useServiceCart } from '../../context/ServiceCartContext';
 import { fetchGlobalSearchSuggestions } from '../../api/productApi';
 import LocationModal from './LocationModal';
 import RPpriceBadge from '../ui/RPpriceBadge';
-import rpLogo from '../../assets/rp_logo.svg';
+import rpLogo from '../../assets/rplogo_nobg.svg';
 
 // Material UI Icons
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const TopHeader = () => {
-  const { user, isAuthenticated, logout, openAuth } = useAuth();
+  const { user, isAuthenticated, openAuth } = useAuth();
   const { pincode, cityName, openLocationModal } = useLocation();
-  const { totalQuantity, openCartDrawer } = useCart();
+  const { totalQuantity } = useCart();
+  const { serviceCartCount } = useServiceCart();
   const navigate = useNavigate();
+  const routerLocation = useRouterLocation();
+
+  const isServicePath =
+    routerLocation.pathname.startsWith('/services') ||
+    routerLocation.pathname === '/insurance' ||
+    routerLocation.pathname === '/tax';
+
+  const cartBadgeCount = isServicePath ? serviceCartCount : (totalQuantity > 0 ? totalQuantity : serviceCartCount);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,7 +51,7 @@ export const TopHeader = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchContainerRef = useRef(null);
 
-  // User State
+  // Coins Tooltip State
   const [showCoinsTooltip, setShowCoinsTooltip] = useState(false);
 
   // Debounced search suggestions
@@ -84,242 +101,312 @@ export const TopHeader = () => {
   };
 
   const coinBalance = Number(user?.wallet_points || user?.points || user?.steps?.coins || 2450);
-  const userName = user?.name || user?.first_name || 'Sign In';
+  const firstName = user?.name ? user.name.trim().split(' ')[0] : (user?.first_name || 'Profile');
 
   return (
     <>
-      {/* GLOSSY HEADER USING APP BASE COLORS #FC8BAD AND #A654CD */}
-      <header className="sticky top-0 z-40 bg-gradient-to-r from-[#FC8BAD] via-[#c86bc1] to-[#A654CD] text-white shadow-md overflow-visible">
-        {/* Glossy top reflection sheen */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/22 via-transparent to-black/8 pointer-events-none" />
+      <header className="sticky top-0 z-40 w-full select-none relative shadow-md">
+        {/* ========================================================================= */}
+        {/* ROW 1: BRAND LOGO, SEARCH BAR, PROFILE (ICON+NAME), CART (ICON ONLY)     */}
+        {/* GLOSSY CUSTOM THEME: #180d26 + #8b3ab5 with radial glows and reflection   */}
+        {/* ========================================================================= */}
+        <div className="w-full bg-[#180d26] text-white relative overflow-hidden border-b border-white/10">
+          {/* Radial gradient ambient glows from the custom theme */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(168,85,247,0.42),transparent_38%),radial-gradient(circle_at_88%_85%,rgba(252,63,120,0.32),transparent_42%)]" />
 
-        <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 h-[68px] flex items-center justify-between gap-4 relative z-10">
-          {/* 1. BRAND & LOGO */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <Link to="/" className="flex items-center gap-2.5 text-decoration-none group">
+          {/* Subtle micro-grid overlay */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.05] bg-[linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:36px_36px]" />
+
+          {/* Glossy top reflection sheen */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-black/20" />
+
+          <div className="w-full max-w-[1600px] mx-auto pl-2.5 pr-4 sm:pl-3 sm:pr-6 lg:pl-4 lg:pr-8 h-16 flex items-center justify-between gap-3 sm:gap-6 relative z-10">
+            {/* 1. BRAND & LOGO */}
+            <Link to="/" className="flex items-center gap-2 text-decoration-none group shrink-0">
               <img
                 src={rpLogo}
                 alt="Reward Planners Logo"
-                className="ml-1 sm:ml-2 h-8 sm:h-9 w-auto max-h-[38px] object-contain group-hover:scale-105 transition-transform drop-shadow-sm shrink-0"
+                className="h-9.5 w-9.5 sm:h-11 sm:w-11 max-h-[44px] object-contain group-hover:scale-105 transition-transform drop-shadow-md shrink-0"
               />
-              <span className="font-extrabold text-base sm:text-lg text-white leading-tight tracking-tight drop-shadow-xs">
-                Reward<span className="text-yellow-200">Planners</span>
+              <span className="font-extrabold text-base sm:text-lg leading-tight tracking-tight drop-shadow-xs">
+                <span className="text-[#FC8BAD]">Reward</span><span className="text-[#F8A926]">Planners</span>
               </span>
             </Link>
-          </div>
 
-          {/* 2. AMAZON-STYLE LOCATION SELECTOR */}
-          <button
-            type="button"
-            onClick={openLocationModal}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 backdrop-blur-xs transition-all cursor-pointer text-left shrink-0 text-white"
-          >
-            <LocationOnOutlinedIcon sx={{ fontSize: 20 }} className="text-white shrink-0" />
-            <div className="text-xs">
-              <span className="text-white/80 block text-[10px] leading-tight font-medium">
-                Deliver to {isAuthenticated ? (user?.name?.split(' ')[0] || 'You') : 'Location'}
-              </span>
-              <span className="font-bold text-white flex items-center gap-0.5 leading-tight">
-                {cityName} {pincode}
-                <KeyboardArrowDownIcon sx={{ fontSize: 15 }} className="text-white/80" />
-              </span>
-            </div>
-          </button>
-
-          {/* 3. FULL-WIDTH OMNIBAR SEARCH */}
-          <div ref={searchContainerRef} className="relative flex-1 max-w-2xl mx-2">
-            <form
-              onSubmit={handleSearchSubmit}
-              className="flex items-center h-10.5 rounded-xl border-2 border-white/40 focus-within:border-white bg-white/95 backdrop-blur-md overflow-hidden transition-all shadow-md"
-            >
-              {/* Category dropdown selector */}
-              <div className="hidden sm:flex items-center pl-3 pr-2 h-full bg-gray-100 text-xs font-semibold text-gray-700 border-r border-gray-200 shrink-0">
-                <select
-                  value={searchCategory}
-                  onChange={(e) => setSearchCategory(e.target.value)}
-                  className="bg-transparent border-none outline-none cursor-pointer pr-1"
-                >
-                  <option value="All">All Categories</option>
-                  <option value="Products">Products</option>
-                  <option value="Services">Services</option>
-                  <option value="BBPS">Bill Pay</option>
-                </select>
-              </div>
-
-              {/* Search input */}
-              <input
-                type="text"
-                value={searchQuery}
-                onFocus={() => setShowSuggestions(true)}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products, services, utilities, deals... (⌘K)"
-                className="w-full px-3 text-sm bg-transparent text-gray-900 placeholder-gray-400 outline-none font-medium"
-              />
-
-              {/* Search action button */}
-              <button
-                type="submit"
-                className="h-full px-4 text-white flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 shrink-0 bg-gradient-to-r from-[#A654CD] to-[#8E3DB5]"
+            {/* 2. OMNIBAR SEARCH BAR */}
+            <div ref={searchContainerRef} className="relative flex-1 max-w-2xl mx-1 sm:mx-4">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex items-center h-10.5 rounded-xl border border-white/20 focus-within:border-purple-400 bg-white/95 backdrop-blur-md overflow-hidden transition-all shadow-inner focus-within:bg-white"
               >
-                <SearchIcon sx={{ fontSize: 19 }} />
-              </button>
-            </form>
-
-            {/* SUGGESTIONS FLYOUT */}
-            {showSuggestions && searchQuery.trim().length >= 2 && (
-              <div className="absolute left-0 right-0 top-12 bg-white text-gray-900 rounded-xl shadow-2xl border border-gray-200 z-50 overflow-hidden max-h-96 overflow-y-auto">
-                {isSearching ? (
-                  <div className="p-4 text-center text-xs text-gray-400">Searching catalog...</div>
-                ) : suggestions.products.length === 0 && suggestions.services.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-gray-500">
-                    No instant matches found for "{searchQuery}". Press Enter to see all results.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100 p-2">
-                    {/* Products matches */}
-                    <div className="p-2">
-                      <div className="text-[11px] font-bold uppercase text-gray-400 px-2 mb-2 flex items-center gap-1.5">
-                        <Inventory2OutlinedIcon sx={{ fontSize: 15 }} className="text-[#5F341A]" />
-                        Matching Products
-                      </div>
-                      <div className="space-y-1">
-                        {suggestions.products.slice(0, 5).map((prod) => (
-                          <Link
-                            key={prod.id}
-                            to={`/product/${prod.id}`}
-                            onClick={() => setShowSuggestions(false)}
-                            className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-                          >
-                            <img
-                              src={prod.image || '/placeholder.png'}
-                              alt=""
-                              className="w-8 h-8 rounded-md object-cover border border-gray-100 shrink-0"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold text-gray-900 truncate">{prod.title}</p>
-                              <span className="text-[10px] text-gray-500 font-medium">In Products</span>
-                            </div>
-                            <RPpriceBadge value={prod.price || 499} />
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Services matches */}
-                    <div className="p-2">
-                      <div className="text-[11px] font-bold uppercase text-gray-400 px-2 mb-2 flex items-center gap-1.5">
-                        <ShieldOutlinedIcon sx={{ fontSize: 15 }} className="text-[#4F6BFF]" />
-                        Matching Services & Bills
-                      </div>
-                      <div className="space-y-1">
-                        {suggestions.services.slice(0, 5).map((srv) => (
-                          <Link
-                            key={srv.id}
-                            to={`/services/${srv.id}`}
-                            onClick={() => setShowSuggestions(false)}
-                            className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-gray-900 truncate">{srv.title}</p>
-                              <span className="text-[10px] text-gray-500">Service & Consultations</span>
-                            </div>
-                            <ArrowForwardIcon sx={{ fontSize: 15 }} className="text-gray-400" />
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* 4. USER UTILITIES (COINS, NOTIFICATIONS, ACCOUNT, CART) */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* RP Coins Wallet Pill */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowCoinsTooltip(true)}
-              onMouseLeave={() => setShowCoinsTooltip(false)}
-            >
-              <Link
-                to="/wallet"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/35 bg-white/20 backdrop-blur-md shadow-xs transition-transform hover:scale-105 cursor-pointer text-decoration-none hover:bg-white/30 text-white"
-              >
-                <MonetizationOnIcon sx={{ fontSize: 18 }} className="text-yellow-300" />
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-black text-white">
-                    {coinBalance.toLocaleString('en-IN')}
-                  </span>
-                  <span className="hidden xl:inline text-[11px] font-bold text-yellow-100">
-                    RP Coins
-                  </span>
+                {/* Category Dropdown */}
+                <div className="hidden sm:flex items-center pl-3 pr-2 h-full bg-purple-50/70 text-xs font-semibold text-slate-700 border-r border-purple-100 shrink-0">
+                  <select
+                    value={searchCategory}
+                    onChange={(e) => setSearchCategory(e.target.value)}
+                    className="bg-transparent border-none outline-none cursor-pointer pr-1 text-slate-700"
+                  >
+                    <option value="All" className="bg-white text-slate-900">All Categories</option>
+                    <option value="Products" className="bg-white text-slate-900">Products</option>
+                    <option value="Services" className="bg-white text-slate-900">Services</option>
+                    <option value="BBPS" className="bg-white text-slate-900">Bill Pay</option>
+                  </select>
                 </div>
+
+                {/* Search Input */}
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onFocus={() => setShowSuggestions(true)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products, services, utilities, deals..."
+                  className="w-full px-3 text-xs sm:text-sm bg-transparent text-slate-900 placeholder-slate-400 outline-none font-medium"
+                />
+
+                {/* Submit Search Button */}
+                <button
+                  type="submit"
+                  className="h-full px-4 text-white flex items-center justify-center cursor-pointer transition-opacity hover:opacity-90 shrink-0 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7]"
+                  aria-label="Search"
+                >
+                  <SearchIcon sx={{ fontSize: 19 }} />
+                </button>
+              </form>
+
+              {/* SEARCH SUGGESTIONS FLYOUT */}
+              {showSuggestions && searchQuery.trim().length >= 2 && (
+                <div className="absolute left-0 right-0 top-12 bg-white text-slate-900 rounded-xl shadow-2xl border border-purple-100 z-50 overflow-hidden max-h-96 overflow-y-auto">
+                  {isSearching ? (
+                    <div className="p-4 text-center text-xs text-slate-500">Searching catalog...</div>
+                  ) : suggestions.products.length === 0 && suggestions.services.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-500">
+                      No instant matches found for "{searchQuery}". Press Enter to see all results.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-purple-100 p-2">
+                      {/* Products matches */}
+                      <div className="p-2">
+                        <div className="text-[11px] font-bold uppercase text-purple-600 px-2 mb-2 flex items-center gap-1.5">
+                          <Inventory2OutlinedIcon sx={{ fontSize: 15 }} className="text-[#8b3ab5]" />
+                          Matching Products
+                        </div>
+                        <div className="space-y-1">
+                          {suggestions.products.slice(0, 5).map((prod) => (
+                            <Link
+                              key={prod.id}
+                              to={`/product/${prod.id}`}
+                              onClick={() => setShowSuggestions(false)}
+                              className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-purple-50/60 transition-colors"
+                            >
+                              <img
+                                src={prod.image || '/placeholder.png'}
+                                alt=""
+                                className="w-8 h-8 rounded-md object-cover border border-purple-100 shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold text-slate-900 truncate">{prod.title}</p>
+                                <span className="text-[10px] text-slate-500 font-medium">In Products</span>
+                              </div>
+                              <RPpriceBadge value={prod.price || 499} />
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Services matches */}
+                      <div className="p-2">
+                        <div className="text-[11px] font-bold uppercase text-purple-600 px-2 mb-2 flex items-center gap-1.5">
+                          <ShieldOutlinedIcon sx={{ fontSize: 15 }} className="text-[#8b3ab5]" />
+                          Matching Services & Bills
+                        </div>
+                        <div className="space-y-1">
+                          {suggestions.services.slice(0, 5).map((srv) => (
+                            <Link
+                              key={srv.id}
+                              to={`/services/${srv.id}`}
+                              onClick={() => setShowSuggestions(false)}
+                              className="flex items-center justify-between p-2 rounded-lg hover:bg-purple-50/60 transition-colors"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold text-slate-900 truncate">{srv.title}</p>
+                                <span className="text-[10px] text-slate-500">Service & Consultations</span>
+                              </div>
+                              <ArrowForwardIcon sx={{ fontSize: 15 }} className="text-slate-400" />
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* 3. PROFILE & CART UTILITIES (ONLY PROFILE + FIRST NAME AND CART ICON) */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Profile Link (Profile Icon + First Name) */}
+              {isAuthenticated ? (
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md transition-all cursor-pointer text-white text-decoration-none shrink-0 group shadow-xs hover:scale-103"
+                  title="My Profile"
+                >
+                  <PersonOutlinedIcon sx={{ fontSize: 20 }} className="text-purple-200 group-hover:scale-110 transition-transform" />
+                  <span className="font-bold text-xs sm:text-sm text-white tracking-tight">
+                    {firstName}
+                  </span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={openAuth}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md transition-all cursor-pointer text-white text-xs sm:text-sm font-bold shadow-xs hover:scale-103"
+                >
+                  <PersonOutlinedIcon sx={{ fontSize: 20 }} className="text-purple-200" />
+                  <span>Sign In</span>
+                </button>
+              )}
+
+              {/* Shopping / Services Cart Button (ONLY Cart Icon + Badge) */}
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    isServicePath
+                      ? '/services/cart'
+                      : totalQuantity > 0
+                      ? '/cart'
+                      : serviceCartCount > 0
+                      ? '/services/cart'
+                      : '/cart'
+                  )
+                }
+                className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md text-white transition-all cursor-pointer flex items-center justify-center shrink-0 shadow-xs hover:scale-105"
+                title={isServicePath ? 'Services Cart' : 'Shopping Cart'}
+                aria-label={isServicePath ? 'Services Cart' : 'Shopping Cart'}
+              >
+                <ShoppingCartOutlinedIcon sx={{ fontSize: 22 }} className="text-white" />
+                {cartBadgeCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#fc3f78] to-[#8b3ab5] text-white font-black text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
+                    {cartBadgeCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* ROW 2: AVAILABLE SERVICES CHIPS (PRODUCTS, SERVICES, PAYMENTS) + LOCATION */}
+        {/* GLOSSY CUSTOM THEME: #180d26 matching Header Top Bar                      */}
+        {/* ========================================================================= */}
+        <div className="w-full bg-[#180d26] text-white relative overflow-hidden border-b border-white/10 py-1.5 shadow-xs">
+          {/* Subtle radial ambient glows */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_50%,rgba(168,85,247,0.22),transparent_45%),radial-gradient(circle_at_82%_50%,rgba(252,63,120,0.18),transparent_45%)]" />
+
+          {/* Subtle micro-grid overlay */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:36px_36px]" />
+
+          {/* Glossy top reflection sheen */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/15" />
+
+          <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 flex items-center justify-between gap-3 text-xs overflow-x-auto no-scrollbar relative z-10">
+            {/* Left: Services Chips (Products, Services, Payments) */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 py-0.5">
+              {/* Products Chip */}
+              <Link
+                to="/store"
+                className={`inline-flex items-center justify-center gap-2 px-5 sm:px-6 h-9 sm:h-9.5 rounded-xl text-xs sm:text-[13px] font-bold text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 shrink-0 backdrop-blur-md shadow-xs ${
+                  routerLocation.pathname.startsWith('/store') || routerLocation.pathname.startsWith('/product')
+                    ? 'border border-[#a855f7] bg-[#8b3ab5]/35 text-white shadow-[0_0_12px_rgba(139,58,181,0.4)]'
+                    : 'bg-white/10 hover:bg-white/20 border border-white/15 hover:border-purple-300/40 text-purple-50'
+                }`}
+              >
+                <ShoppingBagOutlinedIcon sx={{ fontSize: 17 }} className="text-[#d8b4fe]" />
+                <span>Products</span>
               </Link>
 
-              {/* Coins Flyout Tooltip */}
-              {showCoinsTooltip && (
-                <div className="absolute right-0 top-10 w-64 bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200 p-3 z-50 text-xs animate-fade-in">
-                  <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                    <span className="font-bold text-gray-700">Rewards Balance</span>
-                    <span className="font-extrabold text-[#A654CD]">{coinBalance} Coins</span>
-                  </div>
-                  <p className="text-[11px] text-gray-500 my-2">
-                    Worth <strong className="text-emerald-700">₹{coinBalance}</strong> against purchases, service bookings, and utility bill discounts.
-                  </p>
+              {/* Services Chip */}
+              <Link
+                to="/services"
+                className={`inline-flex items-center justify-center gap-2 px-5 sm:px-6 h-9 sm:h-9.5 rounded-xl text-xs sm:text-[13px] font-bold text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 shrink-0 backdrop-blur-md shadow-xs ${
+                  routerLocation.pathname.startsWith('/services')
+                    ? 'border border-sky-400 bg-sky-500/30 text-white shadow-[0_0_12px_rgba(56,189,248,0.4)]'
+                    : 'bg-white/10 hover:bg-white/20 border border-white/15 hover:border-sky-300/40 text-sky-50'
+                }`}
+              >
+                <BuildOutlinedIcon sx={{ fontSize: 17 }} className="text-sky-300" />
+                <span>Services</span>
+              </Link>
+
+              {/* Payments Chip */}
+              <Link
+                to="/bbps"
+                className={`inline-flex items-center justify-center gap-2 px-5 sm:px-6 h-9 sm:h-9.5 rounded-xl text-xs sm:text-[13px] font-bold text-white transition-all transform hover:-translate-y-0.5 active:translate-y-0 shrink-0 backdrop-blur-md shadow-xs ${
+                  routerLocation.pathname.startsWith('/bbps')
+                    ? 'border border-amber-400 bg-amber-500/30 text-white shadow-[0_0_12px_rgba(251,191,36,0.4)]'
+                    : 'bg-white/10 hover:bg-white/20 border border-white/15 hover:border-amber-300/40 text-amber-50'
+                }`}
+              >
+                <BoltOutlinedIcon sx={{ fontSize: 17 }} className="text-amber-300" />
+                <span>Payments</span>
+              </Link>
+            </div>
+
+            {/* Right: Location & RP Coins (Positioned at the end of Row 2) */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 py-0.5">
+              {/* Location Selector Chip */}
+              <button
+                type="button"
+                onClick={openLocationModal}
+                className="inline-flex items-center gap-1.5 px-3.5 h-9 sm:h-9.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md shadow-xs transition-all cursor-pointer shrink-0 hover:scale-102"
+              >
+                <LocationOnOutlinedIcon sx={{ fontSize: 16 }} className="text-[#fc3f78] shrink-0" />
+                <span className="text-[11px] font-medium text-purple-200/90 hidden sm:inline">
+                  Deliver to {isAuthenticated ? (user?.name?.split(' ')[0] || 'You') : 'Location'}:
+                </span>
+                <span className="text-[11px] font-bold text-white flex items-center gap-0.5">
+                  {cityName} {pincode}
+                  <KeyboardArrowDownIcon sx={{ fontSize: 14 }} className="text-purple-200/70" />
+                </span>
+              </button>
+
+              {/* RP Coins Wallet Chip */}
+              {isAuthenticated && (
+                <div
+                  className="relative shrink-0 hidden md:block"
+                  onMouseEnter={() => setShowCoinsTooltip(true)}
+                  onMouseLeave={() => setShowCoinsTooltip(false)}
+                >
                   <Link
                     to="/wallet"
-                    className="block text-center w-full py-1.5 rounded-md font-bold text-white text-xs bg-gradient-to-r from-[#FC8BAD] to-[#A654CD]"
+                    className="inline-flex items-center gap-1.5 px-3.5 h-9 sm:h-9.5 rounded-xl bg-white/10 hover:bg-white/20 border border-amber-400/35 text-amber-300 transition-all text-xs font-bold cursor-pointer text-decoration-none shadow-xs backdrop-blur-md hover:scale-102"
                   >
-                    View Coin Statement
+                    <MonetizationOnIcon sx={{ fontSize: 16 }} className="text-amber-400" />
+                    <span>{coinBalance.toLocaleString('en-IN')} RP Coins</span>
                   </Link>
+
+                  {/* Coins Flyout Tooltip */}
+                  {showCoinsTooltip && (
+                    <div className="absolute right-0 top-11 w-64 bg-[#1e1030] text-white rounded-xl shadow-2xl border border-white/15 p-3 z-50 text-xs animate-fade-in backdrop-blur-xl">
+                      <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                        <span className="font-bold text-purple-100">Rewards Balance</span>
+                        <span className="font-extrabold text-amber-300">{coinBalance} Coins</span>
+                      </div>
+                      <p className="text-[11px] text-purple-200/80 my-2">
+                        Worth <strong className="text-emerald-400">₹{coinBalance}</strong> against purchases, service bookings, and utility bill discounts.
+                      </p>
+                      <Link
+                        to="/wallet"
+                        className="block text-center w-full py-1.5 rounded-lg font-bold text-white text-xs bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-90 transition-opacity shadow-xs"
+                      >
+                        View Coin Statement
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-
-            {/* Notifications */}
-            <Link
-              to="/notifications"
-              className="relative p-2 rounded-xl text-white hover:bg-white/15 transition-colors"
-              title="Notifications"
-            >
-              <NotificationsOutlinedIcon sx={{ fontSize: 22 }} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-yellow-300 ring-2 ring-white/30" />
-            </Link>
-
-            {/* User Account Link - Navigates directly to /profile without popup */}
-            {isAuthenticated ? (
-              <Link
-                to="/profile"
-                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/20 border border-white/20 backdrop-blur-xs transition-all cursor-pointer text-white text-decoration-none group"
-                title="View My Profile"
-              >
-                <div className="w-8 h-8 rounded-full bg-white text-[#A654CD] flex items-center justify-center text-xs font-black shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                  {userName.charAt(0).toUpperCase()}
-                </div>
-                <div className="hidden lg:flex flex-col text-left text-xs">
-                  <span className="text-[10px] text-white/80 font-medium leading-none">Hello,</span>
-                  <span className="font-bold text-white line-clamp-1 max-w-[110px] leading-tight mt-0.5">
-                    {userName}
-                  </span>
-                </div>
-              </Link>
-            ) : null}
-
-            {/* Shopping Cart Button */}
-            <button
-              type="button"
-              onClick={() => navigate('/cart')}
-              className="relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 border border-white/35 backdrop-blur-md text-white font-bold text-xs shadow-xs transition-all cursor-pointer hover:scale-103"
-            >
-              <ShoppingCartOutlinedIcon sx={{ fontSize: 19 }} />
-              <span className="hidden sm:inline">Cart</span>
-              {totalQuantity > 0 && (
-                <span className="bg-amber-400 text-amber-950 font-extrabold text-[11px] px-1.5 py-0.2 rounded-full min-w-[18px] text-center shadow-xs">
-                  {totalQuantity}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </header>

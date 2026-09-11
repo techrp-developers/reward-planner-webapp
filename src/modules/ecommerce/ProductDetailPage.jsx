@@ -122,7 +122,7 @@ export const ProductDetailPage = () => {
   if (loading) {
     return (
       <div className="w-full max-w-[1400px] mx-auto px-4 py-12 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7C3AED]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8b3ab5]" />
       </div>
     );
   }
@@ -134,7 +134,7 @@ export const ProductDetailPage = () => {
         <p className="text-xs text-gray-500">The product you are looking for might have been moved or is currently unavailable in the catalog.</p>
         <button
           onClick={() => navigate('/store')}
-          className="px-6 py-2.5 bg-[#7C3AED] text-white text-xs font-bold rounded-xl hover:bg-[#6D28D9] transition-colors cursor-pointer"
+          className="px-6 py-2.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-all cursor-pointer shadow-sm"
         >
           Browse Corporate Store
         </button>
@@ -167,11 +167,11 @@ export const ProductDetailPage = () => {
     <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6">
       {/* BREADCRUMBS */}
       <nav className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
-        <span onClick={() => navigate('/')} className="hover:text-[#7C3AED] cursor-pointer">
+        <span onClick={() => navigate('/')} className="hover:text-[#8b3ab5] cursor-pointer">
           Home
         </span>
         <span>/</span>
-        <span onClick={() => navigate('/store')} className="hover:text-[#7C3AED] cursor-pointer">
+        <span onClick={() => navigate('/store')} className="hover:text-[#8b3ab5] cursor-pointer">
           Store
         </span>
         {product.category && (
@@ -179,7 +179,7 @@ export const ProductDetailPage = () => {
             <span>/</span>
             <span
               onClick={() => navigate(`/store?category=${product.category_id || ''}`)}
-              className="hover:text-[#7C3AED] cursor-pointer"
+              className="hover:text-[#8b3ab5] cursor-pointer"
             >
               {product.category}
             </span>
@@ -190,7 +190,7 @@ export const ProductDetailPage = () => {
             <span>/</span>
             <span
               onClick={() => navigate(`/store?category=${product.category_id || ''}&sub=${product.subcategory_id || ''}`)}
-              className="hover:text-[#7C3AED] cursor-pointer"
+              className="hover:text-[#8b3ab5] cursor-pointer"
             >
               {product.subcategory}
             </span>
@@ -238,7 +238,7 @@ export const ProductDetailPage = () => {
                   key={idx}
                   onClick={() => setSelectedImage(img)}
                   className={`w-18 h-18 rounded-xl overflow-hidden border-2 bg-gray-50 p-1 shrink-0 transition-all cursor-pointer ${
-                    selectedImage === img ? 'border-[#7C3AED] shadow-sm' : 'border-gray-200 hover:border-gray-300'
+                    selectedImage === img ? 'border-[#8b3ab5] shadow-sm' : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <img src={getImageUrl(img)} alt="" className="w-full h-full object-contain" />
@@ -253,7 +253,7 @@ export const ProductDetailPage = () => {
           {/* Header & Title */}
           <div className="space-y-2 border-b border-gray-100 pb-5">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#7C3AED]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#8b3ab5]">
                 {product.brand || 'Corporate Store'}
               </span>
               {product.category && (
@@ -296,7 +296,7 @@ export const ProductDetailPage = () => {
                       }}
                       className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         isSel
-                          ? 'border-[#7C3AED] bg-violet-50 text-[#7C3AED] shadow-2xs'
+                          ? 'border-[#8b3ab5] bg-purple-50 text-[#8b3ab5] shadow-2xs'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                       }`}
                     >
@@ -388,7 +388,7 @@ export const ProductDetailPage = () => {
             <button
               onClick={handleAddToCart}
               type="button"
-              className="flex-1 py-3.5 rounded-lg border-2 border-[#7C3AED] text-[#7C3AED] font-bold text-sm hover:bg-violet-50 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              className="flex-1 py-3.5 rounded-lg border-2 border-[#8b3ab5] text-[#8b3ab5] font-bold text-sm hover:bg-purple-50 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
               <ShoppingCart size={18} />
               <span>Add to Cart</span>

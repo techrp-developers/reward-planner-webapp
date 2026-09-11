@@ -1,0 +1,60 @@
+<svg viewBox="0 0 200 200" width="200" height="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-prod" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5EEFD"/>
+      <stop offset="50%" stop-color="#EFE4FC"/>
+      <stop offset="100%" stop-color="#E4D2F9"/>
+    </linearGradient>
+    <linearGradient id="box-grad" x1="60" y1="90" x2="140" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#9333EA"/>
+      <stop offset="100%" stop-color="#7928CA"/>
+    </linearGradient>
+    <linearGradient id="lid-grad" x1="55" y1="75" x2="145" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#8B3AB5"/>
+    </linearGradient>
+    <linearGradient id="ribbon-grad" x1="90" y1="75" x2="110" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="card-shadow" x="40" y="150" width="120" height="30" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="obj-glow" x="40" y="60" width="120" height="120" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#7928CA" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Card Background with gentle rounded corners matching container -->
+  <rect width="200" height="200" rx="24" fill="url(#bg-prod)"/>
+  
+  <!-- Subtle ambient glow circle -->
+  <circle cx="100" cy="118" r="52" fill="#D8B4FE" opacity="0.35"/>
+
+  <!-- Floor Shadow -->
+  <ellipse cx="100" cy="165" rx="46" ry="10" fill="#6B21A8" opacity="0.22" filter="url(#card-shadow)"/>
+
+  <!-- Main Simple Graphic: Sleek Gift Box -->
+  <g filter="url(#obj-glow)">
+    <!-- Box Body -->
+    <rect x="62" y="98" width="76" height="62" rx="10" fill="url(#box-grad)"/>
+    
+    <!-- Vertical Ribbon on Body -->
+    <rect x="93" y="98" width="14" height="62" fill="url(#ribbon-grad)"/>
+    
+    <!-- Horizontal Ribbon on Body -->
+    <rect x="62" y="122" width="76" height="14" fill="url(#ribbon-grad)"/>
+
+    <!-- Box Lid -->
+    <rect x="56" y="86" width="88" height="18" rx="6" fill="url(#lid-grad)"/>
+    <rect x="93" y="86" width="14" height="18" fill="url(#ribbon-grad)"/>
+
+    <!-- Bow on Top -->
+    <!-- Left Loop -->
+    <path d="M98 86 C92 72 75 70 76 80 C77 86 94 86 98 86 Z" fill="url(#ribbon-grad)"/>
+    <!-- Right Loop -->
+    <path d="M102 86 C108 72 125 70 124 80 C123 86 106 86 102 86 Z" fill="url(#ribbon-grad)"/>
+    <!-- Center Knot -->
+    <circle cx="100" cy="86" r="5" fill="#F59E0B"/>
+  </g>
+</svg>

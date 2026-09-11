@@ -1,6 +1,7 @@
 // src/components/home/HeroBannerCarousel.jsx
-// Professional Auto-Sliding Hero Banner Carousel (3-second auto-rotate, 50vh height, Senior UI/UX Design)
-// Exact gradients requested:
+// Professional Auto-Sliding Hero Banner Carousel (2-second auto-rotate, Senior UI/UX Design)
+// Floating badges are safely anchored to the showcase card (no edge clipping/cropping)
+// Exact gradients:
 // 1. #FFFFFF -> #A462FC (Purple)
 // 2. #FFFFFF -> #7BCF45 (Green)
 // 3. #FFFFFF -> #EA4988 (Pink)
@@ -25,7 +26,7 @@ import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
 import ElectricBoltOutlinedIcon from '@mui/icons-material/ElectricBoltOutlined';
 import DiamondOutlinedIcon from '@mui/icons-material/DiamondOutlined';
 
-const BANNER_SLIDES = [
+export const BANNER_SLIDES = [
   {
     id: 1,
     tag: 'Corporate Rewards Festival',
@@ -48,6 +49,22 @@ const BANNER_SLIDES = [
       type: 'tech',
       floatingCard1: { title: 'Apple MacBook Air M3', price: '₹99,900', coinTag: 'Save ₹15,000' },
       floatingCard2: { title: 'Sony WH-1000XM5', price: '₹24,990', coinTag: '50% Coins' },
+    },
+    floatingPills: {
+      pill1: {
+        icon: DiamondOutlinedIcon,
+        iconColor: '#7928CA',
+        iconBg: 'bg-purple-100 text-[#7928CA]',
+        label: 'Instant',
+        value: 'Cashback',
+      },
+      pill2: {
+        icon: VerifiedUserIcon,
+        iconColor: '#10B981',
+        iconBg: 'bg-emerald-100 text-emerald-700',
+        label: '100% Genuine',
+        value: 'Brand Direct',
+      },
     },
   },
   {
@@ -73,6 +90,22 @@ const BANNER_SLIDES = [
       floatingCard1: { title: 'Comprehensive 84-Test Package', price: '₹0 Co-Pay', coinTag: '100% Covered' },
       floatingCard2: { title: 'Cult.fit & Gym Pass', price: '₹1,299/mo', coinTag: 'Coins Discount' },
     },
+    floatingPills: {
+      pill1: {
+        icon: VerifiedUserIcon,
+        iconColor: '#059669',
+        iconBg: 'bg-emerald-100 text-emerald-700',
+        label: 'NABL Certified',
+        value: 'Free Checkup',
+      },
+      pill2: {
+        icon: BoltIcon,
+        iconColor: '#65A30D',
+        iconBg: 'bg-lime-100 text-lime-700',
+        label: 'Zero Co-Pay',
+        value: '100% Covered',
+      },
+    },
   },
   {
     id: 3,
@@ -96,6 +129,22 @@ const BANNER_SLIDES = [
       type: 'vouchers',
       floatingCard1: { title: 'Myntra Gift Card ₹2,000', price: '₹1,500 + 500 Coins', coinTag: 'Best Seller' },
       floatingCard2: { title: 'Starbucks Coffee Voucher', price: '₹500', coinTag: 'Instant 20% Off' },
+    },
+    floatingPills: {
+      pill1: {
+        icon: WhatshotIcon,
+        iconColor: '#BE185D',
+        iconBg: 'bg-pink-100 text-pink-700',
+        label: 'Instant',
+        value: 'Cashback',
+      },
+      pill2: {
+        icon: DiamondOutlinedIcon,
+        iconColor: '#DB2777',
+        iconBg: 'bg-rose-100 text-rose-700',
+        label: 'SMS Delivery',
+        value: 'Instant Code',
+      },
     },
   },
   {
@@ -121,6 +170,22 @@ const BANNER_SLIDES = [
       floatingCard1: { title: 'State Electricity Bill', price: '₹2,450', coinTag: 'Paid with Coins' },
       floatingCard2: { title: 'FASTag Instant Top-up', price: '₹1,000', coinTag: 'Zero Fee' },
     },
+    floatingPills: {
+      pill1: {
+        icon: DiamondOutlinedIcon,
+        iconColor: '#D97706',
+        iconBg: 'bg-amber-100 text-amber-700',
+        label: 'Instant',
+        value: 'Cashback',
+      },
+      pill2: {
+        icon: ElectricBoltOutlinedIcon,
+        iconColor: '#EA580C',
+        iconBg: 'bg-orange-100 text-orange-700',
+        label: '100%',
+        value: 'Paperless',
+      },
+    },
   },
 ];
 
@@ -131,13 +196,13 @@ export const HeroBannerCarousel = () => {
 
   const totalSlides = BANNER_SLIDES.length;
 
-  // Auto-slide every 3 seconds (3000ms)
+  // Auto-slide every 2 seconds (2000ms)
   useEffect(() => {
     if (isPaused) return;
 
     timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % totalSlides);
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(timerRef.current);
   }, [isPaused, totalSlides]);
@@ -151,14 +216,12 @@ export const HeroBannerCarousel = () => {
   };
 
   const currentSlide = BANNER_SLIDES[currentIndex];
-  const TagIcon = currentSlide.tagIcon;
-  const BadgeIconComponent = currentSlide.badgeIcon;
 
   return (
     <div
       className="relative w-full rounded-3xl overflow-hidden shadow-lg border border-white/60 transition-all select-none"
       style={{
-        height: 'clamp(380px, 50vh, 500px)',
+        height: 'clamp(400px, 50vh, 500px)',
       }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -166,7 +229,11 @@ export const HeroBannerCarousel = () => {
       {/* Dynamic Linear Gradient Background */}
       {BANNER_SLIDES.map((slide, idx) => {
         const isActive = idx === currentIndex;
+        const SlideTagIcon = slide.tagIcon;
         const SlideBadgeIcon = slide.badgeIcon;
+        const Pill1Icon = slide.floatingPills?.pill1?.icon || DiamondOutlinedIcon;
+        const Pill2Icon = slide.floatingPills?.pill2?.icon || ElectricBoltOutlinedIcon;
+
         return (
           <div
             key={slide.id}
@@ -187,8 +254,8 @@ export const HeroBannerCarousel = () => {
             />
             <div className="absolute top-4 right-1/3 w-64 h-64 rounded-full blur-2xl opacity-20 bg-white pointer-events-none" />
 
-            {/* Content Container (50vh responsive layout) */}
-            <div className="w-full h-full max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-14 flex items-center justify-between gap-8 relative z-20">
+            {/* Content Container (Comfortable horizontal clearance to prevent arrow overlap) */}
+            <div className="w-full h-full max-w-[1500px] mx-auto px-10 sm:px-16 lg:px-20 flex items-center justify-between gap-8 relative z-20">
               {/* LEFT COLUMN: Punchy Copy & CTAs */}
               <div className="flex-1 max-w-2xl py-6 flex flex-col justify-center space-y-4">
                 {/* Eyebrow Tag Pill */}
@@ -196,7 +263,7 @@ export const HeroBannerCarousel = () => {
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-2xs backdrop-blur-md ${slide.tagBg} ${slide.tagBorder}`}
                   >
-                    <TagIcon sx={{ fontSize: 15 }} />
+                    <SlideTagIcon sx={{ fontSize: 15 }} />
                     {slide.tag}
                   </span>
 
@@ -252,96 +319,113 @@ export const HeroBannerCarousel = () => {
               </div>
 
               {/* RIGHT COLUMN: Senior UI 3D Showcase & Glass Cards */}
-              <div className="hidden lg:flex flex-1 items-center justify-center relative max-w-md h-full py-6">
-                {/* Center Showcase Card */}
-                <div className="relative w-full max-w-sm bg-white/85 backdrop-blur-md rounded-3xl p-5 border border-white/90 shadow-2xl space-y-4 transform hover:scale-102 transition-transform duration-300">
-                  {/* Top Badge Ribbon */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-xs"
+              <div className="hidden lg:flex flex-1 items-center justify-center relative max-w-md h-full py-4">
+                {/* Floating Card & Badges Anchor Wrapper */}
+                <div className="relative w-full max-w-sm">
+                  {/* Center Showcase Card */}
+                  <div className="relative w-full bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-4.5 border border-white/95 shadow-xl space-y-2.5 transform hover:scale-[1.01] transition-transform duration-300">
+                    {/* Top Badge Ribbon */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className="w-9 h-9 rounded-2xl flex items-center justify-center text-white shadow-xs shrink-0"
+                          style={{ backgroundColor: slide.accentColor }}
+                        >
+                          <SlideBadgeIcon sx={{ fontSize: 20 }} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
+                            {slide.badgeText}
+                          </p>
+                          <p className="text-sm font-black text-gray-900 leading-tight">
+                            {slide.badgeDiscount}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full shrink-0">
+                        {slide.badgeSub}
+                      </span>
+                    </div>
+
+                    {/* Floating Glass Item 1 */}
+                    <div className="p-2.5 rounded-2xl bg-white/95 border border-gray-100 shadow-xs flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold text-gray-900 truncate">
+                          {slide.cardGraphic.floatingCard1.title}
+                        </p>
+                        <p className="text-xs font-extrabold text-gray-700 mt-0.5">
+                          {slide.cardGraphic.floatingCard1.price}
+                        </p>
+                      </div>
+                      <span
+                        className="text-[10px] font-black px-2.5 py-1 rounded-lg text-white shadow-2xs shrink-0"
                         style={{ backgroundColor: slide.accentColor }}
                       >
-                        <SlideBadgeIcon sx={{ fontSize: 22 }} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
-                          {slide.badgeText}
+                        {slide.cardGraphic.floatingCard1.coinTag}
+                      </span>
+                    </div>
+
+                    {/* Floating Glass Item 2 */}
+                    <div className="p-2.5 rounded-2xl bg-white/95 border border-gray-100 shadow-xs flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold text-gray-900 truncate">
+                          {slide.cardGraphic.floatingCard2.title}
                         </p>
-                        <p className="text-sm font-black text-gray-900 leading-tight">
-                          {slide.badgeDiscount}
+                        <p className="text-xs font-extrabold text-gray-700 mt-0.5">
+                          {slide.cardGraphic.floatingCard2.price}
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 shrink-0">
+                        {slide.cardGraphic.floatingCard2.coinTag}
+                      </span>
+                    </div>
+
+                    {/* Bottom Verification Footer (Clean & 100% Unobscured) */}
+                    <div className="pt-2 flex items-center justify-between text-[10px] font-bold text-gray-500 border-t border-gray-100">
+                      <span className="flex items-center gap-1">
+                        <VerifiedUserIcon sx={{ fontSize: 14 }} className="text-emerald-600" /> Corporate Verified
+                      </span>
+                      <span className="text-gray-400">Reward Planners Network</span>
+                    </div>
+                  </div>
+
+                  {/* Floating Decorative Pill 1: Floats above the top-right of the card (0% card overlap) */}
+                  {slide.floatingPills?.pill1 && (
+                    <div className="absolute bottom-[calc(100%+8px)] right-2 z-20 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-lg border border-white/90 flex items-center gap-2 banner-float-top pointer-events-none">
+                      <div
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${slide.floatingPills.pill1.iconBg}`}
+                      >
+                        <Pill1Icon sx={{ fontSize: 15 }} />
+                      </div>
+                      <div className="text-left shrink-0">
+                        <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider leading-tight whitespace-nowrap">
+                          {slide.floatingPills.pill1.label}
+                        </p>
+                        <p className="text-xs font-black text-gray-900 leading-tight mt-0.5 whitespace-nowrap">
+                          {slide.floatingPills.pill1.value}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      {slide.badgeSub}
-                    </span>
-                  </div>
+                  )}
 
-                  {/* Floating Glass Item 1 */}
-                  <div className="p-3 rounded-2xl bg-white/90 border border-gray-100 shadow-sm flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-gray-900 truncate">
-                        {slide.cardGraphic.floatingCard1.title}
-                      </p>
-                      <p className="text-xs font-extrabold text-gray-700 mt-0.5">
-                        {slide.cardGraphic.floatingCard1.price}
-                      </p>
+                  {/* Floating Decorative Pill 2: Floats below the bottom-left of the card (0% card overlap, zero obstruction of Corporate Verified) */}
+                  {slide.floatingPills?.pill2 && (
+                    <div className="absolute top-[calc(100%+8px)] left-2 z-20 bg-white/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-lg border border-white/90 flex items-center gap-2 banner-float-bottom pointer-events-none">
+                      <div
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${slide.floatingPills.pill2.iconBg}`}
+                      >
+                        <Pill2Icon sx={{ fontSize: 15 }} />
+                      </div>
+                      <div className="text-left shrink-0">
+                        <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider leading-tight whitespace-nowrap">
+                          {slide.floatingPills.pill2.label}
+                        </p>
+                        <p className="text-xs font-black text-gray-900 leading-tight mt-0.5 whitespace-nowrap">
+                          {slide.floatingPills.pill2.value}
+                        </p>
+                      </div>
                     </div>
-                    <span
-                      className="text-[10px] font-black px-2.5 py-1 rounded-lg text-white shadow-2xs shrink-0"
-                      style={{ backgroundColor: slide.accentColor }}
-                    >
-                      {slide.cardGraphic.floatingCard1.coinTag}
-                    </span>
-                  </div>
-
-                  {/* Floating Glass Item 2 */}
-                  <div className="p-3 rounded-2xl bg-white/90 border border-gray-100 shadow-sm flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-gray-900 truncate">
-                        {slide.cardGraphic.floatingCard2.title}
-                      </p>
-                      <p className="text-xs font-extrabold text-gray-700 mt-0.5">
-                        {slide.cardGraphic.floatingCard2.price}
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 shrink-0">
-                      {slide.cardGraphic.floatingCard2.coinTag}
-                    </span>
-                  </div>
-
-                  {/* Bottom Verification Footer */}
-                  <div className="pt-1 flex items-center justify-between text-[10px] font-bold text-gray-500 border-t border-gray-100/80">
-                    <span className="flex items-center gap-1">
-                      <VerifiedUserIcon sx={{ fontSize: 14 }} className="text-emerald-600" /> Corporate Verified
-                    </span>
-                    <span className="text-gray-400">Reward Planners Network</span>
-                  </div>
-                </div>
-
-                {/* Floating Decorative Pill 1 */}
-                <div
-                  className="absolute -top-1 -right-2 bg-white/95 rounded-2xl px-3.5 py-2 shadow-xl border border-white/80 flex items-center gap-2 animate-bounce"
-                  style={{ animationDuration: '3.5s' }}
-                >
-                  <DiamondOutlinedIcon sx={{ fontSize: 18, color: '#A462FC' }} />
-                  <div className="text-left">
-                    <p className="text-[9px] font-bold text-gray-400 uppercase leading-none">Instant</p>
-                    <p className="text-xs font-black text-gray-900 leading-none mt-0.5">Cashback</p>
-                  </div>
-                </div>
-
-                {/* Floating Decorative Pill 2 */}
-                <div
-                  className="absolute -bottom-2 -left-4 bg-white/95 rounded-2xl px-3.5 py-2 shadow-xl border border-white/80 flex items-center gap-2 animate-bounce"
-                  style={{ animationDuration: '4.2s' }}
-                >
-                  <ElectricBoltOutlinedIcon sx={{ fontSize: 18, color: '#F8A926' }} />
-                  <div className="text-left">
-                    <p className="text-[9px] font-bold text-gray-400 uppercase leading-none">100%</p>
-                    <p className="text-xs font-black text-gray-900 leading-none mt-0.5">Paperless</p>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -349,11 +433,11 @@ export const HeroBannerCarousel = () => {
         );
       })}
 
-      {/* Manual Left/Right Navigation Arrows (Frosted Glass) */}
+      {/* Manual Left/Right Navigation Arrows (Positioned safely outside content text area) */}
       <button
         type="button"
         onClick={handlePrev}
-        className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-gray-800 shadow-md border border-white/80 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+        className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
         aria-label="Previous Slide"
       >
         <ChevronLeftIcon sx={{ fontSize: 22 }} />
@@ -362,7 +446,7 @@ export const HeroBannerCarousel = () => {
       <button
         type="button"
         onClick={handleNext}
-        className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-gray-800 shadow-md border border-white/80 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+        className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
         aria-label="Next Slide"
       >
         <ChevronRightIcon sx={{ fontSize: 22 }} />
@@ -398,7 +482,7 @@ export const HeroBannerCarousel = () => {
         })}
       </div>
 
-      {/* CSS Keyframe Animation for Progress Bar */}
+      {/* CSS Keyframe Animations for Progress & Subtle Float */}
       <style>{`
         @keyframes progressTimer {
           from {
@@ -407,6 +491,32 @@ export const HeroBannerCarousel = () => {
           to {
             width: 100%;
           }
+        }
+
+        @keyframes bannerFloatTop {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-5px);
+          }
+        }
+
+        @keyframes bannerFloatBottom {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(5px);
+          }
+        }
+
+        .banner-float-top {
+          animation: bannerFloatTop 3.2s ease-in-out infinite;
+        }
+
+        .banner-float-bottom {
+          animation: bannerFloatBottom 3.8s ease-in-out infinite;
         }
       `}</style>
     </div>

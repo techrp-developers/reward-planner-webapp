@@ -396,7 +396,7 @@ export const CheckoutPage = () => {
           email: user?.email || '',
           contact: user?.phone || '',
         },
-        theme: { color: '#7C3AED' },
+        theme: { color: '#8b3ab5' },
         handler: async (response) => {
           try {
             const verifyRes = await verifyRazorpayPayment({
@@ -463,7 +463,7 @@ export const CheckoutPage = () => {
   if (mode === 'cart' && cartItems.length === 0) {
     return (
       <div className="w-full max-w-[1400px] mx-auto px-4 py-20 text-center space-y-4">
-        <div className="w-20 h-20 mx-auto rounded-3xl bg-violet-50 text-[#7C3AED] flex items-center justify-center border border-violet-100 shadow-xs">
+        <div className="w-20 h-20 mx-auto rounded-3xl bg-purple-50 text-[#8b3ab5] flex items-center justify-center border border-purple-100 shadow-xs">
           <ShoppingBagOutlinedIcon sx={{ fontSize: 36 }} />
         </div>
         <h2 className="text-2xl font-black text-gray-900">Your Cart is Empty</h2>
@@ -472,7 +472,7 @@ export const CheckoutPage = () => {
         </p>
         <button
           onClick={() => navigate('/store')}
-          className="px-6 py-3 bg-[#7C3AED] text-white text-xs font-bold rounded-xl hover:bg-[#6D28D9] transition-colors shadow-md cursor-pointer inline-flex items-center gap-2"
+          className="px-6 py-3 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-opacity shadow-md cursor-pointer inline-flex items-center gap-2"
         >
           <span>Explore Products Catalog</span>
           <ArrowForwardIcon sx={{ fontSize: 16 }} />
@@ -565,7 +565,7 @@ export const CheckoutPage = () => {
                     setShowNewAddressForm(false);
                     setEditingAddress(null);
                   }}
-                  className="w-fit px-4 py-1.5 rounded-xl border border-[#A654CD]/40 text-[#A654CD] hover:bg-purple-50 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer self-end sm:self-center shrink-0"
+                  className="w-fit px-4 py-1.5 rounded-xl border border-[#8b3ab5]/40 text-[#8b3ab5] hover:bg-purple-50 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer self-end sm:self-center shrink-0"
                 >
                   Change
                 </button>
@@ -575,7 +575,7 @@ export const CheckoutPage = () => {
             <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD] text-white flex items-center justify-center text-xs font-black">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white flex items-center justify-center text-xs font-black">
                     1
                   </div>
                   <h3 className="font-black text-base text-gray-900">Delivery Address</h3>
@@ -588,7 +588,7 @@ export const CheckoutPage = () => {
                       setShowNewAddressForm(true);
                       setEditingAddress(null);
                     }}
-                    className="text-xs font-bold text-[#A654CD] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-[#8b3ab5] hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <AddIcon sx={{ fontSize: 16 }} />
                     <span>Add New Address</span>
@@ -622,7 +622,7 @@ export const CheckoutPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowNewAddressForm(true)}
-                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD] text-white text-xs font-bold shadow-md cursor-pointer inline-flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold shadow-md cursor-pointer inline-flex items-center gap-1.5"
                     >
                       <AddIcon sx={{ fontSize: 16 }} />
                       <span>Add Address Now</span>
@@ -660,7 +660,7 @@ export const CheckoutPage = () => {
           {/* STEP 2: PAYMENT METHOD */}
           <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
             <div className="flex items-center gap-2.5 border-b border-gray-100 pb-3">
-              <div className="w-6 h-6 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-xs font-black">
+              <div className="w-6 h-6 rounded-full bg-[#8b3ab5] text-white flex items-center justify-center text-xs font-black">
                 2
               </div>
               <h3 className="font-black text-base text-gray-900">Payment Option</h3>
@@ -670,7 +670,7 @@ export const CheckoutPage = () => {
               <label
                 className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                   paymentMethod === 'razorpay'
-                    ? 'border-[#7C3AED] bg-violet-50/40 ring-2 ring-[#7C3AED]/20 shadow-2xs'
+                    ? 'border-[#8b3ab5] bg-purple-50/40 ring-2 ring-[#8b3ab5]/20 shadow-2xs'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -681,7 +681,7 @@ export const CheckoutPage = () => {
                     value="razorpay"
                     checked={paymentMethod === 'razorpay'}
                     onChange={() => setPaymentMethod('razorpay')}
-                    className="accent-[#7C3AED]"
+                    className="accent-[#8b3ab5]"
                   />
                   <div>
                     <span className="font-bold text-xs text-gray-900 block">
@@ -692,13 +692,13 @@ export const CheckoutPage = () => {
                     </p>
                   </div>
                 </div>
-                <CreditCardOutlinedIcon sx={{ fontSize: 22 }} className="text-[#7C3AED]" />
+                <CreditCardOutlinedIcon sx={{ fontSize: 22 }} className="text-[#8b3ab5]" />
               </label>
 
               <label
                 className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                   paymentMethod === 'wallet'
-                    ? 'border-[#7C3AED] bg-violet-50/40 ring-2 ring-[#7C3AED]/20 shadow-2xs'
+                    ? 'border-[#8b3ab5] bg-purple-50/40 ring-2 ring-[#8b3ab5]/20 shadow-2xs'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -709,7 +709,7 @@ export const CheckoutPage = () => {
                     value="wallet"
                     checked={paymentMethod === 'wallet'}
                     onChange={() => setPaymentMethod('wallet')}
-                    className="accent-[#7C3AED]"
+                    className="accent-[#8b3ab5]"
                   />
                   <div>
                     <span className="font-bold text-xs text-gray-900 block">
@@ -720,7 +720,7 @@ export const CheckoutPage = () => {
                     </p>
                   </div>
                 </div>
-                <ApartmentOutlinedIcon sx={{ fontSize: 22 }} className="text-gray-400" />
+                <AccountBalanceWalletOutlinedIcon sx={{ fontSize: 22 }} className="text-[#8b3ab5]" />
               </label>
             </div>
           </section>
@@ -732,7 +732,7 @@ export const CheckoutPage = () => {
             <h3 className="font-black text-base text-gray-900 border-b border-gray-100 pb-3 flex items-center justify-between">
               <span>Order Summary</span>
               {previewLoading ? (
-                <CircularProgress size={16} sx={{ color: '#7C3AED' }} />
+                <CircularProgress size={16} sx={{ color: '#8b3ab5' }} />
               ) : (
                 <span className="text-xs font-semibold text-gray-500">
                   {displayItems.length} {displayItems.length === 1 ? 'Item' : 'Items'}
@@ -779,7 +779,7 @@ export const CheckoutPage = () => {
                   type="checkbox"
                   checked={useRewards}
                   onChange={(e) => setUseRewards(e.target.checked)}
-                  className="mt-0.5 accent-[#7C3AED] h-4 w-4 rounded cursor-pointer"
+                  className="mt-0.5 accent-[#8b3ab5] h-4 w-4 rounded cursor-pointer"
                 />
                 <div className="flex-1 min-w-0">
                   <span className="font-black text-gray-900 flex items-center gap-1">
@@ -822,7 +822,7 @@ export const CheckoutPage = () => {
               )}
               <div className="flex justify-between text-base font-black text-gray-900 pt-3 border-t border-gray-200">
                 <span>Total Amount Payable</span>
-                <span className="text-xl text-[#7C3AED]">₹{finalPayable.toLocaleString('en-IN')}</span>
+                <span className="text-xl text-[#8b3ab5]">₹{finalPayable.toLocaleString('en-IN')}</span>
               </div>
             </div>
 

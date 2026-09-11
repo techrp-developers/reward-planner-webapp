@@ -27,9 +27,9 @@ const FINANCIAL_SERVICES = [
     actionLabel: 'Schedule Advisory',
     route: '/services/mutual-funds',
     icon: AccountBalanceOutlinedIcon,
-    accentBg: 'from-violet-500/15 to-indigo-500/10 text-[#7C3AED]',
-    borderColor: 'border-violet-200/80',
-    buttonColor: 'bg-[#7C3AED] hover:bg-[#6D28D9] text-white',
+    accentBg: 'from-purple-500/15 to-indigo-500/10 text-[#8b3ab5]',
+    borderColor: 'border-purple-200/80',
+    buttonColor: 'bg-[#8b3ab5] hover:bg-[#7a329f] text-white',
   },
   {
     id: 'portfolio',
@@ -39,9 +39,9 @@ const FINANCIAL_SERVICES = [
     actionLabel: 'Analyze Portfolio',
     route: '/services/mutual-funds',
     icon: AssessmentOutlinedIcon,
-    accentBg: 'from-pink-500/15 to-rose-500/10 text-pink-600',
-    borderColor: 'border-pink-200/80',
-    buttonColor: 'bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] text-white hover:opacity-95',
+    accentBg: 'from-purple-500/15 to-pink-500/10 text-[#8b3ab5]',
+    borderColor: 'border-purple-200/80',
+    buttonColor: 'bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white hover:opacity-95',
   },
 ];
 

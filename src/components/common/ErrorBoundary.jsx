@@ -1,6 +1,6 @@
 // src/components/common/ErrorBoundary.jsx
 import React from 'react';
-import rpLogo from '../../assets/rp_logo.svg';
+import rpLogo from '../../assets/rplogo_nobg.svg';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -33,10 +33,10 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-r from-[#FC8BAD] via-[#c86bc1] to-[#A654CD] p-4 font-['Poppins',sans-serif]">
+        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] p-4 font-['Poppins',sans-serif]">
           <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/60 text-center space-y-5 animate-fadeIn">
             <div className="flex justify-center">
-              <div className="p-3 rounded-2xl bg-[#FC8BAD]/15 border border-[#FC8BAD]/30">
+              <div className="p-3 rounded-2xl bg-[#8b3ab5]/10 border border-[#8b3ab5]/25">
                 <img src={rpLogo} alt="Reward Planners" className="h-10 w-auto object-contain" />
               </div>
             </div>
@@ -54,7 +54,7 @@ export class ErrorBoundary extends React.Component {
               <button
                 type="button"
                 onClick={this.handleReload}
-                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-[#FC8BAD] via-[#c86bc1] to-[#A654CD] hover:opacity-95 shadow-md cursor-pointer transition-all"
+                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md cursor-pointer transition-all"
               >
                 Reload Application
               </button>

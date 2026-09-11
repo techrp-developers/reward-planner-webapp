@@ -1001,7 +1001,7 @@ export const ProfilePage = () => {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-[#FC8BAD] via-[#c86bc1] to-[#A654CD] text-white font-bold text-xs shadow-md hover:opacity-95 cursor-pointer flex items-center gap-1.5"
+                  className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white font-bold text-xs shadow-md hover:opacity-95 cursor-pointer flex items-center gap-1.5"
                 >
                   {passwordLoading ? (
                     <CircularProgress size={14} sx={{ color: '#fff' }} />
@@ -1068,7 +1068,7 @@ export const ProfilePage = () => {
                 <button
                   type="button"
                   onClick={() => setShowNewAddressForm(true)}
-                  className="w-full py-3 px-4 rounded-xl border-2 border-dashed border-[#EA4988]/40 hover:border-[#EA4988] bg-pink-50/40 hover:bg-pink-50 text-[#EA4988] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+                  className="w-full py-3 px-4 rounded-xl border-2 border-dashed border-[#8b3ab5]/40 hover:border-[#8b3ab5] bg-purple-50/40 hover:bg-purple-50 text-[#8b3ab5] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
                 >
                   <AddIcon sx={{ fontSize: 18 }} />
                   <span>ADD A NEW ADDRESS</span>
