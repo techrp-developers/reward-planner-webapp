@@ -20,11 +20,30 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import BoltIcon from '@mui/icons-material/Bolt';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useServiceCart } from '../../context/ServiceCartContext';
+
+const shouldHideAddToCartForService = (serviceId, serviceName) => {
+  const sId = Number(serviceId || 0);
+  const normalizedName = String(serviceName || '').toLowerCase();
+  return (
+    sId === 12 ||
+    sId === 18 ||
+    sId === 19 ||
+    normalizedName.includes('health insurance') ||
+    normalizedName.includes('super top-up') ||
+    normalizedName.includes('super top up') ||
+    normalizedName.includes('personal accident')
+  );
+};
 
 export const ServiceDetailPage = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
+  const { addToCart, serviceCartCount } = useServiceCart();
 
   const [serviceData, setServiceData] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -232,6 +251,44 @@ export const ServiceDetailPage = () => {
     }
   };
 
+  const hideAddToCart = shouldHideAddToCartForService(
+    Number(service?.id || serviceId || 0),
+    service?.name
+  );
+
+  const [addingToCart, setAddingToCart] = useState(false);
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    const sId = Number(service?.id || serviceId || 0);
+    const vId = Number(activeVariant?.id || variants[0]?.id || 0);
+    navigate(`/services/checkout?mode=buy_now&serviceId=${sId}&variantId=${vId}`);
+  };
+
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    const sId = Number(service?.id || serviceId || 0);
+    const vId = Number(activeVariant?.id || variants[0]?.id || 0);
+    setAddingToCart(true);
+    try {
+      await addToCart({
+        service_id: sId,
+        variant_id: vId,
+        serviceName: activeVariant?.title || service.name,
+      });
+    } catch {
+      // Toast notification handled in ServiceCartContext
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-8 space-y-8">
@@ -250,7 +307,7 @@ export const ServiceDetailPage = () => {
         <p className="text-xs text-gray-500">The requested service could not be located in the catalog.</p>
         <button
           onClick={() => navigate('/services')}
-          className="px-5 py-2.5 bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] text-white rounded-xl text-xs font-bold shadow-md cursor-pointer"
+          className="px-5 py-2.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white rounded-xl text-xs font-bold shadow-md cursor-pointer"
         >
           Return to Services
         </button>
@@ -345,7 +402,7 @@ export const ServiceDetailPage = () => {
                     <div
                       key={v.id}
                       onClick={() => setSelectedVariant(v)}
-                      className="p-[2px] rounded-2xl bg-gradient-to-r from-[#A654CD] to-[#FC8BAD] cursor-pointer shadow-xs transition-all"
+                      className="p-[2px] rounded-2xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] cursor-pointer shadow-xs transition-all"
                     >
                       <div className="bg-[#FEF4FF] rounded-[14px] p-4 h-full flex flex-col justify-between">
                         <span className="font-bold text-xs sm:text-sm text-gray-900 block truncate">
@@ -430,14 +487,50 @@ export const ServiceDetailPage = () => {
           </div>
         </div>
 
-        {/* Primary Action Button (Enquire Now / Buy Now) */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
-          <button
-            onClick={scrollToEnquiry}
-            className="w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
-          >
-            <span>{isEnquiryService ? 'Enquire Now' : `₹${price.toLocaleString('en-IN')} Buy Now`}</span>
-          </button>
+        {/* Action Buttons: Dual CTA for Purchasable Services, Enquire Now for Enquiry Services */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center gap-3.5">
+          {isEnquiryService ? (
+            <button
+              onClick={scrollToEnquiry}
+              className="w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Enquire Now</span>
+            </button>
+          ) : (
+            <>
+              {/* Buy Now Button */}
+              <button
+                onClick={handleBuyNow}
+                className="w-full sm:w-auto min-w-[240px] py-4 px-8 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <BoltIcon sx={{ fontSize: 20 }} />
+                <span>₹{price.toLocaleString('en-IN')} Buy Now</span>
+              </button>
+
+              {/* Add to Cart Button (Hidden for insurance services) */}
+              {!hideAddToCart && (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                  className="w-full sm:w-auto min-w-[190px] py-4 px-7 rounded-xl font-bold text-sm text-[#7C3AED] bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
+                >
+                  <ShoppingCartOutlinedIcon sx={{ fontSize: 18 }} />
+                  <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
+                </button>
+              )}
+
+              {/* View Services Cart Button */}
+              {serviceCartCount > 0 && (
+                <button
+                  onClick={() => navigate('/services/cart')}
+                  className="w-full sm:w-auto py-4 px-5 rounded-xl font-bold text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>Services Cart ({serviceCartCount})</span>
+                  <ArrowForwardIcon sx={{ fontSize: 14 }} />
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -449,7 +542,7 @@ export const ServiceDetailPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               {featureList.map((feat, idx) => (
                 <div key={idx} className="flex items-center gap-3 p-3.5 rounded-2xl bg-gray-50/70 border border-gray-100 text-xs sm:text-sm font-semibold text-gray-800">
-                  <div className="w-6 h-6 rounded-full bg-[#F3E8FF] text-[#7C3AED] flex items-center justify-center shrink-0 shadow-2xs">
+                  <div className="w-6 h-6 rounded-full bg-[#F3E8FF] text-[#8b3ab5] flex items-center justify-center shrink-0 shadow-2xs">
                     <CheckIcon sx={{ fontSize: 14 }} />
                   </div>
                   <span>{feat}</span>
@@ -461,8 +554,8 @@ export const ServiceDetailPage = () => {
 
         {/* Block 2: Step-by-Step Journey Timeline */}
         {journeyBlock && Array.isArray(journeyBlock.content) && journeyBlock.content.length > 0 && (
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6 border-l-4 border-l-[#A654CD]">
-            <h3 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#A654CD] to-[#FC8BAD]">
+          <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-xs space-y-6 border-l-4 border-l-[#8b3ab5]">
+            <h3 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-[#8b3ab5] to-[#a855f7]">
               {journeyBlock.title || "From start to finish, here's what happens"}
             </h3>
 
@@ -673,7 +766,7 @@ export const ServiceDetailPage = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 rounded-xl font-bold text-sm sm:text-base text-white bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
+                className="w-full py-4 rounded-xl font-bold text-sm sm:text-base text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
               >
                 {submitting ? 'Submitting Application...' : 'Submit Enquiry'}
               </button>
@@ -789,7 +882,7 @@ export const ServiceDetailPage = () => {
 
             <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 inline-block">
               <span className="text-xs text-gray-400 block font-medium">Reference ID</span>
-              <span className="text-sm font-black text-[#7C3AED]">{enquiryRefId}</span>
+              <span className="text-sm font-black text-[#8b3ab5]">{enquiryRefId}</span>
             </div>
 
             <div>
@@ -798,7 +891,7 @@ export const ServiceDetailPage = () => {
                   setIsSuccessModalOpen(false);
                   navigate('/services');
                 }}
-                className="w-full py-3 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] hover:opacity-95 shadow-md cursor-pointer"
+                className="w-full py-3 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md cursor-pointer"
               >
                 Back to Services
               </button>

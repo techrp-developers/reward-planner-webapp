@@ -1,0 +1,49 @@
+<svg viewBox="0 0 200 200" width="200" height="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-comm" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F0FDFA"/>
+      <stop offset="50%" stop-color="#CCFBF1"/>
+      <stop offset="100%" stop-color="#99F6E4"/>
+    </linearGradient>
+    <linearGradient id="user-center" x1="80" y1="75" x2="120" y2="155" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D9488"/>
+      <stop offset="100%" stop-color="#115E59"/>
+    </linearGradient>
+    <linearGradient id="user-left" x1="50" y1="85" x2="90" y2="155" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="user-right" x1="110" y1="85" x2="150" y2="155" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <filter id="comm-shadow" x="35" y="152" width="130" height="28" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="comm-glow" x="40" y="65" width="120" height="115" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0D9488" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="24" fill="url(#bg-comm)"/>
+  <circle cx="100" cy="118" r="52" fill="#5EEAD4" opacity="0.32"/>
+
+  <!-- Shadow -->
+  <ellipse cx="100" cy="166" rx="46" ry="9" fill="#0F766E" opacity="0.2" filter="url(#comm-shadow)"/>
+
+  <!-- Main Graphic: Three Harmonious Team Avatars -->
+  <g filter="url(#comm-glow)">
+    <!-- Left Colleague -->
+    <circle cx="74" cy="98" r="14" fill="url(#user-left)"/>
+    <path d="M54 148 C54 130 64 122 74 122 C84 122 94 130 94 148 Z" fill="url(#user-left)"/>
+
+    <!-- Right Colleague -->
+    <circle cx="126" cy="98" r="14" fill="url(#user-right)"/>
+    <path d="M106 148 C106 130 116 122 126 122 C136 122 146 130 146 148 Z" fill="url(#user-right)"/>
+
+    <!-- Center Leader Colleague (Slightly larger, in foreground) -->
+    <circle cx="100" cy="92" r="16" fill="url(#user-center)"/>
+    <path d="M78 152 C78 132 88 120 100 120 C112 120 122 132 122 152 Z" fill="url(#user-center)"/>
+  </g>
+</svg>

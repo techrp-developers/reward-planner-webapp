@@ -264,17 +264,17 @@ export const AddressForm = ({
             placeholder="10-digit number"
             value={formData.alternate_phone}
             onChange={(e) => handlePhoneChange('alternate_phone', e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl outline-none font-medium focus:border-[#A654CD] focus:ring-2 focus:ring-[#A654CD]/20"
+            className="w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-xl outline-none font-medium focus:border-[#8b3ab5] focus:ring-2 focus:ring-[#8b3ab5]/20"
           />
         </div>
       </div>
 
-      {/* Row 6: Address Type (Home vs Work) */}
-      <div className="pt-1">
+      {/* Row 6: Address Type Radios */}
+      <div>
         <label className="block text-[11px] font-bold text-gray-700 mb-2">
-          Address Type
+          Save Address As *
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           {ADDRESS_TYPES.map((type) => {
             const isSelected = formData.address_type === type.id;
             return (
@@ -282,7 +282,7 @@ export const AddressForm = ({
                 key={type.id}
                 className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-[#A654CD] bg-purple-100/50 shadow-2xs ring-1 ring-[#A654CD]/30'
+                    ? 'border-[#8b3ab5] bg-purple-100/50 shadow-2xs ring-1 ring-[#8b3ab5]/30'
                     : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
               >
@@ -292,7 +292,7 @@ export const AddressForm = ({
                   value={type.id}
                   checked={isSelected}
                   onChange={() => handleChange('address_type', type.id)}
-                  className="accent-[#A654CD]"
+                  className="accent-[#8b3ab5]"
                 />
                 <span className="text-base">{type.icon}</span>
                 <div>
@@ -325,7 +325,7 @@ export const AddressForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD] text-white text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
+          className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg hover:opacity-95 transition-all cursor-pointer flex items-center gap-2"
         >
           {isSubmitting ? (
             <>

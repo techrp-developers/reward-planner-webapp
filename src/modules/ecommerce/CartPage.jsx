@@ -89,7 +89,7 @@ export const CartPage = () => {
   if (items.length === 0 && savedForLater.length === 0) {
     return (
       <div className="w-full max-w-[1400px] mx-auto px-4 py-16 text-center space-y-5">
-        <div className="w-24 h-24 mx-auto rounded-3xl bg-violet-50 text-[#7C3AED] flex items-center justify-center border border-violet-100 shadow-xs">
+        <div className="w-24 h-24 mx-auto rounded-3xl bg-purple-50 text-[#8b3ab5] flex items-center justify-center border border-purple-100 shadow-xs">
           <ShoppingCartOutlinedIcon sx={{ fontSize: 44 }} />
         </div>
         <div className="space-y-1">
@@ -101,7 +101,7 @@ export const CartPage = () => {
         <div className="pt-2">
           <button
             onClick={() => navigate('/store')}
-            className="px-8 py-3.5 bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-all shadow-md cursor-pointer inline-flex items-center gap-2"
+            className="px-8 py-3.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-all shadow-md cursor-pointer inline-flex items-center gap-2"
           >
             <span>Explore Store Catalog</span>
             <ArrowForwardIcon sx={{ fontSize: 16 }} />
@@ -151,7 +151,7 @@ export const CartPage = () => {
             <button
               type="button"
               onClick={openLocationModal}
-              className="px-3.5 py-1.5 rounded-xl border border-violet-200 text-[#7C3AED] hover:bg-violet-50 font-bold text-xs cursor-pointer transition-all shadow-2xs"
+              className="px-3.5 py-1.5 rounded-xl border border-purple-200 text-[#8b3ab5] hover:bg-purple-50 font-bold text-xs cursor-pointer transition-all shadow-2xs"
             >
               Change Pincode
             </button>
@@ -347,7 +347,7 @@ export const CartPage = () => {
               <p className="text-xs text-gray-500">You have items saved for later below, or you can explore our catalog.</p>
               <button
                 onClick={() => navigate('/store')}
-                className="px-5 py-2 bg-[#7C3AED] text-white text-xs font-bold rounded-xl hover:bg-[#6D28D9] cursor-pointer"
+                className="px-5 py-2 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 cursor-pointer shadow-sm"
               >
                 Browse Store
               </button>
@@ -393,7 +393,7 @@ export const CartPage = () => {
                         <button
                           type="button"
                           onClick={() => handleMoveToCart(sItem)}
-                          className="px-4 py-2 rounded-xl bg-violet-50 text-[#7C3AED] border border-violet-200 font-bold hover:bg-violet-100 cursor-pointer transition-all"
+                          className="px-4 py-2 rounded-xl bg-purple-50 text-[#8b3ab5] border border-purple-200 font-bold hover:bg-purple-100 cursor-pointer transition-all"
                         >
                           MOVE TO CART
                         </button>

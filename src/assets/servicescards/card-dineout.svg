@@ -1,0 +1,56 @@
+<svg viewBox="0 0 200 200" width="200" height="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-dine" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF7ED"/>
+      <stop offset="50%" stop-color="#FFEDD5"/>
+      <stop offset="100%" stop-color="#FED7AA"/>
+    </linearGradient>
+    <linearGradient id="bun-top" x1="60" y1="85" x2="130" y2="115" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="patty-grad" x1="60" y1="120" x2="130" y2="135" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+    <filter id="dine-shadow" x="35" y="152" width="130" height="28" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="dine-glow" x="40" y="65" width="120" height="115" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#EA580C" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="24" fill="url(#bg-dine)"/>
+  <circle cx="100" cy="118" r="52" fill="#FDBA74" opacity="0.32"/>
+
+  <!-- Shadow -->
+  <ellipse cx="100" cy="166" rx="46" ry="9" fill="#C2410C" opacity="0.2" filter="url(#dine-shadow)"/>
+
+  <!-- Main Graphic: Clean Gourmet Burger -->
+  <g filter="url(#dine-glow)">
+    <!-- Top Bun Dome -->
+    <path d="M64 110 C64 86 80 76 100 76 C120 76 136 86 136 110 Z" fill="url(#bun-top)"/>
+    <!-- Sesame Seeds -->
+    <ellipse cx="88" cy="88" rx="2" ry="1.2" fill="#FEF3C7"/>
+    <ellipse cx="102" cy="84" rx="2" ry="1.2" fill="#FEF3C7"/>
+    <ellipse cx="114" cy="90" rx="2" ry="1.2" fill="#FEF3C7"/>
+    <ellipse cx="96" cy="96" rx="2" ry="1.2" fill="#FEF3C7"/>
+
+    <!-- Green Lettuce Layer -->
+    <path d="M60 114 C66 110 72 118 78 112 C84 118 90 110 96 114 C102 110 108 118 114 112 C120 118 126 110 132 114 C136 112 140 116 140 116 L60 116 Z" fill="#22C55E"/>
+
+    <!-- Red Tomato Slice -->
+    <rect x="64" y="118" width="72" height="7" rx="3.5" fill="#EF4444"/>
+
+    <!-- Melted Yellow Cheese Triangle -->
+    <path d="M66 126 L134 126 L124 135 L106 128 L88 136 Z" fill="#FACC15"/>
+
+    <!-- Savory Patty -->
+    <rect x="62" y="128" width="76" height="12" rx="6" fill="url(#patty-grad)"/>
+
+    <!-- Bottom Bun -->
+    <rect x="65" y="142" width="70" height="10" rx="5" fill="url(#bun-top)"/>
+  </g>
+</svg>

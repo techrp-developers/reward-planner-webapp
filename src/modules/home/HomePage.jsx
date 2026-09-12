@@ -11,7 +11,8 @@ import BrandPartnersSection from '../../components/home/BrandPartnersSection';
 
 // Enterprise Components from RewardPlanners.com
 import MetricsSocialProofSection from '../../components/home/MetricsSocialProofSection';
-import PlatformCapabilitiesSection from '../../components/home/PlatformCapabilitiesSection';
+import BirthdayCelebrationModal from '../../components/home/BirthdayCelebrationModal.jsx';
+import { getCompanyFromUser, getTodayCelebrations } from '../../services/celebrationService.js';
 
 // Material UI Icons
 import WhatshotIcon from '@mui/icons-material/Whatshot';
@@ -39,7 +40,18 @@ export const HomePage = () => {
   const [deals, setDeals] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [bbpsCategories, setBbpsCategories] = useState([]);
-  const [birthdays, setBirthdays] = useState([]);
+  const [birthdays, setBirthdays] = useState(() => {
+    try {
+      const cached = localStorage.getItem('rp_user_profile');
+      const initialUser = cached ? JSON.parse(cached) : user;
+      const compName = getCompanyFromUser(initialUser);
+      const userEmps = initialUser?.company?.employees || initialUser?.employees || initialUser?.colleagues || [];
+      return getTodayCelebrations(compName, userEmps);
+    } catch {
+      return getTodayCelebrations('TechCorp Global');
+    }
+  });
+  const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,11 +102,11 @@ export const HomePage = () => {
           setBbpsCategories(bbpsData.value);
         }
 
-        // Mock birthdays for corporate celebration banner
-        setBirthdays([
-          { id: 1, name: 'Priya Sharma', department: 'Engineering' },
-          { id: 2, name: 'Rahul Verma', department: 'Sales & Ops' },
-        ]);
+        // Dynamic birthdays for corporate celebration banner based on user's company
+        const compName = getCompanyFromUser(user);
+        const userEmps = user?.company?.employees || user?.employees || user?.colleagues || [];
+        const activeCelebrations = getTodayCelebrations(compName, userEmps);
+        setBirthdays(activeCelebrations);
       } catch (err) {
         console.error('Failed to load homepage data:', err);
       } finally {
@@ -106,6 +118,21 @@ export const HomePage = () => {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  // Recalculate celebrations whenever user data updates
+  useEffect(() => {
+    const compName = getCompanyFromUser(user);
+    const userEmps = user?.company?.employees || user?.employees || user?.colleagues || [];
+    const activeCelebrations = getTodayCelebrations(compName, userEmps);
+    setBirthdays(activeCelebrations);
+  }, [user]);
+
+  // Open modal if user navigates to /birthdays
+  useEffect(() => {
+    if (window.location.pathname === '/birthdays' || window.location.hash.includes('birthdays')) {
+      setCelebrationModalOpen(true);
+    }
   }, []);
 
   const displayDeals =
@@ -123,33 +150,38 @@ export const HomePage = () => {
       : allProducts.slice(5, 10);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-4 space-y-3">
-      {/* 1. CORPORATE CELEBRATIONS TICKER / RIBBON */}
-      {birthdays.length > 0 ? (
-        <div className="w-full bg-violet-50 border-b border-violet-100 py-2 px-4">
-          <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs text-violet-800">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="p-1 rounded-full bg-violet-200 text-violet-700 shrink-0 flex items-center justify-center">
-                <CardGiftcardOutlinedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <span className="font-bold text-violet-900">Today's Celebrations:</span>
-              <span className="truncate">
-                {birthdays.map((b) => `${b.name} (${b.department || b.role || 'Colleague'})`).join(' • ')}
-              </span>
-            </div>
-            <Link
-              to="/birthdays"
-              className="shrink-0 font-bold text-[#7C3AED] hover:underline flex items-center gap-1"
-            >
-              Send Wishes 🎁
-            </Link>
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC] pb-6 space-y-4 text-gray-900">
+      {/* 1. CORPORATE CELEBRATIONS TICKER / RIBBON (ALWAYS VISIBLE) */}
+      <div className="w-full bg-violet-50/80 border-b border-violet-100 py-1.5 px-4 shadow-2xs">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-end">
+          {/* Right: Birthday Wishes to your Colleagues button */}
+          <button
+            type="button"
+            onClick={() => setCelebrationModalOpen(true)}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-violet-200 text-violet-900 shadow-2xs hover:bg-violet-100/60 hover:border-violet-300 hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view colleagues celebrating today"
+          >
+            <span className="w-5 h-5 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-[11px] group-hover:scale-105 transition-transform shadow-2xs">
+              🎂
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold tracking-tight text-violet-900 group-hover:text-[#7C3AED] transition-colors">
+              Birthday Wishes to your Colleagues
+            </span>
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-[#7C3AED] text-white shadow-xs">
+              {birthdays.length > 0 ? birthdays.length : 2}
+            </span>
+            <ChevronRightIcon sx={{ fontSize: 14 }} className="text-violet-500 group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
-      ) : (
-        <div className="w-full bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-violet-100 py-2 px-4 text-xs text-center font-medium text-violet-900">
-          ✨ Welcome to <strong>Reward Planners</strong>: Explore curated corporate perks, electronics deals, and on-demand services!
-        </div>
-      )}
+      </div>
+
+      {/* Birthday Celebration Modal */}
+      <BirthdayCelebrationModal
+        isOpen={celebrationModalOpen}
+        onClose={() => setCelebrationModalOpen(false)}
+        companyName={getCompanyFromUser(user)}
+        celebrants={birthdays.length > 0 ? birthdays : getTodayCelebrations(getCompanyFromUser(user))}
+      />
 
       <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-6">
         {/* 2. SENIOR UI/UX HERO PROMOTIONAL BANNER CAROUSEL (50VH, 3-SEC AUTO SLIDE) */}
@@ -160,18 +192,18 @@ export const HomePage = () => {
 
         {/* 4. FLASH DEALS OF THE DAY WITH TIMER */}
         <section className="space-y-3">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                <WhatshotIcon sx={{ fontSize: 22 }} />
+          <div className="flex items-center justify-between border-b border-gray-200 pb-3 gap-2">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <WhatshotIcon sx={{ fontSize: 20 }} />
               </div>
-              <div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
                   Flash Deals of the Day
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500 font-normal flex items-center gap-1.5 mt-0.5">
-                  <AccessTimeIcon sx={{ fontSize: 14 }} className="text-rose-500" />
-                  <span>Ends in <strong className="text-rose-600 font-bold">04h : 32m : 18s</strong></span>
+                  <AccessTimeIcon sx={{ fontSize: 13 }} className="text-rose-500 shrink-0" />
+                  <span className="truncate">Ends in <strong className="text-rose-600 font-bold">04h : 32m : 18s</strong></span>
                 </p>
               </div>
             </div>
@@ -184,7 +216,7 @@ export const HomePage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {displayDeals.map((prod) => (
               <ProductCard key={prod.id} item={prod} />
             ))}
@@ -194,18 +226,18 @@ export const HomePage = () => {
         {/* 5. OUR SERVICES & MODULES RIBBON */}
         <OurServicesSection />
 
-        {/* 6. 1-CLICK UTILITY BILL PAYMENTS (BBPS GRID) */}
-        <section className="bg-white rounded-3xl border border-gray-200 p-4 sm:p-5 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                <BoltIcon sx={{ fontSize: 22 }} />
+        {/* 6. 1-CLICK UTILITY BILL PAYMENTS (BBPS GRID: 4x2 ON MOBILE, 8x1 ON DESKTOP) */}
+        <section className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-3.5 sm:p-5 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <BoltIcon sx={{ fontSize: 20 }} />
               </div>
-              <div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
                   Quick Utility Bill Payments & Recharges
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5">
+                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5 truncate sm:whitespace-normal">
                   Instant BBPS confirmation with RP Coins cash discount
                 </p>
               </div>
@@ -215,7 +247,7 @@ export const HomePage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2.5 pt-1">
+          <div className="grid grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-2.5 md:gap-3 pt-1">
             {[
               { title: 'Electricity', icon: LightbulbOutlinedIcon, catId: 1, color: 'text-amber-500 bg-amber-50' },
               { title: 'Mobile', icon: PhoneAndroidOutlinedIcon, catId: 2, color: 'text-blue-500 bg-blue-50' },
@@ -231,12 +263,12 @@ export const HomePage = () => {
                 <Link
                   key={idx}
                   to={`/bbps?category=${biller.catId}`}
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl border border-gray-100 bg-white hover:bg-violet-50/50 hover:border-violet-200 transition-all text-center group cursor-pointer shadow-2xs"
+                  className="flex flex-col items-center justify-center p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-gray-100 bg-white hover:bg-violet-50/50 hover:border-violet-200 transition-all text-center group cursor-pointer shadow-2xs"
                 >
-                  <div className={`p-2.5 rounded-xl mb-1.5 transition-transform group-hover:scale-110 ${biller.color}`}>
-                    <BillerIcon sx={{ fontSize: 24 }} />
+                  <div className={`p-2 sm:p-2.5 rounded-xl mb-1 sm:mb-1.5 transition-transform group-hover:scale-110 ${biller.color}`}>
+                    <BillerIcon sx={{ fontSize: 20 }} />
                   </div>
-                  <span className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#7C3AED]">
+                  <span className="text-[11px] sm:text-xs md:text-sm font-bold text-gray-800 group-hover:text-[#7C3AED] truncate w-full">
                     {biller.title}
                   </span>
                 </Link>
@@ -245,21 +277,18 @@ export const HomePage = () => {
           </div>
         </section>
 
-        {/* 8. ENTERPRISE CAPABILITIES & ONE DASHBOARD PILLARS */}
-        <PlatformCapabilitiesSection />
-
-        {/* 9. ON-DEMAND CORPORATE & PROFESSIONAL SERVICES (FULL WIDTH) */}
-        <section className="bg-white rounded-3xl border border-gray-200 p-4 sm:p-5 shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-[#4F6BFF] flex items-center justify-center shrink-0">
-                <BuildOutlinedIcon sx={{ fontSize: 22 }} />
+        {/* 7. ON-DEMAND CORPORATE & PROFESSIONAL SERVICES */}
+        <section className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-3.5 sm:p-5 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-[#4F6BFF] flex items-center justify-center shrink-0">
+                <BuildOutlinedIcon sx={{ fontSize: 20 }} />
               </div>
-              <div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
                   On-Demand Corporate & Professional Services
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5">
+                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5 truncate sm:whitespace-normal">
                   Government filings, legal docs, CA advisory, and home cleaning
                 </p>
               </div>
@@ -269,7 +298,7 @@ export const HomePage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 pt-1">
             {[
               {
                 title: 'ITR & Tax Filing',
@@ -319,7 +348,7 @@ export const HomePage = () => {
               <div
                 key={idx}
                 onClick={() => navigate('/services')}
-                className={`p-4 rounded-2xl border ${service.border} ${service.cardBg} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group`}
+                className={`p-3.5 sm:p-4 rounded-2xl border ${service.border} ${service.cardBg} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group`}
               >
                 <div>
                   <span className={`text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full ${service.badgeStyle}`}>
@@ -328,7 +357,7 @@ export const HomePage = () => {
                   <h5 className={`font-bold text-sm text-gray-900 mt-2 ${service.titleHover} transition-colors`}>{service.title}</h5>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">{service.desc}</p>
                 </div>
-                <div className="mt-4 pt-2.5 border-t border-black/5 flex items-center justify-between">
+                <div className="mt-3 sm:mt-4 pt-2.5 border-t border-black/5 flex items-center justify-between">
                   <span className="text-xs sm:text-sm font-bold text-gray-900">{service.price}</span>
                   <span className={`text-xs sm:text-sm font-bold ${service.accentColor} group-hover:translate-x-0.5 transition-transform`}>Book →</span>
                 </div>
@@ -339,16 +368,16 @@ export const HomePage = () => {
 
         {/* 8. BESTSELLERS IN CORPORATE TECH & FASHION */}
         <section className="space-y-3">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-violet-100 text-[#7C3AED] flex items-center justify-center shrink-0">
-                <TrendingUpIcon sx={{ fontSize: 22 }} />
+          <div className="flex items-center justify-between border-b border-gray-200 pb-3 gap-2">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-violet-100 text-[#7C3AED] flex items-center justify-center shrink-0">
+                <TrendingUpIcon sx={{ fontSize: 20 }} />
               </div>
-              <div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
                   Trending in Corporate Perks & Tech
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5">
+                <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5 truncate sm:whitespace-normal">
                   Most popular electronics, lifestyle perks, and corporate rewards this week
                 </p>
               </div>
@@ -359,7 +388,7 @@ export const HomePage = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {displayTrending.map((prod) => (
               <ProductCard key={`trend-${prod.id}`} item={prod} />
             ))}

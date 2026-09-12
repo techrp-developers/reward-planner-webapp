@@ -163,7 +163,7 @@ export const ProductCard = ({ item }) => {
           onClick={handleAddToCart}
           disabled={isAdding}
           className="absolute bottom-1.5 inset-x-2 py-1.5 rounded-lg text-white font-bold text-[11px] flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-md cursor-pointer"
-          style={{ backgroundColor: '#7C3AED' }}
+          style={{ background: 'linear-gradient(90deg, #8b3ab5 0%, #a855f7 100%)' }}
         >
           <ShoppingCartOutlinedIcon sx={{ fontSize: 14 }} />
           <span>{isAdding ? 'Adding...' : 'Quick Add'}</span>

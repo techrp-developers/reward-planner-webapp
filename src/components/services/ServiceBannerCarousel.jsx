@@ -216,7 +216,7 @@ export const ServiceBannerCarousel = ({ banners: propBanners }) => {
                 setActiveIdx(i);
               }}
               className={`h-2 rounded-full transition-all cursor-pointer ${
-                i === activeIdx ? 'w-6 bg-[#FC8BAD]' : 'w-2 bg-white/70 hover:bg-white'
+                i === activeIdx ? 'w-6 bg-[#8b3ab5]' : 'w-2 bg-white/70 hover:bg-white'
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

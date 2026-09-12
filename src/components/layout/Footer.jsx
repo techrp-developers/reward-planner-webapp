@@ -1,7 +1,7 @@
 // src/components/layout/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import rpLogo from '../../assets/rp_logo.svg';
+import rpLogo from '../../assets/rplogo_nobg.svg';
 import { POLICIES_LIST } from '../../modules/policies/policiesData';
 
 // Material UI Icons
@@ -24,7 +24,7 @@ export const Footer = () => {
       }}
     >
       {/* ── TOP GRADIENT ACCENT LINE ────────────────────────────────────────── */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD]" />
+      <div className="h-[2px] w-full bg-gradient-to-r from-[#8b3ab5] to-[#a855f7]" />
 
       {/* Subtle Ambient soft glows */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/40 rounded-full blur-3xl pointer-events-none" />
@@ -154,7 +154,7 @@ export const Footer = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#EA4988]" />
                 <span>Policies & Governance</span>
               </h5>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs sm:text-[13px] text-gray-700 font-medium pt-0.5">
+              <ul className="flex flex-col space-y-2 text-xs sm:text-[13px] text-gray-700 font-medium pt-0.5">
                 {POLICIES_LIST.map((item) => (
                   <li key={item.id}>
                     <Link

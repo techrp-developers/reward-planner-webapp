@@ -24,6 +24,7 @@ export const AddressCard = ({
 
   return (
     <div
+      data-testid="address-card"
       onClick={() => onSelect && onSelect(addrId)}
       className={`relative p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
         isSelected
@@ -86,7 +87,7 @@ export const AddressCard = ({
             <button
               type="button"
               onClick={() => onEdit(address)}
-              className="px-2.5 py-1 rounded-lg text-xs font-bold text-[#A654CD] hover:bg-purple-50 transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg text-xs font-bold text-[#8b3ab5] hover:bg-purple-50 transition-colors flex items-center gap-1 cursor-pointer"
               title="Edit Address"
             >
               <EditOutlinedIcon sx={{ fontSize: 15 }} />
@@ -121,7 +122,7 @@ export const AddressCard = ({
               e.stopPropagation();
               onDeliverHere && onDeliverHere(address);
             }}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FC8BAD] via-[#EA4988] to-[#A654CD] text-white text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <span>DELIVER HERE</span>
             <ArrowForwardIcon sx={{ fontSize: 15 }} />

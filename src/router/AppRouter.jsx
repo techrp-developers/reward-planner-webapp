@@ -8,7 +8,7 @@ import MegaMenuStrip from '../components/layout/MegaMenuStrip';
 import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
-import rpLogo from '../assets/rp_logo.svg';
+import rpLogo from '../assets/rplogo_nobg.svg';
 
 import LoginPage from '../modules/auth/LoginPage';
 import HomePage from '../modules/home/HomePage';
@@ -20,6 +20,8 @@ import BBPSPage from '../modules/bbps/BBPSPage';
 import ServicesPage from '../modules/services/ServicesPage';
 import ServiceCategoryPage from '../modules/services/ServiceCategoryPage';
 import ServiceDetailPage from '../modules/services/ServiceDetailPage';
+import ServiceCartPage from '../modules/services/ServiceCartPage';
+import ServiceCheckoutPage from '../modules/services/ServiceCheckoutPage';
 import MutualFundPage from '../modules/services/MutualFundPage';
 import ServiceBundlePage from '../modules/services/ServiceBundlePage';
 import ProfilePage from '../modules/profile/ProfilePage';
@@ -93,8 +95,11 @@ export const AppRouter = () => {
           
           {/* SERVICES FULL SUITE */}
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services/cart" element={<ServiceCartPage />} />
+          <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
           <Route path="/services/category/:categoryId" element={<ServiceCategoryPage />} />
           <Route path="/services/detail/:serviceId" element={<ServiceDetailPage />} />
+          <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
           <Route path="/services/mutual-funds" element={<MutualFundPage />} />
           <Route path="/services/bundle/:bundleId" element={<ServiceBundlePage />} />
           <Route path="/insurance" element={<Navigate to="/services/category/2" replace />} />

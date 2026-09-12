@@ -14,15 +14,20 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import BoltIcon from '@mui/icons-material/Bolt';
+import { useServiceCart } from '../../context/ServiceCartContext';
 
 export const ServiceBundlePage = () => {
   const { bundleId } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
+  const { addBundle, serviceCartCount } = useServiceCart();
 
   const [bundleData, setBundleData] = useState(null);
   const [formValues, setFormValues] = useState({});
   const [loading, setLoading] = useState(true);
+  const [addingPack, setAddingPack] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [formError, setFormError] = useState('');
@@ -93,6 +98,30 @@ export const ServiceBundlePage = () => {
     }
   };
 
+  const handleBuyPackNow = () => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    navigate(`/services/checkout?mode=buy_now&bundleId=${bundle?.id || bundleId}`);
+  };
+
+  const handleAddPackToCart = async () => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    setAddingPack(true);
+    try {
+      const selectedItemIds = (items || []).map((i) => Number(i.id || i.service_id)).filter(Boolean);
+      await addBundle(Number(bundle?.id || bundleId), selectedItemIds, bundle?.name || 'Service Pack');
+    } catch {
+      // Toast handled by context
+    } finally {
+      setAddingPack(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-12">
@@ -108,7 +137,7 @@ export const ServiceBundlePage = () => {
         <h2 className="text-xl font-bold text-gray-900">Bundle Not Found</h2>
         <button
           onClick={() => navigate('/services')}
-          className="px-5 py-2.5 bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] text-white rounded-xl text-xs font-bold"
+          className="px-5 py-2.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white rounded-xl text-xs font-bold shadow-md cursor-pointer hover:opacity-95"
         >
           Return to Services
         </button>
@@ -256,9 +285,46 @@ export const ServiceBundlePage = () => {
               </p>
             </div>
 
+            {/* Direct Pack Checkout & Cart Actions */}
+            <div className="space-y-2.5">
+              <button
+                onClick={handleBuyPackNow}
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <BoltIcon sx={{ fontSize: 18 }} />
+                <span>Buy This Pack Now (₹{bundlePrice.toLocaleString('en-IN')})</span>
+              </button>
+
+              <button
+                onClick={handleAddPackToCart}
+                disabled={addingPack}
+                className="w-full py-3 px-6 rounded-xl font-bold text-xs text-[#7C3AED] bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <ShoppingCartOutlinedIcon sx={{ fontSize: 16 }} />
+                <span>{addingPack ? 'Adding Pack...' : 'Add Pack to Services Cart'}</span>
+              </button>
+
+              {serviceCartCount > 0 && (
+                <button
+                  onClick={() => navigate('/services/cart')}
+                  className="w-full py-2 px-4 rounded-xl font-bold text-[11px] text-gray-600 hover:text-gray-900 transition-colors text-center cursor-pointer"
+                >
+                  View Services Cart ({serviceCartCount}) →
+                </button>
+              )}
+            </div>
+
+            {/* Divider between Buy Now and Custom Enquiry */}
+            <div className="relative flex items-center justify-center">
+              <div className="border-t border-gray-200 w-full" />
+              <span className="bg-white px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0">
+                Or Request Callback
+              </span>
+            </div>
+
             {/* Dynamic Enquiry Form */}
             <form onSubmit={handleEnquirySubmit} className="space-y-3.5 text-xs">
-              <h4 className="font-extrabold text-sm text-gray-900">Request Pack Activation</h4>
+              <h4 className="font-extrabold text-sm text-gray-900">Custom Pack Consultation</h4>
 
               {formError && (
                 <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-semibold">
@@ -334,7 +400,7 @@ export const ServiceBundlePage = () => {
               setIsSuccessModalOpen(false);
               navigate('/services');
             }}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] text-white font-bold text-xs"
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white font-bold text-xs shadow-md cursor-pointer hover:opacity-95"
           >
             Back to Services
           </button>

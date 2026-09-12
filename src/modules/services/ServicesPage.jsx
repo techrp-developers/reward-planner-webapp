@@ -291,7 +291,7 @@ export const ServicesPage = () => {
                         <span className="text-[10px] text-emerald-700 font-bold">Bundle Discount Applied</span>
                       </div>
 
-                      <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#FC8BAD] to-[#A654CD] shadow-sm group-hover:opacity-95 flex items-center gap-1.5 cursor-pointer">
+                      <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-sm group-hover:opacity-95 flex items-center gap-1.5 cursor-pointer">
                         <span>View Pack</span>
                         <ArrowForwardIcon sx={{ fontSize: 14 }} />
                       </button>
@@ -387,7 +387,7 @@ export const ServicesPage = () => {
                       </div>
                     </div>
 
-                    <button className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#7C3AED] bg-violet-50 hover:bg-violet-100 transition-colors cursor-pointer flex items-center gap-1">
+                    <button className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#8b3ab5] bg-purple-50 hover:bg-purple-100 transition-colors cursor-pointer flex items-center gap-1">
                       <span>Book Service</span>
                       <ArrowForwardIcon sx={{ fontSize: 13 }} />
                     </button>

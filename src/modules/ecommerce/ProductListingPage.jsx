@@ -465,7 +465,7 @@ export const ProductListingPage = () => {
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 p-8 space-y-4 shadow-xs">
-              <div className="w-16 h-16 mx-auto rounded-full bg-violet-50 text-[#7C3AED] flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto rounded-full bg-purple-50 text-[#8b3ab5] flex items-center justify-center">
                 <Filter size={28} />
               </div>
               <h4 className="text-base font-bold text-gray-900">No matching products found</h4>
@@ -474,7 +474,7 @@ export const ProductListingPage = () => {
               </p>
               <button
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#7C3AED] text-white text-xs font-bold rounded-xl hover:bg-[#6D28D9] transition-colors cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-opacity cursor-pointer shadow-sm"
               >
                 <RotateCcw size={14} />
                 <span>Reset All Filters</span>
@@ -505,7 +505,7 @@ export const ProductListingPage = () => {
                     size="medium"
                     sx={{
                       '& .Mui-selected': {
-                        backgroundColor: '#7C3AED !important',
+                        backgroundColor: '#8b3ab5 !important',
                         color: '#fff !important',
                         fontWeight: 'bold',
                       },
