@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation } from '../../context/LocationContext';
 import {
   fetchUserInfo,
   updateProfile,
@@ -103,6 +104,7 @@ export const ProfilePage = () => {
   const orderIdParam = searchParams.get('orderId') ? Number(searchParams.get('orderId')) : null;
   const statusParam = searchParams.get('status');
   const { user: authUser, isAuthenticated, logout } = useAuth();
+  const { openLocationModal } = useLocation();
   const fileInputRef = useRef(null);
 
   // User & Data States
@@ -247,8 +249,10 @@ export const ProfilePage = () => {
   useEffect(() => {
     if (tabParam === 'orders' || orderIdParam) {
       setOrdersModalVisible(true);
+    } else if (tabParam === 'addresses' || tabParam === 'address') {
+      openLocationModal();
     }
-  }, [tabParam, orderIdParam]);
+  }, [tabParam, orderIdParam, openLocationModal]);
 
   // Format Helpers matching mobile app
   const formatPhone = (phone) => {
@@ -636,7 +640,7 @@ export const ProfilePage = () => {
           <div className="bg-white rounded-3xl border border-gray-200 shadow-xs overflow-hidden flex-1 flex flex-col hover:border-indigo-300 hover:shadow-md transition-all">
             <button
               type="button"
-              onClick={() => setAddressModalVisible(true)}
+              onClick={openLocationModal}
               className="w-full flex-1 flex items-center justify-between p-4 sm:p-5 hover:bg-gray-50/80 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center gap-3.5">
@@ -1011,117 +1015,6 @@ export const ProfilePage = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* 4. SAVED ADDRESSES MODAL */}
-      {addressModalVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-          <div className="w-full max-w-2xl bg-white rounded-3xl p-6 shadow-2xl space-y-4 border border-gray-100 animate-scaleUp max-h-[88vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[#6366F1] flex items-center justify-center">
-                  <LocationOnOutlinedIcon sx={{ fontSize: 20 }} />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-gray-900 flex items-center gap-2">
-                    Manage Addresses
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                      {addresses.length}
-                    </span>
-                  </h3>
-                  <p className="text-[11px] text-gray-400">Save and edit your delivery locations</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setAddressModalVisible(false);
-                  setShowNewAddressForm(false);
-                  setEditingAddress(null);
-                }}
-                className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors"
-              >
-                <CloseOutlinedIcon sx={{ fontSize: 18 }} />
-              </button>
-            </div>
-
-            {/* Address Form (Add or Edit) */}
-            {(showNewAddressForm || editingAddress) ? (
-              <div className="py-1">
-                <AddressForm
-                  initialData={editingAddress}
-                  onSave={handleSaveProfileAddress}
-                  onCancel={() => {
-                    setShowNewAddressForm(false);
-                    setEditingAddress(null);
-                  }}
-                  submitting={addressSubmitting}
-                  submitLabel={editingAddress ? 'SAVE CHANGES' : 'SAVE ADDRESS'}
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {/* Add New Address Button (Flipkart Style) */}
-                <button
-                  type="button"
-                  onClick={() => setShowNewAddressForm(true)}
-                  className="w-full py-3 px-4 rounded-xl border-2 border-dashed border-[#8b3ab5]/40 hover:border-[#8b3ab5] bg-purple-50/40 hover:bg-purple-50 text-[#8b3ab5] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
-                >
-                  <AddIcon sx={{ fontSize: 18 }} />
-                  <span>ADD A NEW ADDRESS</span>
-                </button>
-
-                {/* List of Saved Addresses */}
-                {addresses.length === 0 ? (
-                  <div className="text-center py-10 px-4 space-y-2">
-                    <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
-                      <LocationOnOutlinedIcon sx={{ fontSize: 28 }} />
-                    </div>
-                    <p className="text-sm font-bold text-gray-700">No Saved Addresses Found</p>
-                    <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                      Add a delivery address to ensure fast and seamless checkout for all your reward orders.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    {addresses.map((addr) => {
-                      const addrId = addr.id || addr.address_id;
-                      return (
-                        <AddressCard
-                          key={addrId}
-                          address={addr}
-                          showRadio={false}
-                          showDeliverHereButton={false}
-                          onEdit={(item) => {
-                            setEditingAddress(item);
-                            setShowNewAddressForm(false);
-                          }}
-                          onDelete={(id) => handleDeleteProfileAddress(id)}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Modal Footer */}
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setAddressModalVisible(false);
-                  setShowNewAddressForm(false);
-                  setEditingAddress(null);
-                }}
-                className="py-2.5 px-5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs cursor-pointer transition-colors"
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       )}

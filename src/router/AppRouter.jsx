@@ -99,6 +99,7 @@ export const AppRouter = () => {
           <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
           <Route path="/services/category/:categoryId" element={<ServiceCategoryPage />} />
           <Route path="/services/detail/:serviceId" element={<ServiceDetailPage />} />
+          <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
           <Route path="/services/mutual-funds" element={<MutualFundPage />} />
           <Route path="/services/bundle/:bundleId" element={<ServiceBundlePage />} />
           <Route path="/insurance" element={<Navigate to="/services/category/2" replace />} />

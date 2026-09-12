@@ -24,6 +24,7 @@ export const AddressCard = ({
 
   return (
     <div
+      data-testid="address-card"
       onClick={() => onSelect && onSelect(addrId)}
       className={`relative p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
         isSelected

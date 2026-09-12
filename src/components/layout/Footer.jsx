@@ -154,7 +154,7 @@ export const Footer = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#EA4988]" />
                 <span>Policies & Governance</span>
               </h5>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs sm:text-[13px] text-gray-700 font-medium pt-0.5">
+              <ul className="flex flex-col space-y-2 text-xs sm:text-[13px] text-gray-700 font-medium pt-0.5">
                 {POLICIES_LIST.map((item) => (
                   <li key={item.id}>
                     <Link

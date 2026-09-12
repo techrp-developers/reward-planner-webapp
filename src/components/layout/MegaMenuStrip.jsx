@@ -101,18 +101,21 @@ export const MegaMenuStrip = () => {
   ];
 
   return (
-    <nav className="w-full bg-[#180d26] text-white border-b border-white/10 shadow-md relative z-30 select-none overflow-hidden">
-      {/* Subtle radial ambient glows */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_50%,rgba(168,85,247,0.18),transparent_40%),radial-gradient(circle_at_85%_50%,rgba(252,63,120,0.15),transparent_40%)]" />
+    <nav className="hidden lg:block w-full bg-[#180d26] text-white border-b border-white/10 shadow-md relative z-20 select-none">
+      {/* Subtle background effects isolated with overflow-hidden */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* Subtle radial ambient glows */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_50%,rgba(168,85,247,0.18),transparent_40%),radial-gradient(circle_at_85%_50%,rgba(252,63,120,0.15),transparent_40%)]" />
 
-      {/* Subtle micro-grid overlay */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:36px_36px]" />
+        {/* Subtle micro-grid overlay */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:36px_36px]" />
 
-      {/* Glossy top reflection sheen */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/15" />
+        {/* Glossy top reflection sheen */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/15" />
+      </div>
 
       <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 relative z-10">
-        <div className="flex items-center justify-between text-xs font-medium text-purple-100/90 h-11 overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between text-[13.5px] font-medium text-purple-100 h-10 overflow-x-auto no-scrollbar">
           {/* 1. All Products with Mega Menu */}
           <div
             className="relative h-full flex items-center shrink-0"
@@ -121,16 +124,16 @@ export const MegaMenuStrip = () => {
           >
             <Link
               to="/store"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white font-semibold hover:text-white hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-white font-semibold hover:text-purple-200 hover:bg-white/10 transition-colors"
             >
               <ShoppingBagOutlinedIcon sx={{ fontSize: 16 }} className="text-[#d8b4fe]" />
-              <span className="font-bold text-white hover:text-purple-200">All Products</span>
+              <span className="font-semibold text-white hover:text-purple-200">All Products</span>
               <KeyboardArrowDownIcon sx={{ fontSize: 15 }} className="text-purple-300/80" />
             </Link>
 
             {/* Products Dropdown */}
             {activeMenu === 'products' && (
-              <div className="absolute left-0 top-11 w-[750px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-6 z-50 animate-fade-in grid grid-cols-3 gap-6 backdrop-blur-xl">
+              <div className="hidden lg:grid absolute left-0 top-11 w-[750px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-6 z-50 animate-fade-in grid-cols-3 gap-6 backdrop-blur-xl">
                 {categories.length > 0 ? (
                   categories.slice(0, 6).map((cat) => (
                     <div key={cat.id || cat.category_id} className="space-y-2">
@@ -168,7 +171,7 @@ export const MegaMenuStrip = () => {
           {/* 2. Electronics & Gadgets */}
           <Link
             to="/store?category=1"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
             <SmartphoneOutlinedIcon sx={{ fontSize: 16 }} className="text-[#c084fc]" />
             <span>Electronics & Gadgets</span>
@@ -177,7 +180,7 @@ export const MegaMenuStrip = () => {
           {/* 3. Corporate Fashion */}
           <Link
             to="/store?category=7"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
             <CheckroomOutlinedIcon sx={{ fontSize: 16 }} className="text-[#f472b6]" />
             <span>Corporate Fashion</span>
@@ -186,7 +189,7 @@ export const MegaMenuStrip = () => {
           {/* 4. Home & Kitchen */}
           <Link
             to="/store?category=4"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors shrink-0"
           >
             <WeekendOutlinedIcon sx={{ fontSize: 16 }} className="text-[#c084fc]" />
             <span>Home & Kitchen</span>
@@ -200,16 +203,16 @@ export const MegaMenuStrip = () => {
           >
             <Link
               to="/services"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
             >
-              <BuildOutlinedIcon sx={{ fontSize: 16 }} className="text-[#38bdf8]" />
+              <BuildOutlinedIcon sx={{ fontSize: 15 }} className="text-[#38bdf8]" />
               <span>Services & Docs</span>
-              <KeyboardArrowDownIcon sx={{ fontSize: 15 }} className="text-purple-300/80" />
+              <KeyboardArrowDownIcon sx={{ fontSize: 14 }} className="text-purple-300/80" />
             </Link>
 
             {/* Services Dropdown */}
             {activeMenu === 'services' && (
-              <div className="absolute left-0 top-11 w-[800px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-6 z-50 animate-fade-in grid grid-cols-4 gap-6 backdrop-blur-xl">
+              <div className="hidden lg:grid absolute left-0 top-10 w-[800px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-6 z-50 animate-fade-in grid-cols-4 gap-6 backdrop-blur-xl">
                 {serviceCategories.map((group, idx) => {
                   const SrvIcon = group.icon;
                   return (
@@ -252,16 +255,16 @@ export const MegaMenuStrip = () => {
           >
             <Link
               to="/bbps"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-purple-100 hover:text-white hover:bg-white/10 transition-colors"
             >
               <BoltOutlinedIcon sx={{ fontSize: 16 }} className="text-[#fbbf24]" />
               <span>Bill Pay (BBPS)</span>
-              <KeyboardArrowDownIcon sx={{ fontSize: 15 }} className="text-purple-300/80" />
+              <KeyboardArrowDownIcon sx={{ fontSize: 14 }} className="text-purple-300/80" />
             </Link>
 
             {/* BBPS Quick Dropdown */}
             {activeMenu === 'bbps' && (
-              <div className="absolute left-0 top-11 w-[640px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-5 z-50 animate-fade-in grid grid-cols-2 gap-3 backdrop-blur-xl">
+              <div className="hidden lg:grid absolute left-0 top-10 w-[640px] bg-[#1a0f2b] text-white rounded-b-2xl shadow-2xl border border-white/15 p-5 z-50 animate-fade-in grid-cols-2 gap-3 backdrop-blur-xl">
                 {bbpsCategories.map((biller, idx) => {
                   const CategoryIcon = biller.icon;
                   return (
@@ -290,9 +293,9 @@ export const MegaMenuStrip = () => {
           {/* 7. Deals of the Day */}
           <Link
             to="/deals"
-            className="flex items-center gap-1.5 px-3.5 py-1 rounded-xl text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/30 transition-all shrink-0 font-bold shadow-xs hover:scale-102"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/30 transition-all shrink-0 font-semibold shadow-xs hover:scale-102"
           >
-            <WhatshotIcon sx={{ fontSize: 16 }} className="text-[#fb7185]" />
+            <WhatshotIcon sx={{ fontSize: 15 }} className="text-[#fb7185]" />
             <span>Deals of the Day</span>
           </Link>
         </div>

@@ -219,10 +219,7 @@ export const HeroBannerCarousel = () => {
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden shadow-lg border border-white/60 transition-all select-none"
-      style={{
-        height: 'clamp(400px, 50vh, 500px)',
-      }}
+      className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-white/60 transition-all select-none min-h-[460px] sm:min-h-[420px] md:min-h-[460px] lg:h-[480px] flex items-center"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -255,15 +252,15 @@ export const HeroBannerCarousel = () => {
             <div className="absolute top-4 right-1/3 w-64 h-64 rounded-full blur-2xl opacity-20 bg-white pointer-events-none" />
 
             {/* Content Container (Comfortable horizontal clearance to prevent arrow overlap) */}
-            <div className="w-full h-full max-w-[1500px] mx-auto px-10 sm:px-16 lg:px-20 flex items-center justify-between gap-8 relative z-20">
+            <div className="w-full h-full max-w-[1500px] mx-auto px-5 sm:px-14 lg:px-20 flex items-center justify-between gap-8 relative z-20">
               {/* LEFT COLUMN: Punchy Copy & CTAs */}
-              <div className="flex-1 max-w-2xl py-6 flex flex-col justify-center space-y-4">
+              <div className="flex-1 max-w-2xl py-6 sm:py-8 flex flex-col justify-center space-y-3 sm:space-y-4">
                 {/* Eyebrow Tag Pill */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-2xs backdrop-blur-md ${slide.tagBg} ${slide.tagBorder}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider border shadow-2xs backdrop-blur-md ${slide.tagBg} ${slide.tagBorder}`}
                   >
-                    <SlideTagIcon sx={{ fontSize: 15 }} />
+                    <SlideTagIcon sx={{ fontSize: 14 }} />
                     {slide.tag}
                   </span>
 
@@ -274,12 +271,12 @@ export const HeroBannerCarousel = () => {
                 </div>
 
                 {/* Main Headline in Poppins */}
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 leading-[1.18] tracking-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 leading-[1.2] tracking-tight">
                   {slide.title}
                 </h2>
 
                 {/* Value Proposition Description */}
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed max-w-xl font-medium">
+                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed max-w-xl font-medium line-clamp-3 sm:line-clamp-none">
                   {slide.subtitle}
                 </p>
 
@@ -297,10 +294,10 @@ export const HeroBannerCarousel = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-3 pt-2">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2 pb-6 sm:pb-0">
                   <Link
                     to={slide.primaryBtn.link}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4.5 sm:px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
                     style={{
                       backgroundColor: slide.accentColor,
                     }}
@@ -311,7 +308,7 @@ export const HeroBannerCarousel = () => {
 
                   <Link
                     to={slide.secondaryBtn.link}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-gray-800 bg-white/80 hover:bg-white border border-gray-300/80 hover:border-gray-400 transition-all shadow-xs backdrop-blur-xs"
+                    className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-gray-800 bg-white/80 hover:bg-white border border-gray-300/80 hover:border-gray-400 transition-all shadow-xs backdrop-blur-xs"
                   >
                     <span>{slide.secondaryBtn.text}</span>
                   </Link>
@@ -433,11 +430,11 @@ export const HeroBannerCarousel = () => {
         );
       })}
 
-      {/* Manual Left/Right Navigation Arrows (Positioned safely outside content text area) */}
+      {/* Manual Left/Right Navigation Arrows (Desktop & Tablet only to prevent mobile text overlap) */}
       <button
         type="button"
         onClick={handlePrev}
-        className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+        className="hidden sm:flex absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
         aria-label="Previous Slide"
       >
         <ChevronLeftIcon sx={{ fontSize: 22 }} />
@@ -446,7 +443,7 @@ export const HeroBannerCarousel = () => {
       <button
         type="button"
         onClick={handleNext}
-        className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
+        className="hidden sm:flex absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md border border-white/90 items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md"
         aria-label="Next Slide"
       >
         <ChevronRightIcon sx={{ fontSize: 22 }} />

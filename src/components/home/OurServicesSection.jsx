@@ -96,12 +96,12 @@ export const OurServicesSection = () => {
     <section className="space-y-3">
       {/* Standard Section Header */}
       <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center shrink-0">
-            <GridViewOutlinedIcon sx={{ fontSize: 22 }} />
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center shrink-0">
+            <GridViewOutlinedIcon sx={{ fontSize: 20 }} />
           </div>
           <div>
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
+            <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight">
               Our Services
             </h3>
           </div>
@@ -109,7 +109,7 @@ export const OurServicesSection = () => {
       </div>
 
       {/* Grid of 8 Service Card Images (Square Box Type: same height & same width) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-4">
         {MODULE_TILES.map((tile) => {
           const CardWrapper = tile.isAvailable ? Link : 'div';
           const wrapperProps = tile.isAvailable
