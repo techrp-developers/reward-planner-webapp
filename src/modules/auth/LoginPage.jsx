@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import rpLogo from '../../assets/rplogo_nobg.svg';
+import rpLogo from '../../assets/rp_logo_crisp.png';
 import './LoginPage.css';
 
 

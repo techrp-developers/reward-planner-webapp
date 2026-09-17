@@ -39,6 +39,9 @@
     overflow-x: hidden;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {

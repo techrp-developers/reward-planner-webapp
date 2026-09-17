@@ -76,11 +76,16 @@ export const ProductDetailPage = () => {
   }, [id]);
 
   const handleCheckDelivery = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!checkPin || checkPin.length !== 6) return;
     setCheckingPin(true);
     try {
-      const res = await checkPincodeServiceability({ delivery_postcode: checkPin });
+      const res = await checkPincodeServiceability({
+        pincode: checkPin,
+        mode: 'buy_now',
+        variantId: resolveVariantId(),
+        quantity: 1,
+      });
       setDeliveryResult(res);
     } catch {
       setDeliveryResult({ serviceable: true });
@@ -88,6 +93,13 @@ export const ProductDetailPage = () => {
       setCheckingPin(false);
     }
   };
+
+  // Trigger delivery check when product and pincode are available
+  useEffect(() => {
+    if (product?.id && checkPin && checkPin.length === 6) {
+      handleCheckDelivery();
+    }
+  }, [product?.id, selectedVariant?.variant_id]);
 
   const resolveVariantId = () => {
     return (
@@ -367,12 +379,20 @@ export const ProductDetailPage = () => {
               </button>
             </form>
 
-            <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold pt-1">
-              <CheckCircle2 size={15} />
-              <span>
-                Express Delivery Available to {checkPin} by <strong>Tuesday, 10 Sep</strong> | Cash on Delivery available
-              </span>
-            </div>
+            {deliveryResult && (
+              <div className={`flex items-center gap-2 text-xs font-semibold pt-1 ${deliveryResult.serviceable !== false ? 'text-emerald-700' : 'text-rose-600'}`}>
+                {deliveryResult.serviceable !== false ? (
+                  <CheckCircle2 size={15} className="shrink-0 text-emerald-600" />
+                ) : (
+                  <RotateCcw size={15} className="shrink-0 text-rose-500" />
+                )}
+                <span>
+                  {deliveryResult.serviceable !== false
+                    ? `Express Delivery available to ${checkPin}${deliveryResult.vendors?.[0]?.options?.[0]?.estimated_delivery_date ? ` by ${new Date(deliveryResult.vendors[0].options[0].estimated_delivery_date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}` : ' within 2-4 business days'} | Verified Logistics`
+                    : (deliveryResult.message || 'Delivery currently unavailable for this pincode')}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* ACTION BUTTONS: BUY NOW & ADD TO CART */}
