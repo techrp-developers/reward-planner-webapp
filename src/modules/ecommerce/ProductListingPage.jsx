@@ -8,21 +8,27 @@ import {
   fetchCategoriesWithSub,
   fetchBestSellers,
   fetchTrending,
+  fetchNewArrivals,
+  fetchMostViewedProducts,
+  fetchRecentProducts,
+  fetchRecommendations,
 } from '../../api/productApi';
 import ProductCard from '../../components/product/ProductCard';
-import StoreSubCategoryStrip from './components/StoreSubCategoryStrip';
-import EcommerceBannerCarousel from './components/EcommerceBannerCarousel';
-import { Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw } from 'lucide-react';
+import EcommerceAdBannerCarousel from './components/EcommerceAdBannerCarousel';
+import EcommerceCategoriesGrid from './components/EcommerceCategoriesGrid';
+import EcommerceCampaignPosters from './components/EcommerceCampaignPosters';
+import EcommerceFlashSale from './components/EcommerceFlashSale';
+import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
+import EcommerceFeaturedWeek from './components/EcommerceFeaturedWeek';
+import EcommerceCategoryTabGrid from './components/EcommerceCategoryTabGrid';
+import { Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 import Pagination from '@mui/material/Pagination';
-
-// Material UI Icons for Flash Deals & Trending sections
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 export const ProductListingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { totalQuantity } = useCart();
 
   const query = searchParams.get('q') || searchParams.get('search') || '';
   const viewParam = searchParams.get('view') || '';
@@ -46,9 +52,12 @@ export const ProductListingPage = () => {
   const [currentPage, setCurrentPage] = useState(pageParam);
   const [loading, setLoading] = useState(false);
 
-  // Landing Page Showcase State (Flash Deals & Trending)
-  const [deals, setDeals] = useState([]);
-  const [trending, setTrending] = useState([]);
+  // Landing Page Showcase State (Step-by-Step Sections)
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [mostViewed, setMostViewed] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [landingLoading, setLandingLoading] = useState(true);
 
   // Live ticking countdown timer for Flash Deals (Ends in 04h : 32m : 18s)
@@ -81,36 +90,42 @@ export const ProductListingPage = () => {
       .catch((err) => console.error('Error fetching categories:', err));
   }, []);
 
-  // 2. Load Landing Data (Flash Deals & Trending) on mount
+  // 2. Load Landing Data (New Arrivals, Most Viewed, Recommendations, Recent, Featured) on mount
   useEffect(() => {
     let isMounted = true;
     const loadLandingData = async () => {
       setLandingLoading(true);
       try {
-        const [bsData, trData, allData] = await Promise.allSettled([
-          fetchBestSellers(),
-          fetchTrending(),
+        const [naData, mvData, recData, recpData, allData] = await Promise.allSettled([
+          fetchNewArrivals(),
+          fetchMostViewedProducts(10),
+          fetchRecommendations(10),
+          fetchRecentProducts(10),
           fetchAllProducts({ limit: 40 }),
         ]);
 
         if (!isMounted) return;
 
         const all = allData.status === 'fulfilled' && Array.isArray(allData.value) ? allData.value : [];
-        const bs = bsData.status === 'fulfilled' && Array.isArray(bsData.value) && bsData.value.length > 0
-          ? bsData.value
+        const na = naData.status === 'fulfilled' && Array.isArray(naData.value) && naData.value.length > 0
+          ? naData.value
           : all.slice(0, 10);
-        const tr = trData.status === 'fulfilled' && Array.isArray(trData.value) && trData.value.length > 0
-          ? trData.value
+        const mv = mvData.status === 'fulfilled' && Array.isArray(mvData.value) && mvData.value.length > 0
+          ? mvData.value
           : all.slice(10, 20);
+        const rec = recData.status === 'fulfilled' && Array.isArray(recData.value) && recData.value.length > 0
+          ? recData.value
+          : all.slice(20, 30);
+        const recp = recpData.status === 'fulfilled' && Array.isArray(recpData.value) && recpData.value.length > 0
+          ? recpData.value
+          : [];
+        const feat = all.length > 0 ? all.slice(5, 17) : na.slice(0, 10);
 
-        // Flash deals: high discount products
-        const discounted = all.filter((p) => {
-          const disc = parseInt(String(p.discount || '').replace(/\D/g, ''), 10);
-          return disc > 15;
-        });
-
-        setDeals(discounted.length > 0 ? discounted.slice(0, 5) : bs.slice(0, 5));
-        setTrending(tr.slice(0, 5));
+        setNewArrivals(na);
+        setMostViewed(mv);
+        setRecommendations(rec);
+        setRecentProducts(recp);
+        setFeaturedProducts(feat);
       } catch (err) {
         console.error('Error loading store landing data:', err);
       } finally {
@@ -301,112 +316,104 @@ export const ProductListingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-10 space-y-6 text-gray-900">
-      {/* 1. SUB CATEGORY STRIP (ALWAYS AT TOP IN E-COMMERCE MODULE) */}
-      <StoreSubCategoryStrip
-        activeCategory={resolvedCategoryId}
-        activeSub={subParam}
-        isAllActive={viewParam === 'all' && !categoryParam && !subParam}
-        onSelectCategory={handleSelectCategory}
-        onSelectSubcategory={handleSelectSubcategory}
-      />
-
+    <div className="min-h-screen bg-[#F8FAFC] pb-10 space-y-6 text-gray-900 pt-5">
       {/* ========================================================================= */}
       {/* VIEW A: STORE LANDING VIEW (WHEN ALL PRODUCTS / FILTERS NOT EXPLICITLY CLICKED) */}
-      {/* Hierarchy: Subcategories -> Banners -> Flash Deals -> Trending            */}
       {/* ========================================================================= */}
       {isLandingMode ? (
-        <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-6">
-          {/* 2. DEDICATED E-COMMERCE BANNERS SHOWCASE (DIFFERENT SHOPPING DESIGN) */}
-          <EcommerceBannerCarousel />
+        <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-8">
+          {/* Top End-Corner: 'All Products' Link & Shopping Cart in One Row (Below Header, Above Categories) */}
+          <div className="flex justify-end items-center gap-2 sm:gap-3 mb-1">
+            <button
+              type="button"
+              onClick={() => handleSelectCategory('all')}
+              className="text-sm font-bold text-gray-700 hover:text-[#7C3AED] flex items-center gap-1 transition-colors cursor-pointer group py-1.5 px-3 rounded-xl hover:bg-white hover:shadow-2xs border border-transparent hover:border-gray-200"
+            >
+              <span>All Products</span>
+              <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform text-gray-500 group-hover:text-[#7C3AED]" />
+            </button>
 
-          {/* 3. FLASH DEALS OF THE DAY WITH COUNTDOWN TIMER */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 gap-2">
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                  <WhatshotIcon sx={{ fontSize: 20 }} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
-                    Flash Deals of the Day
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 font-normal flex items-center gap-1.5 mt-0.5">
-                    <AccessTimeIcon sx={{ fontSize: 13 }} className="text-rose-500 shrink-0" />
-                    <span className="truncate">
-                      Ends in{' '}
-                      <strong className="text-rose-600 font-bold">
-                        {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
-                      </strong>
-                    </span>
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleSelectCategory('all')}
-                className="text-xs sm:text-sm font-semibold text-[#7C3AED] hover:underline flex items-center gap-0.5 shrink-0 cursor-pointer"
-              >
-                <span>View All Deals</span>
-                <ChevronRight size={16} />
-              </button>
-            </div>
+            {/* Shopping Cart Button with Live Badge */}
+            <button
+              type="button"
+              onClick={() => navigate('/cart')}
+              className="relative p-2 rounded-xl text-gray-700 hover:text-[#7C3AED] bg-white border border-gray-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center justify-center group"
+              title="Shopping Cart"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EC4899] text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
+          </div>
 
-            {landingLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {deals.map((prod) => (
-                  <ProductCard key={`deal-${prod.id}`} item={prod} />
-                ))}
-              </div>
-            )}
-          </section>
+          {/* ADVERTISEMENT HERO BANNER CAROUSEL (EXACT BANNERS MATCHING APP REFERENCE) */}
+          <EcommerceAdBannerCarousel onSelectCategory={handleSelectCategory} />
 
-          {/* 4. TRENDING IN CORPORATE PERKS & TECH */}
-          <section className="space-y-3 pb-8">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 gap-2">
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <div className="w-8.5 h-8.5 sm:w-10 sm:h-10 rounded-xl bg-violet-100 text-[#7C3AED] flex items-center justify-center shrink-0">
-                  <TrendingUpIcon sx={{ fontSize: 20 }} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate sm:whitespace-normal">
-                    Trending in Corporate Perks & Tech
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 font-normal mt-0.5 truncate sm:whitespace-normal">
-                    Most popular electronics, lifestyle perks, and corporate rewards this week
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleSelectCategory('all')}
-                className="text-xs sm:text-sm font-semibold text-[#7C3AED] hover:underline flex items-center gap-0.5 shrink-0 cursor-pointer"
-              >
-                <span>Explore All Products</span>
-                <ChevronRight size={16} />
-              </button>
-            </div>
+          {/* 1. CATEGORIES SECTION (WITH 3D PEDESTAL ICONS) */}
+          <EcommerceCategoriesGrid
+            onSelectCategory={handleSelectCategory}
+          />
 
-            {landingLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {trending.map((prod) => (
-                  <ProductCard key={`trend-${prod.id}`} item={prod} />
-                ))}
-              </div>
-            )}
-          </section>
+          {/* 2. CURATED PROMO POSTERS (VERTICAL POSTERS FROM /v1/campaign/home) */}
+          <EcommerceCampaignPosters onSelectCategory={handleSelectCategory} />
+
+          {/* 3. FLASH SALE SECTION (AMBER FLAME PATTERN + 3D LOGO + COUNTDOWN + CAMPAIGN 4 PRODUCTS) */}
+          <EcommerceFlashSale campaignId={4} />
+
+          {/* 4. NEW ARRIVALS ("The latest trends, just for you") */}
+          <EcommerceHorizontalSection
+            title="New Arrivals"
+            subtitle="The latest trends, just for you"
+            actionText="View All"
+            onAction={() => handleSelectCategory('all')}
+            products={newArrivals}
+            loading={landingLoading}
+          />
+
+          {/* 5. MOST VIEWED */}
+          <EcommerceHorizontalSection
+            title="Most Viewed"
+            actionText="Explore More"
+            onAction={() => handleSelectCategory('all')}
+            products={mostViewed}
+            loading={landingLoading}
+          />
+
+          {/* 6. YOU MAY LIKE THIS (RECOMMENDATIONS) */}
+          <EcommerceHorizontalSection
+            title="You May Like This"
+            actionText="Explore More"
+            onAction={() => handleSelectCategory('all')}
+            products={recommendations}
+            loading={landingLoading}
+          />
+
+          {/* 7. FEATURED THIS WEEK (WARM GOLD DUAL-ROW GRADIENT) */}
+          <EcommerceFeaturedWeek
+            products={featuredProducts}
+            loading={landingLoading}
+            onExplore={() => handleSelectCategory('all')}
+          />
+
+          {/* 8. RECENTLY VIEWED (SHOWN IF HISTORY PRESENT) */}
+          {recentProducts.length > 0 && (
+            <EcommerceHorizontalSection
+              title="Recently Viewed"
+              actionText="View All"
+              onAction={() => handleSelectCategory('all')}
+              products={recentProducts}
+              loading={landingLoading}
+            />
+          )}
+
+          {/* 9. BOTTOM INTERACTIVE CATEGORY TABS & DYNAMIC PRODUCT GRID */}
+          <EcommerceCategoryTabGrid
+            onOpenCategoryCatalog={(catId) => handleSelectCategory(catId)}
+          />
         </div>
       ) : (
         /* ========================================================================= */
@@ -466,38 +473,33 @@ export const ProductListingPage = () => {
                 )}
               </nav>
 
-              <h2 className="text-xl sm:text-2xl font-black text-gray-900 flex items-baseline gap-2 flex-wrap">
-                <span>
-                  {query
-                    ? `Search Results for "${query}"`
-                    : activeSubcategoryObj
-                    ? activeSubcategoryObj.name
-                    : activeCategoryObj
-                    ? activeCategoryObj.name
-                    : 'All Products'}
-                </span>
-                <span className="text-xs font-semibold text-gray-500">
-                  ({totalProducts > 0 ? `${totalProducts} Products in Database` : `${filteredProducts.length} Products`})
-                </span>
+              <h2 className="text-xl sm:text-2xl font-black text-gray-900">
+                {query
+                  ? `Search Results for "${query}"`
+                  : activeSubcategoryObj
+                  ? activeSubcategoryObj.name
+                  : activeCategoryObj
+                  ? activeCategoryObj.name
+                  : 'All Products'}
               </h2>
             </div>
 
             {/* Top Controls: Mobile Filter Button & Sort By Dropdown */}
-            <div className="flex items-center gap-3 self-end md:self-auto text-xs font-semibold">
+            <div className="flex items-center gap-3 self-end md:self-auto text-sm font-semibold">
               <button
                 onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-                className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-xl shadow-2xs text-gray-700 font-bold hover:bg-gray-50 cursor-pointer"
+                className="lg:hidden flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-300 rounded-xl shadow-2xs text-gray-700 font-bold hover:bg-gray-50 cursor-pointer"
               >
-                <Filter size={15} className="text-[#7C3AED]" />
+                <Filter size={16} className="text-[#7C3AED]" />
                 <span>Filters</span>
               </button>
 
               <div className="flex items-center gap-2">
-                <span className="text-gray-500 hidden sm:inline">Sort By:</span>
+                <span className="text-gray-600 hidden sm:inline text-sm">Sort By:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-white border border-gray-300 text-gray-800 rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#7C3AED] shadow-2xs cursor-pointer"
+                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#7C3AED] shadow-2xs cursor-pointer font-medium"
                 >
                   <option value="popular">Most Popular</option>
                   <option value="price-low">Price: Low to High</option>
@@ -506,6 +508,22 @@ export const ProductListingPage = () => {
                   <option value="discount">Biggest Discount</option>
                 </select>
               </div>
+
+              {/* Shopping Cart Button with Live Badge */}
+              <button
+                type="button"
+                onClick={() => navigate('/cart')}
+                className="relative p-2 rounded-xl text-gray-700 hover:text-[#7C3AED] bg-white border border-gray-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center justify-center group"
+                title="Shopping Cart"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart size={19} className="group-hover:scale-105 transition-transform" />
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EC4899] text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+                    {totalQuantity}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
@@ -521,23 +539,23 @@ export const ProductListingPage = () => {
             >
               {/* Sidebar Header */}
               <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                  <SlidersHorizontal size={16} className="text-[#7C3AED]" />
+                <div className="flex items-center gap-2 text-base font-bold text-gray-900">
+                  <SlidersHorizontal size={17} className="text-[#7C3AED]" />
                   <span>Filter Products</span>
                 </div>
                 {(selectedPriceRange !== 'all' || selectedMinRating > 0 || subParam || (categoryParam && categoryParam !== 'all')) && (
                   <button
                     onClick={handleResetFilters}
-                    className="text-[11px] font-bold text-[#7C3AED] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-[#7C3AED] hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <RotateCcw size={12} />
+                    <RotateCcw size={13} />
                     <span>Reset</span>
                   </button>
                 )}
                 {mobileFilterOpen && (
                   <button
                     onClick={() => setMobileFilterOpen(false)}
-                    className="lg:hidden text-gray-400 hover:text-gray-700 text-sm font-bold ml-2 cursor-pointer"
+                    className="lg:hidden text-gray-400 hover:text-gray-700 text-base font-bold ml-2 cursor-pointer"
                   >
                     ✕
                   </button>
@@ -545,20 +563,20 @@ export const ProductListingPage = () => {
               </div>
 
               {/* 1. Category Hierarchy Filter */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Categories</h4>
+              <div className="space-y-2.5">
+                <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Categories</h4>
                 <div className="space-y-1">
                   {/* All Products option */}
                   <button
                     onClick={() => handleSelectCategory('all')}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer ${
                       viewParam === 'all' && !categoryParam && !subParam
                         ? 'bg-purple-100 text-[#7C3AED] font-bold'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     <span>All Products</span>
-                    {viewParam === 'all' && !categoryParam && !subParam && <Check size={14} />}
+                    {viewParam === 'all' && !categoryParam && !subParam && <Check size={16} />}
                   </button>
 
                   {/* Category Tree with Accordion Subcategories */}
@@ -571,7 +589,7 @@ export const ProductListingPage = () => {
                       <div key={cat.id} className="rounded-lg">
                         <div
                           onClick={() => handleSelectCategory(cat.id)}
-                          className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer group ${
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer group ${
                             isCatSelected && !subParam
                               ? 'bg-purple-100 text-[#7C3AED] font-bold'
                               : 'text-gray-700 hover:bg-gray-100'
@@ -583,10 +601,10 @@ export const ProductListingPage = () => {
                               <button
                                 type="button"
                                 onClick={(e) => toggleCategoryExpand(cat.id, e)}
-                                className="p-0.5 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-700"
+                                className="p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-700"
                               >
                                 <ChevronDown
-                                  size={14}
+                                  size={16}
                                   className={`transition-transform duration-200 ${
                                     isExpanded ? 'rotate-180' : ''
                                   }`}
@@ -605,10 +623,10 @@ export const ProductListingPage = () => {
                                 <button
                                   key={sub.id}
                                   onClick={() => handleSelectSubcategory(cat.id, sub.id)}
-                                  className={`w-full text-left px-2.5 py-1 rounded text-[11px] transition-colors block truncate cursor-pointer ${
+                                  className={`w-full text-left px-2.5 py-1.5 rounded text-xs transition-colors block truncate cursor-pointer ${
                                     isSubSelected
                                       ? 'text-[#7C3AED] font-bold bg-purple-50'
-                                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                   }`}
                                 >
                                   {sub.name}
@@ -624,9 +642,9 @@ export const ProductListingPage = () => {
               </div>
 
               {/* 2. Price Range Filter */}
-              <div className="space-y-2 border-t border-gray-100 pt-4">
-                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Price Range</h4>
-                <div className="space-y-1.5 text-xs text-gray-600">
+              <div className="space-y-2.5 border-t border-gray-100 pt-4">
+                <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Price Range</h4>
+                <div className="space-y-2 text-sm text-gray-700">
                   {[
                     { label: 'All Prices', value: 'all' },
                     { label: 'Under ₹1,000', value: 'under-1000' },
@@ -634,13 +652,13 @@ export const ProductListingPage = () => {
                     { label: '₹3,000 - ₹5,000', value: '3000-5000' },
                     { label: 'Above ₹5,000', value: 'above-5000' },
                   ].map((p) => (
-                    <label key={p.value} className="flex items-center gap-2 cursor-pointer py-0.5 hover:text-gray-900">
+                    <label key={p.value} className="flex items-center gap-2.5 cursor-pointer py-0.5 hover:text-gray-900">
                       <input
                         type="radio"
                         name="priceFilter"
                         checked={selectedPriceRange === p.value}
                         onChange={() => setSelectedPriceRange(p.value)}
-                        className="accent-[#7C3AED]"
+                        className="accent-[#7C3AED] h-4 w-4"
                       />
                       <span>{p.label}</span>
                     </label>
@@ -649,22 +667,22 @@ export const ProductListingPage = () => {
               </div>
 
               {/* 3. Rating Filter */}
-              <div className="space-y-2 border-t border-gray-100 pt-4">
-                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Customer Rating</h4>
-                <div className="space-y-1.5 text-xs text-gray-600">
+              <div className="space-y-2.5 border-t border-gray-100 pt-4">
+                <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Customer Rating</h4>
+                <div className="space-y-2 text-sm text-gray-700">
                   {[
                     { label: 'All Ratings', rating: 0 },
                     { label: '4★ & above', rating: 4 },
                     { label: '3★ & above', rating: 3 },
                     { label: '2★ & above', rating: 2 },
                   ].map((r) => (
-                    <label key={r.rating} className="flex items-center gap-2 cursor-pointer py-0.5 hover:text-gray-900">
+                    <label key={r.rating} className="flex items-center gap-2.5 cursor-pointer py-0.5 hover:text-gray-900">
                       <input
                         type="radio"
                         name="ratingFilter"
                         checked={selectedMinRating === r.rating}
                         onChange={() => setSelectedMinRating(r.rating)}
-                        className="accent-[#7C3AED]"
+                        className="accent-[#7C3AED] h-4 w-4"
                       />
                       <span className="flex items-center gap-1">
                         {r.label}
@@ -717,8 +735,8 @@ export const ProductListingPage = () => {
                   {/* Pagination Bar */}
                   {totalPages > 1 && (
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
-                      <span className="text-xs text-gray-500 font-medium">
-                        Showing Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong> ({totalProducts} Total Products in Database)
+                      <span className="text-sm text-gray-600 font-medium">
+                        Showing Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                       </span>
 
                       <Pagination

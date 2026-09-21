@@ -32,64 +32,64 @@ export const Footer = () => {
               </div>
             </Link>
 
-            <p className="text-xs text-slate-400 leading-relaxed max-w-xs font-normal">
+            <p className="text-sm text-slate-400 leading-relaxed max-w-xs font-normal">
               Plan. Shop. Pay. Earn. A Better Everyday.
             </p>
 
             {/* Social Icons Row */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2.5 pt-1">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
-                className="w-7 h-7 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                className="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
               >
-                <FacebookIcon sx={{ fontSize: 16 }} />
+                <FacebookIcon sx={{ fontSize: 18 }} />
               </a>
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
-                className="w-7 h-7 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                className="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
               >
-                <InstagramIcon sx={{ fontSize: 16 }} />
+                <InstagramIcon sx={{ fontSize: 18 }} />
               </a>
               <a
                 href="https://twitter.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Twitter / X"
-                className="w-7 h-7 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                className="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
               >
-                <TwitterIcon sx={{ fontSize: 16 }} />
+                <TwitterIcon sx={{ fontSize: 18 }} />
               </a>
               <a
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"
-                className="w-7 h-7 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                className="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
               >
-                <LinkedInIcon sx={{ fontSize: 16 }} />
+                <LinkedInIcon sx={{ fontSize: 18 }} />
               </a>
               <a
                 href="https://youtube.com"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="YouTube"
-                className="w-7 h-7 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                className="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-[#7C3AED] text-slate-300 hover:text-white flex items-center justify-center transition-all hover:scale-110"
               >
-                <YouTubeIcon sx={{ fontSize: 16 }} />
+                <YouTubeIcon sx={{ fontSize: 18 }} />
               </a>
             </div>
           </div>
 
           {/* 1. Products Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Products</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Products</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/store" className="hover:text-white transition-colors">
                   Shop
@@ -115,8 +115,8 @@ export const Footer = () => {
 
           {/* 2. Services Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Services</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Services</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/services" className="hover:text-white transition-colors">
                   Insurance
@@ -147,8 +147,8 @@ export const Footer = () => {
 
           {/* 3. Payments Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Payments</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Payments</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/bbps?category=Mobile%20Prepaid" className="hover:text-white transition-colors">
                   Mobile Recharges
@@ -174,8 +174,8 @@ export const Footer = () => {
 
           {/* 4. Company Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Company</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Company</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/terms" className="hover:text-white transition-colors">
                   About Us
@@ -196,8 +196,8 @@ export const Footer = () => {
 
           {/* 5. Support Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Support</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Support</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/support-policy" className="hover:text-white transition-colors">
                   Help Centre
@@ -218,8 +218,8 @@ export const Footer = () => {
 
           {/* 6. Legal Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Legal</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+            <h4 className="text-sm font-bold uppercase tracking-wider text-white">Legal</h4>
+            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
                 <Link to="/terms" className="hover:text-white transition-colors">
                   Terms & Conditions
@@ -240,12 +240,12 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar: Copyright & Security Badges */}
-        <div className="border-t border-slate-800/80 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
+        <div className="border-t border-slate-800/80 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 gap-3">
           <div>
             © 2024 Reward Planners. All rights reserved.
           </div>
           <div className="flex items-center gap-2 text-slate-300">
-            <LockOutlinedIcon sx={{ fontSize: 15 }} className="text-[#A855F7]" />
+            <LockOutlinedIcon sx={{ fontSize: 17 }} className="text-[#A855F7]" />
             <span>Secure | Trusted | Rewarding</span>
           </div>
         </div>
