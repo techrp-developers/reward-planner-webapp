@@ -1,6 +1,6 @@
 // src/components/common/ErrorBoundary.jsx
 import React from 'react';
-import rpLogo from '../../assets/rplogo_nobg.svg';
+import rpLogo from '../../assets/rp_logo_crisp.png';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {

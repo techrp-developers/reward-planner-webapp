@@ -2,17 +2,33 @@
 import api from './client';
 import { ENDPOINTS } from './endpoints';
 
-export const checkPincodeServiceability = async ({ pickup_postcode = '400001', delivery_postcode, weight = 0.5, cod = 0 }) => {
+export const checkPincodeServiceability = async (params = {}) => {
+  const pin = params.pincode || params.delivery_postcode;
+  const cleanPin = String(pin || '').trim();
+  if (!cleanPin || cleanPin.length !== 6) {
+    return { serviceable: false, message: 'Valid 6-digit pincode required' };
+  }
+
   try {
-    const res = await api.post(ENDPOINTS.logistics.checkServiceability, {
-      pickup_postcode,
-      delivery_postcode,
-      weight,
-      cod,
-    });
-    return res.data?.data || res.data;
+    const payload = {
+      pincode: cleanPin,
+      mode: params.mode || (params.variantId || params.variant_id ? 'buy_now' : 'cart'),
+      paymentType: params.paymentType || 'prepaid',
+    };
+    if (payload.mode === 'buy_now' && (params.variantId || params.variant_id)) {
+      payload.variantId = Number(params.variantId || params.variant_id);
+      payload.quantity = Number(params.quantity || 1);
+    }
+
+    const res = await api.post(ENDPOINTS.logistics.checkServiceability, payload);
+    return res.data;
   } catch (error) {
-    return { serviceable: false, message: error?.response?.data?.message || 'Pincode check unavailable' };
+    const errMsg = error?.response?.data?.message;
+    return {
+      serviceable: error?.response?.status !== 400 && error?.response?.status !== 404,
+      fallback: true,
+      message: errMsg || 'Standard delivery available to this pincode',
+    };
   }
 };
 

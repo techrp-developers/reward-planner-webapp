@@ -284,8 +284,9 @@ export const CartProvider = ({ children }) => {
   }, [items]);
 
   const subtotal = useMemo(() => {
+    if (cartSummary?.cartTotal) return Number(cartSummary.cartTotal);
     return items.reduce((sum, item) => sum + (Number(item.price) * (Number(item.quantity) || 1)), 0);
-  }, [items]);
+  }, [items, cartSummary]);
 
   const totalMrp = useMemo(() => {
     return items.reduce((sum, item) => sum + (Number(item.mrp || item.price) * (Number(item.quantity) || 1)), 0);
@@ -295,9 +296,20 @@ export const CartProvider = ({ children }) => {
     return totalMrp > subtotal ? totalMrp - subtotal : 0;
   }, [totalMrp, subtotal]);
 
+  const finalPayable = useMemo(() => {
+    if (cartSummary?.finalPayable !== undefined) return Number(cartSummary.finalPayable);
+    return subtotal;
+  }, [subtotal, cartSummary]);
+
+  const redeemedCoins = useMemo(() => {
+    if (cartSummary?.totalRedeemed !== undefined) return Number(cartSummary.totalRedeemed);
+    return 0;
+  }, [cartSummary]);
+
   const estimatedCoins = useMemo(() => {
+    if (cartSummary?.totalRewardEarn !== undefined) return Number(cartSummary.totalRewardEarn);
     return items.reduce((sum, item) => sum + (Number(item.rewardCoins || 0) * (Number(item.quantity) || 1)), 0);
-  }, [items]);
+  }, [items, cartSummary]);
 
   return (
     <CartContext.Provider
@@ -308,6 +320,8 @@ export const CartProvider = ({ children }) => {
         subtotal,
         totalMrp,
         totalSavings,
+        finalPayable,
+        redeemedCoins,
         estimatedCoins,
         isDrawerOpen,
         loading,

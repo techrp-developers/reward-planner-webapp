@@ -38,6 +38,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const ADDRESS_STORAGE_KEY = 'rp_saved_addresses_v1';
@@ -225,7 +226,7 @@ export const CheckoutPage = () => {
     rawSummary?.finalPayable ??
     Math.max(0, subtotal - (useRewards ? coinsDiscount : 0) + shippingCharges)
   );
-  const availableCoins = Number(user?.reward_points ?? user?.coins ?? user?.wallet_balance ?? 500);
+  const availableCoins = Number(checkoutData?.wallet?.balance ?? user?.reward_points ?? user?.coins ?? user?.wallet_balance ?? 500);
 
   // Address Handlers
   const handleSaveAddress = async (data) => {
@@ -328,10 +329,10 @@ export const CheckoutPage = () => {
         latestData = await fetchCheckoutCartPreview(useRewards, selectedAddressId);
       }
 
-      const sum = latestData?.summary || latestData?.data?.summary || latestData || {};
+      const sum = latestData?.summary || latestData?.data?.summary || latestData?.data || latestData || {};
       const rew = sum?.reward || latestData?.reward || {};
-      const latestPayable = Number(sum?.payableAmount ?? sum?.finalPayable ?? finalPayable);
-      const latestRedeemable = useRewards ? Number(rew?.redeemCoins ?? coinsDiscount) : 0;
+      const latestPayable = Number(latestData?.payableAmount ?? sum?.payableAmount ?? sum?.finalPayable ?? finalPayable);
+      const latestRedeemable = useRewards ? Number(latestData?.reward?.redeemCoins ?? rew?.redeemCoins ?? coinsDiscount) : 0;
 
       // 2. Place Order on Backend
       let orderRes;

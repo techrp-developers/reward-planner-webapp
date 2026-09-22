@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from '../../context/LocationContext';
 import { fetchCategoriesWithSub } from '../../api/productApi';
-import rpLogo from '../../assets/rplogo_nobg.svg';
+import rpLogo from '../../assets/rp_logo_crisp.png';
 
 // Material UI Icons
 import CloseIcon from '@mui/icons-material/Close';

@@ -151,6 +151,39 @@ export const fetchTopRated = async () => {
   return fetchAllProducts({ page: 1, limit: 10 });
 };
 
+export const fetchMostViewedProducts = async (limit = 10) => {
+  try {
+    const res = await api.get(ENDPOINTS.products.mostViewed, { params: { limit } });
+    const list = wrapNormalizedList(res.data);
+    if (list.length > 0) return list;
+  } catch (err) {
+    console.warn('most-viewed endpoint empty/failed, falling back to all-products', err);
+  }
+  return fetchAllProducts({ page: 1, limit });
+};
+
+export const fetchRecentProducts = async (limit = 10) => {
+  try {
+    const res = await api.get(ENDPOINTS.products.recentProducts, { params: { limit } });
+    const list = wrapNormalizedList(res.data);
+    if (list.length > 0) return list;
+  } catch (err) {
+    console.warn('recent-products endpoint empty/failed', err);
+  }
+  return [];
+};
+
+export const fetchRecommendations = async (limit = 10) => {
+  try {
+    const res = await api.get(ENDPOINTS.products.recommendations, { params: { limit } });
+    const list = wrapNormalizedList(res.data);
+    if (list.length > 0) return list;
+  } catch (err) {
+    console.warn('recommendations endpoint empty/failed, falling back to all-products', err);
+  }
+  return fetchAllProducts({ page: 2, limit });
+};
+
 export const fetchGlobalSearchSuggestions = async (q, signal) => {
   if (!q || !q.trim()) return { products: [], services: [] };
   try {
@@ -176,5 +209,8 @@ export default {
   fetchBestSellers,
   fetchTrending,
   fetchTopRated,
+  fetchMostViewedProducts,
+  fetchRecentProducts,
+  fetchRecommendations,
   fetchGlobalSearchSuggestions,
 };

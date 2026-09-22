@@ -8,7 +8,7 @@ import MegaMenuStrip from '../components/layout/MegaMenuStrip';
 import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
-import rpLogo from '../assets/rplogo_nobg.svg';
+import rpLogo from '../assets/rp_logo_crisp.png';
 
 import LoginPage from '../modules/auth/LoginPage';
 import HomePage from '../modules/home/HomePage';
@@ -38,6 +38,11 @@ export const AppRouter = () => {
     '/refund-cancellation-policy',
     '/support-policy',
   ].includes(location.pathname.toLowerCase()) || location.pathname.toLowerCase().startsWith('/policies/');
+
+  const isEcommercePage =
+    location.pathname.startsWith('/store') ||
+    location.pathname.startsWith('/deals') ||
+    location.pathname.startsWith('/product');
 
   // 1. Initial Session Hydration Screen
   if (loading) {
@@ -129,8 +134,8 @@ export const AppRouter = () => {
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
 
-      {/* FULL-WIDTH FOOTER (Hidden on dedicated policy pages per user specification) */}
-      {!isPolicyPage && <Footer />}
+      {/* FULL-WIDTH FOOTER (Hidden on dedicated policy pages and e-commerce pages per user specification) */}
+      {!isPolicyPage && !isEcommercePage && <Footer />}
     </div>
   );
 };

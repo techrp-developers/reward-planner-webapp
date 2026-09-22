@@ -137,7 +137,7 @@ export const cancelPendingPaymentOrder = async (orderId) => {
 
 export const fetchOrderReceipt = async (orderId) => {
   const res = await api.get(ENDPOINTS.orders.receipt(orderId));
-  return res.data?.data || res.data;
+  return res.data?.receipt || res.data?.data || res.data;
 };
 
 export const fetchMyOrders = async (params = {}) => {
