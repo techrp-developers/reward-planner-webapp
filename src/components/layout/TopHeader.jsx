@@ -21,7 +21,10 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import iconHome from '../../assets/icon1.png';
+import iconProducts from '../../assets/icon2.png';
+import iconServices from '../../assets/icon3.png';
+import iconPayments from '../../assets/icon4.png';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
@@ -29,9 +32,9 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import userAvatar from '../../assets/home/user-avatar.png';
+import iconNotification from '../../assets/icon5.png';
+import iconProfile from '../../assets/icon6.png';
 
 export const TopHeader = () => {
   const { user, isAuthenticated, openAuth } = useAuth();
@@ -174,77 +177,112 @@ export const TopHeader = () => {
             </Link>
           </div>
 
-          {/* Center: Clean Nav Pills (Desktop & Tablet) */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-2.5">
+          {/* Center: Clean Nav Links with Icons & Active Indicator (Mockup Parity) */}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-3">
             <Link
               to="/"
-              className={`px-5.5 py-2 rounded-full text-[15px] sm:text-base transition-all ${
+              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'home'
-                  ? 'font-bold bg-[#EDE9FE] text-[#6D28D9] border border-[#DDD6FE] shadow-xs'
-                  : 'font-semibold text-slate-800 hover:text-[#6D28D9] hover:bg-purple-50/70 border border-transparent'
+                  ? 'font-bold text-[#6D28D9]'
+                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
               }`}
             >
-              Home
+              <img
+                src={iconHome}
+                alt="Home"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+              />
+              <span>Home</span>
+              {activeTab === 'home' && (
+                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+              )}
             </Link>
+
             <Link
               to="/store"
-              className={`px-5.5 py-2 rounded-full text-[15px] sm:text-base transition-all ${
+              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'products'
-                  ? 'font-bold bg-[#EDE9FE] text-[#6D28D9] border border-[#DDD6FE] shadow-xs'
-                  : 'font-semibold text-slate-800 hover:text-[#6D28D9] hover:bg-purple-50/70 border border-transparent'
+                  ? 'font-bold text-[#6D28D9]'
+                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
               }`}
             >
-              Products
+              <img
+                src={iconProducts}
+                alt="Products"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+              />
+              <span>Products</span>
+              {activeTab === 'products' && (
+                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+              )}
             </Link>
+
             <Link
               to="/services"
-              className={`px-5.5 py-2 rounded-full text-[15px] sm:text-base transition-all ${
+              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'services'
-                  ? 'font-bold bg-[#EDE9FE] text-[#6D28D9] border border-[#DDD6FE] shadow-xs'
-                  : 'font-semibold text-slate-800 hover:text-[#6D28D9] hover:bg-purple-50/70 border border-transparent'
+                  ? 'font-bold text-[#6D28D9]'
+                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
               }`}
             >
-              Services
+              <img
+                src={iconServices}
+                alt="Services"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+              />
+              <span>Services</span>
+              {activeTab === 'services' && (
+                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+              )}
             </Link>
+
             <Link
               to="/bbps"
-              className={`px-5.5 py-2 rounded-full text-[15px] sm:text-base transition-all ${
+              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'payments'
-                  ? 'font-bold bg-[#EDE9FE] text-[#6D28D9] border border-[#DDD6FE] shadow-xs'
-                  : 'font-semibold text-slate-800 hover:text-[#6D28D9] hover:bg-purple-50/70 border border-transparent'
+                  ? 'font-bold text-[#6D28D9]'
+                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
               }`}
             >
-              Payments
+              <img
+                src={iconPayments}
+                alt="Payments"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+              />
+              <span>Payments</span>
+              {activeTab === 'payments' && (
+                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+              )}
             </Link>
           </nav>
 
-          {/* Right: Notification Bell + User Avatar (Cart icon removed per request) */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Notification Bell */}
+          {/* Right: 3D Notification Bell + 3D User Avatar */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* 3D Notification Bell with Badge 3 */}
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="relative p-2 rounded-full text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
+              className="relative p-1 rounded-full text-slate-700 hover:opacity-90 transition-all cursor-pointer group"
               title="Notifications"
               aria-label="Notifications"
             >
-              <NotificationsNoneOutlinedIcon sx={{ fontSize: 23 }} />
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#EC4899] text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white shadow-xs">
-                2
-              </span>
+              <img
+                src={iconNotification}
+                alt="Notifications"
+                className="w-8.5 h-8.5 sm:w-9 sm:h-9 object-contain group-hover:scale-110 transition-transform"
+              />
             </button>
 
-            {/* Profile Avatar */}
+            {/* 3D Profile Avatar */}
             <Link
               to="/profile"
-              className="flex items-center justify-center cursor-pointer ml-1 group"
+              className="flex items-center justify-center cursor-pointer group ml-0.5"
               title="My Profile"
             >
               <img
-                src={userAvatar}
+                src={iconProfile}
                 alt="Profile"
-                className="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-purple-200/90 group-hover:ring-purple-500 transition-all shadow-xs"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                className="w-9 h-9 sm:w-9.5 sm:h-9.5 object-contain group-hover:scale-110 transition-transform"
               />
             </Link>
           </div>

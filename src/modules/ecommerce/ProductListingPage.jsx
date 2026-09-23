@@ -16,7 +16,6 @@ import {
 import ProductCard from '../../components/product/ProductCard';
 import EcommerceAdBannerCarousel from './components/EcommerceAdBannerCarousel';
 import EcommerceCategoriesGrid from './components/EcommerceCategoriesGrid';
-import EcommerceCampaignPosters from './components/EcommerceCampaignPosters';
 import EcommerceFlashSale from './components/EcommerceFlashSale';
 import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
 import EcommerceFeaturedWeek from './components/EcommerceFeaturedWeek';
@@ -358,10 +357,7 @@ export const ProductListingPage = () => {
             onSelectCategory={handleSelectCategory}
           />
 
-          {/* 2. CURATED PROMO POSTERS (VERTICAL POSTERS FROM /v1/campaign/home) */}
-          <EcommerceCampaignPosters onSelectCategory={handleSelectCategory} />
-
-          {/* 3. FLASH SALE SECTION (AMBER FLAME PATTERN + 3D LOGO + COUNTDOWN + CAMPAIGN 4 PRODUCTS) */}
+          {/* 2. FLASH SALE SECTION (AMBER FLAME PATTERN + 3D LOGO + COUNTDOWN + CAMPAIGN 4 PRODUCTS) */}
           <EcommerceFlashSale campaignId={4} />
 
           {/* 4. NEW ARRIVALS ("The latest trends, just for you") */}

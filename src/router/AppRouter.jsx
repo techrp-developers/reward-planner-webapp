@@ -39,6 +39,8 @@ export const AppRouter = () => {
     '/support-policy',
   ].includes(location.pathname.toLowerCase()) || location.pathname.toLowerCase().startsWith('/policies/');
 
+  const isHomePage = location.pathname === '/';
+
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
     location.pathname.startsWith('/deals') ||
@@ -78,7 +80,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#111827]">
+    <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-[#111827] ${isHomePage ? 'h-screen overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
@@ -87,7 +89,7 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className="flex-1 w-full">
+      <main className={`flex-1 w-full ${isHomePage ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
         <Routes>
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/" element={<HomePage />} />
@@ -134,8 +136,8 @@ export const AppRouter = () => {
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
 
-      {/* FULL-WIDTH FOOTER (Hidden on dedicated policy pages and e-commerce pages per user specification) */}
-      {!isPolicyPage && !isEcommercePage && <Footer />}
+      {/* FULL-WIDTH FOOTER (Hidden on home dashboard, dedicated policy pages, and e-commerce pages per user specification) */}
+      {!isPolicyPage && !isEcommercePage && !isHomePage && <Footer />}
     </div>
   );
 };

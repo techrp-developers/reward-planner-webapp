@@ -2,52 +2,40 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import bannerKurta from '../../../assets/ecommerce/banners/banner_kurta.png';
-import bannerLava from '../../../assets/ecommerce/banners/banner_lava.png';
-import bannerColgate from '../../../assets/ecommerce/banners/banner_colgate.png';
-import bannerAdidas from '../../../assets/ecommerce/banners/banner_adidas.png';
-import bannerMivi from '../../../assets/ecommerce/banners/banner_mivi.png';
+import banner1 from '../../../assets/banners/bannerimge1.png';
+import banner2 from '../../../assets/banners/bannerimage2.png';
+import banner3 from '../../../assets/banners/bannerimage3.png';
 
 const AD_BANNERS = [
   {
-    id: 'kurta',
-    image: bannerKurta,
-    title: 'Kurta Sets - Min. 75% Off',
-    subtitle: 'Top ethnic collection! Early Bird Deals',
-    categoryId: 7, // Fashion
-    tag: 'Fashion',
-  },
-  {
-    id: 'lava',
-    image: bannerLava,
-    title: 'Lava Virat Curve',
-    subtitle: 'Watch now • Launch event is live',
-    categoryId: 1, // Electronics
-    tag: 'Mobiles',
-  },
-  {
-    id: 'colgate',
-    image: bannerColgate,
+    id: 'banner-1',
+    image: banner1,
     title: 'Colgate Total - Up to 50% Off',
     subtitle: 'Prevent dental issues • Upgrade to Colgate Total',
     categoryId: 3, // Beauty / Personal Care
     tag: 'Personal Care',
+    objectFit: 'object-contain',
+    bgColor: 'bg-white',
   },
   {
-    id: 'adidas',
-    image: bannerAdidas,
-    title: 'Adidas - Min. 50% Off',
-    subtitle: 'Classic style, best deal! Add to cart before it is gone',
-    categoryId: 22, // Sports & Fitness
-    tag: 'Footwear',
-  },
-  {
-    id: 'mivi',
-    image: bannerMivi,
-    title: 'Mivi DuoPods Blaze - Flat 82% Off',
-    subtitle: 'Enjoy 40 hrs playtime • DuoPods Blaze',
+    id: 'banner-2',
+    image: banner2,
+    title: 'Lava Virat Curve',
+    subtitle: 'Watch now • Launch event is live',
     categoryId: 1, // Electronics
-    tag: 'Audio',
+    tag: 'Mobiles',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#0f172a]',
+  },
+  {
+    id: 'banner-3',
+    image: banner3,
+    title: 'Kurta Sets - Min. 75% Off',
+    subtitle: 'Top ethnic collection! Early Bird Deals',
+    categoryId: 7, // Fashion
+    tag: 'Fashion',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#581c87]',
   },
 ];
 
@@ -150,7 +138,7 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex items-center gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 sm:px-2"
+          className="relative flex items-center gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 sm:px-2"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {AD_BANNERS.map((banner, index) => {
@@ -161,7 +149,9 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
                 ref={(el) => (cardRefs.current[index] = el)}
                 onClick={() => handleBannerClick(banner)}
                 style={{ scrollSnapAlign: 'center' }}
-                className={`w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[520px] shrink-0 aspect-[386/187] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 bg-white ${
+                className={`w-[85vw] sm:w-[440px] md:w-[500px] lg:w-[560px] shrink-0 aspect-[16/9] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 ${
+                  banner.bgColor || 'bg-white'
+                } ${
                   isActive
                     ? 'shadow-md scale-[1.01] ring-1 ring-purple-100'
                     : 'shadow-xs hover:shadow-md opacity-95 hover:opacity-100 hover:scale-[1.01]'
@@ -171,7 +161,9 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
                   src={banner.image}
                   alt={banner.title}
                   loading={index < 2 ? 'eager' : 'lazy'}
-                  className="w-full h-full object-cover select-none pointer-events-none"
+                  className={`w-full h-full ${
+                    banner.objectFit || 'object-cover'
+                  } select-none pointer-events-none`}
                   draggable={false}
                 />
               </div>
