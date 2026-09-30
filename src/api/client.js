@@ -9,7 +9,7 @@ export const api = axios.create({
 
 // Request interceptor: attach token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('rp_access_token');
+  const token = sessionStorage.getItem('rp_access_token') || localStorage.getItem('rp_access_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -56,8 +56,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem('rp_refresh_token');
+      const refreshToken = sessionStorage.getItem('rp_refresh_token') || localStorage.getItem('rp_refresh_token');
       if (!refreshToken) {
+        sessionStorage.removeItem('rp_access_token');
+        sessionStorage.removeItem('rp_refresh_token');
         localStorage.removeItem('rp_access_token');
         localStorage.removeItem('rp_refresh_token');
         processQueue(new Error('Missing refresh token'), null);
@@ -73,7 +75,7 @@ api.interceptors.response.use(
         const newToken = res.data?.accessToken || res.data?.data?.accessToken;
         if (!newToken) throw new Error('No new token in refresh response');
 
-        localStorage.setItem('rp_access_token', newToken);
+        sessionStorage.setItem('rp_access_token', newToken);
         api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
         processQueue(null, newToken);
 
@@ -81,6 +83,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshErr) {
         processQueue(refreshErr, null);
+        sessionStorage.removeItem('rp_access_token');
+        sessionStorage.removeItem('rp_refresh_token');
         localStorage.removeItem('rp_access_token');
         localStorage.removeItem('rp_refresh_token');
         window.dispatchEvent(new CustomEvent('rp_session_expired'));

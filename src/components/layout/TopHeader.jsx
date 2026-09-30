@@ -14,6 +14,15 @@ import LocationModal from './LocationModal';
 import MobileNavDrawer from './MobileNavDrawer';
 import RPpriceBadge from '../ui/RPpriceBadge';
 import rpLogo from '../../assets/rp_logo_crisp.png';
+import userAvatar from '../../assets/home/user-avatar.png';
+import {
+  Home,
+  ShoppingBag,
+  LayoutGrid,
+  CreditCard,
+  Bell,
+  ChevronDown,
+} from 'lucide-react';
 
 // Material UI Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -21,10 +30,10 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import iconHome from '../../assets/icon1.png';
-import iconProducts from '../../assets/icon2.png';
-import iconServices from '../../assets/icon3.png';
-import iconPayments from '../../assets/icon4.png';
+import iconHome from '../../assets/homeicon.png';
+import iconProducts from '../../assets/producticon.png';
+import iconServices from '../../assets/servicesicon.png';
+import iconPayments from '../../assets/paymentsicon.png';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
@@ -46,6 +55,9 @@ export const TopHeader = () => {
 
   // Mobile Navigation Drawer (Hamburger) State
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  const displayName = user?.name || user?.full_name || 'Shrinivas Karur';
+  const avatarSrc = user?.avatar || user?.userImage || userAvatar || iconProfile;
 
   const isServicePath =
     routerLocation.pathname.startsWith('/services') ||
@@ -163,25 +175,25 @@ export const TopHeader = () => {
               <img
                 src={rpLogo}
                 alt="Reward Planners"
-                className="h-9.5 w-auto max-h-[40px] object-contain group-hover:scale-105 transition-transform shrink-0"
+                className="h-10 w-auto max-h-[42px] object-contain group-hover:scale-105 transition-transform shrink-0"
                 style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
               <div className="flex flex-col text-left leading-none tracking-tight">
-                <span className="font-extrabold text-[#090D42] text-[15px] sm:text-base leading-tight">
+                <span className="font-black text-[15px] sm:text-base leading-tight bg-gradient-to-r from-[#FF5E00] via-[#FF007A] to-[#D946EF] bg-clip-text text-transparent">
                   Reward
                 </span>
-                <span className="font-extrabold text-[#090D42] text-[15px] sm:text-base leading-tight">
+                <span className="font-black text-[15px] sm:text-base leading-tight bg-gradient-to-r from-[#D946EF] via-[#7C3AED] to-[#4F46E5] bg-clip-text text-transparent">
                   Planners
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* Center: Clean Nav Links with Icons & Active Indicator (Mockup Parity) */}
+          {/* Center: Clean Nav Links with Custom 3D Icons & Active Indicator */}
           <nav className="hidden md:flex items-center gap-1 lg:gap-3">
             <Link
               to="/"
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
+              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'home'
                   ? 'font-bold text-[#6D28D9]'
                   : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
@@ -190,17 +202,17 @@ export const TopHeader = () => {
               <img
                 src={iconHome}
                 alt="Home"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
               />
               <span>Home</span>
               {activeTab === 'home' && (
-                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
               )}
             </Link>
 
             <Link
               to="/store"
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
+              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'products'
                   ? 'font-bold text-[#6D28D9]'
                   : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
@@ -209,17 +221,17 @@ export const TopHeader = () => {
               <img
                 src={iconProducts}
                 alt="Products"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
               />
               <span>Products</span>
               {activeTab === 'products' && (
-                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
               )}
             </Link>
 
             <Link
               to="/services"
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
+              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'services'
                   ? 'font-bold text-[#6D28D9]'
                   : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
@@ -228,17 +240,17 @@ export const TopHeader = () => {
               <img
                 src={iconServices}
                 alt="Services"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
               />
               <span>Services</span>
               {activeTab === 'services' && (
-                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
               )}
             </Link>
 
             <Link
               to="/bbps"
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-[15px] sm:text-base transition-all group ${
+              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
                 activeTab === 'payments'
                   ? 'font-bold text-[#6D28D9]'
                   : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
@@ -247,42 +259,42 @@ export const TopHeader = () => {
               <img
                 src={iconPayments}
                 alt="Payments"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
               />
               <span>Payments</span>
               {activeTab === 'payments' && (
-                <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-[#7C3AED] rounded-full shadow-xs" />
+                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
               )}
             </Link>
           </nav>
 
-          {/* Right: 3D Notification Bell + 3D User Avatar */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* 3D Notification Bell with Badge 3 */}
+          {/* Right: 3D Notification Bell + Profile Pill */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Notification Bell with Clean Single 3D Badge */}
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="relative p-1 rounded-full text-slate-700 hover:opacity-90 transition-all cursor-pointer group"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-50/90 hover:bg-purple-50/80 border border-slate-200/80 hover:border-purple-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
               title="Notifications"
               aria-label="Notifications"
             >
               <img
                 src={iconNotification}
                 alt="Notifications"
-                className="w-8.5 h-8.5 sm:w-9 sm:h-9 object-contain group-hover:scale-110 transition-transform"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain group-hover:scale-110 transition-transform"
               />
             </button>
 
-            {/* 3D Profile Avatar */}
+            {/* Profile Avatar Circle Only */}
             <Link
               to="/profile"
-              className="flex items-center justify-center cursor-pointer group ml-0.5"
+              className="w-10 h-10 rounded-full overflow-hidden border border-slate-200/80 hover:border-purple-300 shadow-2xs hover:shadow-xs hover:ring-2 hover:ring-purple-500/25 transition-all cursor-pointer group shrink-0 bg-slate-100 flex items-center justify-center"
               title="My Profile"
             >
               <img
-                src={iconProfile}
-                alt="Profile"
-                className="w-9 h-9 sm:w-9.5 sm:h-9.5 object-contain group-hover:scale-110 transition-transform"
+                src={avatarSrc}
+                alt={displayName}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               />
             </Link>
           </div>

@@ -8,14 +8,18 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     try {
-      return localStorage.getItem('rp_access_token');
+      // Clear legacy permanent localStorage tokens so every fresh launch/run starts on the Login page
+      localStorage.removeItem('rp_access_token');
+      localStorage.removeItem('rp_refresh_token');
+      localStorage.removeItem('rp_user_profile');
+      return sessionStorage.getItem('rp_access_token');
     } catch {
       return null;
     }
   });
   const [user, setUser] = useState(() => {
     try {
-      const cached = localStorage.getItem('rp_user_profile');
+      const cached = sessionStorage.getItem('rp_user_profile');
       return cached ? JSON.parse(cached) : null;
     } catch {
       return null;
@@ -23,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(() => {
     try {
-      return Boolean(localStorage.getItem('rp_access_token'));
+      return Boolean(sessionStorage.getItem('rp_access_token'));
     } catch {
       return false;
     }
@@ -35,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   const hydrateUser = useCallback(async () => {
     let storedToken = null;
     try {
-      storedToken = localStorage.getItem('rp_access_token');
+      storedToken = sessionStorage.getItem('rp_access_token');
     } catch {
       storedToken = null;
     }
@@ -61,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         const userData = res.data || res.user || res;
         setUser(userData);
         try {
-          localStorage.setItem('rp_user_profile', JSON.stringify(userData));
+          sessionStorage.setItem('rp_user_profile', JSON.stringify(userData));
         } catch {}
 
         // Check terms
@@ -83,6 +87,9 @@ export const AuthProvider = ({ children }) => {
       // ONLY purge token if the server explicitly responded with 401 Unauthorized
       if (err?.response?.status === 401) {
         try {
+          sessionStorage.removeItem('rp_access_token');
+          sessionStorage.removeItem('rp_refresh_token');
+          sessionStorage.removeItem('rp_user_profile');
           localStorage.removeItem('rp_access_token');
           localStorage.removeItem('rp_refresh_token');
           localStorage.removeItem('rp_user_profile');
@@ -101,6 +108,9 @@ export const AuthProvider = ({ children }) => {
 
     const handleSessionExpired = () => {
       try {
+        sessionStorage.removeItem('rp_access_token');
+        sessionStorage.removeItem('rp_refresh_token');
+        sessionStorage.removeItem('rp_user_profile');
         localStorage.removeItem('rp_access_token');
         localStorage.removeItem('rp_refresh_token');
         localStorage.removeItem('rp_user_profile');
@@ -127,14 +137,16 @@ export const AuthProvider = ({ children }) => {
 
     if (accessToken) {
       try {
-        localStorage.setItem('rp_access_token', accessToken);
+        sessionStorage.setItem('rp_access_token', accessToken);
+        localStorage.removeItem('rp_access_token');
       } catch {}
       setToken(accessToken);
       api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
     }
     if (refreshToken) {
       try {
-        localStorage.setItem('rp_refresh_token', refreshToken);
+        sessionStorage.setItem('rp_refresh_token', refreshToken);
+        localStorage.removeItem('rp_refresh_token');
       } catch {}
     }
 
@@ -159,6 +171,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     try {
+      sessionStorage.removeItem('rp_access_token');
+      sessionStorage.removeItem('rp_refresh_token');
+      sessionStorage.removeItem('rp_user_profile');
       localStorage.removeItem('rp_access_token');
       localStorage.removeItem('rp_refresh_token');
       localStorage.removeItem('rp_user_profile');

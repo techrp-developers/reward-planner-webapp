@@ -26,6 +26,12 @@ import MutualFundPage from '../modules/services/MutualFundPage';
 import ServiceBundlePage from '../modules/services/ServiceBundlePage';
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
+import MyEventsPage from '../modules/events/MyEventsPage';
+import AllEventsPage from '../modules/events/AllEventsPage';
+import HealthWellnessPage from '../modules/wellness/HealthWellnessPage';
+import MyBenefitsPage from '../modules/benefits/MyBenefitsPage';
+import ReportsPage from '../modules/reports/ReportsPage';
+import CustomerSupportPage from '../modules/support/CustomerSupportPage';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -40,6 +46,19 @@ export const AppRouter = () => {
   ].includes(location.pathname.toLowerCase()) || location.pathname.toLowerCase().startsWith('/policies/');
 
   const isHomePage = location.pathname === '/';
+  const isEventsPage =
+    location.pathname.startsWith('/events') ||
+    location.pathname === '/my-events' ||
+    location.pathname === '/all-events';
+  const isWellnessPage =
+    location.pathname.startsWith('/wellness') ||
+    location.pathname === '/health-wellness';
+  const isBenefitsPage =
+    location.pathname.startsWith('/benefits') ||
+    location.pathname === '/my-benefits';
+  const isReportsPage =
+    location.pathname.startsWith('/reports');
+  const isFixedLayout = isHomePage || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage;
 
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
@@ -61,7 +80,7 @@ export const AppRouter = () => {
   // 2. Unauthenticated Experience: Direct to Login Page (No signup/register options, no header sign in button)
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-['Poppins',sans-serif]">
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<LoginPage />} />
@@ -71,6 +90,9 @@ export const AppRouter = () => {
           <Route path="/shipping-delivery-policy" element={<PolicyPage policyId="shipping" />} />
           <Route path="/refund-cancellation-policy" element={<PolicyPage policyId="refund" />} />
           <Route path="/support-policy" element={<PolicyPage policyId="support" />} />
+          <Route path="/customer-support" element={<CustomerSupportPage />} />
+          <Route path="/support" element={<CustomerSupportPage />} />
+          <Route path="/help" element={<CustomerSupportPage />} />
           <Route path="/policies/:policyId" element={<PolicyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -80,7 +102,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-[#111827] ${isHomePage ? 'h-screen overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-[#111827] font-['Poppins',sans-serif] ${isFixedLayout ? 'h-screen overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
@@ -89,10 +111,19 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className={`flex-1 w-full ${isHomePage ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
+      <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
         <Routes>
-          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<HomePage />} />
+          <Route path="/events" element={<MyEventsPage />} />
+          <Route path="/events/all" element={<AllEventsPage />} />
+          <Route path="/all-events" element={<AllEventsPage />} />
+          <Route path="/my-events" element={<MyEventsPage />} />
+          <Route path="/wellness" element={<HealthWellnessPage />} />
+          <Route path="/health-wellness" element={<HealthWellnessPage />} />
+          <Route path="/benefits" element={<MyBenefitsPage />} />
+          <Route path="/my-benefits" element={<MyBenefitsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/store" element={<ProductListingPage />} />
           <Route path="/deals" element={<ProductListingPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
@@ -122,6 +153,12 @@ export const AppRouter = () => {
 
           <Route path="/fitness" element={<Navigate to="/" replace />} />
           <Route path="/coming-soon" element={<Navigate to="/" replace />} />
+          
+          {/* CUSTOMER SUPPORT & HELP DESK */}
+          <Route path="/customer-support" element={<CustomerSupportPage />} />
+          <Route path="/support" element={<CustomerSupportPage />} />
+          <Route path="/help" element={<CustomerSupportPage />} />
+
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/orders" element={<ProfilePage />} />
           <Route path="/wallet" element={<ProfilePage />} />
@@ -136,8 +173,8 @@ export const AppRouter = () => {
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
 
-      {/* FULL-WIDTH FOOTER (Hidden on home dashboard, dedicated policy pages, and e-commerce pages per user specification) */}
-      {!isPolicyPage && !isEcommercePage && !isHomePage && <Footer />}
+      {/* FULL-WIDTH FOOTER (Hidden on fixed layout app pages, policy pages, and e-commerce per user specification) */}
+      {!isPolicyPage && !isEcommercePage && !isFixedLayout && <Footer />}
     </div>
   );
 };

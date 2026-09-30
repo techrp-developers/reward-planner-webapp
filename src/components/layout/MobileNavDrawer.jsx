@@ -8,6 +8,10 @@ import { useAuth } from '../../context/AuthContext';
 import { useLocation } from '../../context/LocationContext';
 import { fetchCategoriesWithSub } from '../../api/productApi';
 import rpLogo from '../../assets/rp_logo_crisp.png';
+import iconHome from '../../assets/homeicon.png';
+import iconProducts from '../../assets/producticon.png';
+import iconServices from '../../assets/servicesicon.png';
+import iconPayments from '../../assets/paymentsicon.png';
 
 // Material UI Icons
 import CloseIcon from '@mui/icons-material/Close';
@@ -343,9 +347,63 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
         {/* ---------------------------------------------------- */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 relative z-10 divide-y divide-white/10">
           {/* ==================================================== */}
+          {/* SECTION 0: HEADER OPTIONS (MAIN NAVIGATION)          */}
+          {/* ==================================================== */}
+          <div className="pt-1 pb-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-purple-300/60 px-2 pb-2">
+              Header Options
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleLinkClick('/')}
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
+                  <img src={iconHome} alt="Home" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-bold text-white">Home</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleLinkClick('/store')}
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
+                  <img src={iconProducts} alt="Products" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-bold text-white">Products</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleLinkClick('/services')}
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
+                  <img src={iconServices} alt="Services" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-bold text-white">Services</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleLinkClick('/bbps')}
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
+                  <img src={iconPayments} alt="Payments" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-bold text-white">Payments</span>
+              </button>
+            </div>
+          </div>
+
+          {/* ==================================================== */}
           {/* SECTION 1: CORPORATE SERVICES & SUB CATEGORIES       */}
           {/* ==================================================== */}
-          <div className="pt-1">
+          <div className="pt-2">
             <button
               type="button"
               onClick={() => toggleSection('services')}

@@ -199,17 +199,17 @@ export const Footer = () => {
             <h4 className="text-sm font-bold uppercase tracking-wider text-white">Support</h4>
             <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
-                <Link to="/support-policy" className="hover:text-white transition-colors">
+                <Link to="/customer-support" className="hover:text-white transition-colors">
                   Help Centre
                 </Link>
               </li>
               <li>
-                <Link to="/support-policy" className="hover:text-white transition-colors">
+                <Link to="/customer-support?tab=faq" className="hover:text-white transition-colors">
                   FAQs
                 </Link>
               </li>
               <li>
-                <Link to="/support-policy" className="hover:text-white transition-colors">
+                <Link to="/customer-support" className="hover:text-white transition-colors">
                   Customer Support
                 </Link>
               </li>

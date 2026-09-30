@@ -2,23 +2,27 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { HelpCircle, LogOut } from 'lucide-react';
-import iconRewards from '../../../assets/icon11.png';
-import iconEvents from '../../../assets/icon12.png';
-import iconHealth from '../../../assets/icon13.png';
-import iconBenefits from '../../../assets/icon14.png';
-import iconReports from '../../../assets/icon15.png';
+import {
+  Gift,
+  Calendar,
+  Heart,
+  FileText,
+  BarChart2,
+  HelpCircle,
+  LogOut,
+} from 'lucide-react';
 
-export const EmployeeSidebar = ({ activeItem = '', onItemClick }) => {
+export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const isSupportActive = activeTab === 'support' || activeItem === 'support' || activeItem === 'Help & Support';
 
   const menuItems = [
-    { id: 'My Rewards', label: 'My Rewards', icon: iconRewards, route: '/profile?tab=rewards' },
-    { id: 'My Events', label: 'My Events', icon: iconEvents, route: '/profile?tab=events' },
-    { id: 'Health & Wellness', label: 'Health & Wellness', icon: iconHealth, route: '/services/detail/12' },
-    { id: 'My Benefits', label: 'My Benefits', icon: iconBenefits, route: '/profile?tab=benefits' },
-    { id: 'Reports', label: 'Reports', icon: iconReports, route: '/profile?tab=reports' },
+    { id: 'My Rewards', label: 'My Rewards', icon: Gift, route: '/profile?tab=rewards' },
+    { id: 'My Events', label: 'My Events', icon: Calendar, route: '/events' },
+    { id: 'Health & Wellness', label: 'Health & Wellness', icon: Heart, route: '/wellness' },
+    { id: 'My Benefits', label: 'My Benefits', icon: FileText, route: '/benefits' },
+    { id: 'Reports', label: 'Reports', icon: BarChart2, route: '/reports' },
   ];
 
   const handleClick = (item) => {
@@ -42,11 +46,12 @@ export const EmployeeSidebar = ({ activeItem = '', onItemClick }) => {
   };
 
   return (
-    <aside className="w-56 xl:w-60 shrink-0 h-full flex flex-col justify-between py-4 px-0 bg-white border-r border-slate-100 select-none overflow-hidden">
+    <aside className="w-56 xl:w-60 shrink-0 h-full flex flex-col justify-between py-6 px-0 bg-white border-r border-slate-100 select-none overflow-hidden">
       {/* Top Navigation Items */}
-      <div className="space-y-3.5">
-        <nav className="space-y-1" aria-label="Employee Sidebar">
+      <div>
+        <nav className="space-y-3.5 px-3" aria-label="Employee Sidebar">
           {menuItems.map((item) => {
+            const Icon = item.icon;
             const isActive = activeItem === item.id;
 
             return (
@@ -54,34 +59,51 @@ export const EmployeeSidebar = ({ activeItem = '', onItemClick }) => {
                 key={item.id}
                 type="button"
                 onClick={() => handleClick(item)}
-                className={`w-full flex items-center gap-3 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold transition-all duration-200 cursor-pointer text-left border-l-4 group ${
+                className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 text-[14.5px] rounded-2xl transition-all duration-150 cursor-pointer text-left group ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#7C3AED] to-[#6366F1] text-white shadow-xs font-bold border-[#4C1D95]'
-                    : 'text-slate-600 hover:text-[#7C3AED] hover:bg-purple-50/70 border-transparent hover:border-[#7C3AED]'
+                    ? 'text-[#6D28D9] font-bold bg-[#F0EBFC]'
+                    : 'text-[#0a0a5c] font-medium hover:text-[#6D28D9] hover:bg-purple-50/40'
                 }`}
               >
-                <img
-                  src={item.icon}
-                  alt={item.label}
-                  className="w-6 h-6 sm:w-6.5 sm:h-6.5 object-contain mix-blend-multiply shrink-0 group-hover:scale-110 transition-transform"
+                <Icon
+                  size={21}
+                  className={`shrink-0 transition-transform group-hover:scale-105 ${
+                    isActive ? 'text-[#6D28D9] stroke-[2.3]' : 'text-[#0a0a5c] stroke-[2.1]'
+                  }`}
                 />
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}
         </nav>
       </div>
 
-      {/* Bottom Actions: Help & Support + Logout + Copyright */}
-      <div className="pt-3 border-t border-slate-100 space-y-2">
-        <div className="space-y-1">
+      {/* Bottom Actions: Help & Support + Logout */}
+      <div className="pt-2">
+        {/* Subtle Horizontal Divider */}
+        <div className="w-full px-5 mb-4">
+          <div className="border-t border-slate-100 w-full" />
+        </div>
+
+        <div className="space-y-2.5">
           {/* Help & Support */}
           <button
             type="button"
-            onClick={() => navigate('/profile?tab=support')}
-            className="w-full flex items-center gap-3 px-5 sm:px-6 py-2.5 text-sm font-semibold text-slate-600 hover:text-[#7C3AED] hover:bg-purple-50/70 border-l-4 border-transparent hover:border-[#7C3AED] transition-all cursor-pointer text-left"
+            onClick={() => navigate('/customer-support')}
+            className={`w-full flex items-center gap-3.5 px-6 py-2.5 text-[14.5px] transition-colors cursor-pointer text-left group ${
+              isSupportActive
+                ? 'font-bold text-[#6D28D9] bg-purple-50/70 border-r-4 border-[#6D28D9]'
+                : 'font-medium text-[#0a0a5c] hover:text-[#6D28D9] hover:bg-purple-50/40'
+            }`}
           >
-            <HelpCircle size={18} className="text-slate-500" />
+            <HelpCircle
+              size={21}
+              className={`stroke-[2.1] shrink-0 ${
+                isSupportActive
+                  ? 'text-[#6D28D9]'
+                  : 'text-[#0a0a5c] group-hover:text-[#6D28D9]'
+              }`}
+            />
             <span>Help & Support</span>
           </button>
 
@@ -89,19 +111,12 @@ export const EmployeeSidebar = ({ activeItem = '', onItemClick }) => {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-5 sm:px-6 py-2.5 text-sm font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 border-l-4 border-transparent hover:border-rose-500 transition-all cursor-pointer text-left group"
+            className="w-full flex items-center gap-3.5 px-6 py-2.5 text-[14.5px] font-medium text-[#EF4444] hover:text-red-700 hover:bg-red-50/50 transition-colors cursor-pointer text-left group"
           >
-            <LogOut size={18} className="text-rose-500 group-hover:text-rose-600" />
+            <LogOut size={21} className="text-[#EF4444] stroke-[2.1] shrink-0 group-hover:translate-x-0.5 transition-transform" />
             <span>Logout</span>
           </button>
         </div>
-
-        {/* Copyright */}
-        <p className="text-[10px] text-slate-400 font-medium px-4 pt-1 leading-tight text-center">
-          © 2026 RewardPlanners.
-          <br />
-          All rights reserved.
-        </p>
       </div>
     </aside>
   );

@@ -1,10 +1,12 @@
-// src/modules/ecommerce/components/EcommerceAdBannerCarousel.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import banner1 from '../../../assets/banners/bannerimge1.png';
 import banner2 from '../../../assets/banners/bannerimage2.png';
 import banner3 from '../../../assets/banners/bannerimage3.png';
+import bannerSmartwatch3D from '../../../assets/banners/banner_smartwatch_3d.jpg';
+import bannerEarbuds3D from '../../../assets/banners/banner_earbuds_3d.jpg';
+import bannerKitchen3D from '../../../assets/banners/banner_kitchen_3d.jpg';
 
 const AD_BANNERS = [
   {
@@ -28,6 +30,17 @@ const AD_BANNERS = [
     bgColor: 'bg-[#0f172a]',
   },
   {
+    id: 'banner-smartwatch',
+    image: bannerSmartwatch3D,
+    title: 'Ultra Watch Series - Flat 10% Off',
+    subtitle: 'Fitness & AMOLED Display • Save 10% Now',
+    categoryId: 1, // Electronics / Wearables
+    tag: 'Smart Wearables',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#0a0f2d]',
+    is3D: true,
+  },
+  {
     id: 'banner-3',
     image: banner3,
     title: 'Kurta Sets - Min. 75% Off',
@@ -36,6 +49,28 @@ const AD_BANNERS = [
     tag: 'Fashion',
     objectFit: 'object-cover',
     bgColor: 'bg-[#581c87]',
+  },
+  {
+    id: 'banner-earbuds',
+    image: bannerEarbuds3D,
+    title: 'Pro Sound Earbuds - Flat 20% Off',
+    subtitle: 'Spatial Audio & ANC • Save 20% Now',
+    categoryId: 1, // Electronics / Audio
+    tag: 'Wireless Audio',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#050b28]',
+    is3D: true,
+  },
+  {
+    id: 'banner-kitchen',
+    image: bannerKitchen3D,
+    title: 'Smart Kitchen Sale - Up to 20% Off',
+    subtitle: 'Air Fryers & Blenders • Save 10% - 20%',
+    categoryId: 4, // Home & Kitchen
+    tag: 'Home & Kitchen',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#180a02]',
+    is3D: true,
   },
 ];
 
@@ -149,12 +184,12 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
                 ref={(el) => (cardRefs.current[index] = el)}
                 onClick={() => handleBannerClick(banner)}
                 style={{ scrollSnapAlign: 'center' }}
-                className={`w-[85vw] sm:w-[440px] md:w-[500px] lg:w-[560px] shrink-0 aspect-[16/9] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 ${
+                className={`relative w-[82vw] sm:w-[410px] md:w-[460px] lg:w-[510px] shrink-0 aspect-[16/8] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 group/card ${
                   banner.bgColor || 'bg-white'
                 } ${
                   isActive
-                    ? 'shadow-md scale-[1.01] ring-1 ring-purple-100'
-                    : 'shadow-xs hover:shadow-md opacity-95 hover:opacity-100 hover:scale-[1.01]'
+                    ? 'shadow-xl scale-[1.015] ring-2 ring-purple-400/40'
+                    : 'shadow-xs hover:shadow-xl opacity-90 hover:opacity-100 hover:scale-[1.01]'
                 }`}
               >
                 <img
@@ -163,7 +198,7 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
                   loading={index < 2 ? 'eager' : 'lazy'}
                   className={`w-full h-full ${
                     banner.objectFit || 'object-cover'
-                  } select-none pointer-events-none`}
+                  } select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-[1.02]`}
                   draggable={false}
                 />
               </div>

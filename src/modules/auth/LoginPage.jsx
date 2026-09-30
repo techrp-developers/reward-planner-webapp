@@ -10,7 +10,7 @@ import './LoginPage.css';
 export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, loading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, loading: authLoading } = useAuth();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -21,9 +21,9 @@ export const LoginPage = () => {
   const [touchedEmail, setTouchedEmail] = useState(false);
   const [touchedPassword, setTouchedPassword] = useState(false);
 
-  // If already logged in, redirect immediately to target screen or home
+  // If already logged in and on a protected redirect route (not explicitly /login), redirect to target
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!authLoading && isAuthenticated && location.pathname !== '/login') {
       const redirectPath = location.state?.from?.pathname || '/';
       navigate(redirectPath, { replace: true });
     }
@@ -97,6 +97,44 @@ export const LoginPage = () => {
           <div className="panel-intro">
             <h2>Login to continue</h2>
           </div>
+
+          {isAuthenticated && (
+            <div
+              style={{
+                background: 'rgba(124, 58, 237, 0.08)',
+                border: '1px solid rgba(124, 58, 237, 0.2)',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                fontSize: '12px',
+                color: '#4C1D95',
+              }}
+            >
+              <span>
+                Logged in as <strong>{user?.name || user?.email || user?.phone || 'Employee'}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                style={{
+                  background: '#7C3AED',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  fontWeight: 600,
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                }}
+              >
+                Dashboard →
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} autoComplete="off">
             <div className="form-group">

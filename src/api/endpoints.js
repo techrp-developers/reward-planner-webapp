@@ -121,4 +121,10 @@ export const ENDPOINTS = {
     gmc: '/v1/gmc/dashboard',
     claims: '/v1/claims',
   },
+  support: {
+    categories: '/v1/support/categories',
+    createTicket: '/v1/support/create-ticket',
+    myTickets: '/v1/support/my-tickets',
+    recentOrders: '/v1/support/recent-orders',
+  },
 };

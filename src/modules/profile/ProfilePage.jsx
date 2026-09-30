@@ -247,12 +247,14 @@ export const ProfilePage = () => {
   }, [loadUser]);
 
   useEffect(() => {
-    if (tabParam === 'orders' || orderIdParam) {
+    if (tabParam === 'support') {
+      navigate('/customer-support', { replace: true });
+    } else if (tabParam === 'orders' || orderIdParam) {
       setOrdersModalVisible(true);
     } else if (tabParam === 'addresses' || tabParam === 'address') {
       openLocationModal();
     }
-  }, [tabParam, orderIdParam, openLocationModal]);
+  }, [tabParam, orderIdParam, openLocationModal, navigate]);
 
   // Format Helpers matching mobile app
   const formatPhone = (phone) => {
@@ -736,7 +738,7 @@ export const ProfilePage = () => {
             {/* Help & Support */}
             <button
               type="button"
-              onClick={() => setHelpModalVisible(true)}
+              onClick={() => navigate('/customer-support')}
               className="w-full flex items-center justify-between p-4 sm:px-5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center gap-3.5">
