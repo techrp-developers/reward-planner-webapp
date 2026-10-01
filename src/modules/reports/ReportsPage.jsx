@@ -15,7 +15,6 @@ import {
   X,
   ArrowRight,
 } from 'lucide-react';
-import { EmployeeSidebar } from '../home/components/EmployeeSidebar';
 import pageBgAurora from '../../assets/page_bg_aurora.png';
 
 // Visual assets
@@ -143,8 +142,6 @@ export const ReportsPage = () => {
   return (
     <div className="h-full w-full bg-[#F8FAFD] flex flex-col overflow-hidden">
       <div className="flex-1 w-full max-w-[1600px] mx-auto flex flex-col md:flex-row h-full overflow-hidden">
-        {/* Left Sidebar (Corporate Employee Navigation with 'Reports' highlighted) */}
-        <EmployeeSidebar activeItem="Reports" />
 
         {/* Main Content Area */}
         <main

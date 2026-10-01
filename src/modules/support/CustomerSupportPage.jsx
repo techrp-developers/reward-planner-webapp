@@ -2,7 +2,6 @@
 // Complete Customer Support & Corporate Help Desk Page
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import EmployeeSidebar from '../home/components/EmployeeSidebar';
 import pageBgAurora from '../../assets/page_bg_aurora.png';
 import {
   fetchSupportCategories,
@@ -184,7 +183,6 @@ export const CustomerSupportPage = () => {
   return (
     <div className="flex w-full min-h-[calc(100vh-4.25rem)] bg-[#F8FAFC]">
       {/* ── 1. EMPLOYEE SIDEBAR WITH ACTIVE SUPPORT TAB ── */}
-      <EmployeeSidebar activeTab="support" />
 
       {/* ── 2. MAIN CONTENT AREA (WITH AURORA BACKGROUND) ── */}
       <div

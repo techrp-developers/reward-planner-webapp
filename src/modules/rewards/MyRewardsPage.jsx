@@ -2,7 +2,6 @@
 // Exact implementation of the My Rewards page matching design mockup
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EmployeeSidebar } from '../home/components/EmployeeSidebar';
 
 // Visual Assets extracted directly from mockup
 import rewardsHeroGift from '../../assets/rewards/rewards_hero_gift.png';
@@ -90,7 +89,6 @@ export const MyRewardsPage = () => {
     <div className="h-full w-full bg-[#F8FAFD] flex flex-col overflow-hidden">
       <div className="flex-1 w-full max-w-[1600px] mx-auto flex flex-col md:flex-row h-full overflow-hidden">
         {/* ── 1. SIDEBAR WITH ACTIVE 'My Rewards' TAB ── */}
-        <EmployeeSidebar activeTab="rewards" />
 
         {/* ── 2. MAIN DASHBOARD CONTENT AREA ── */}
         <main
@@ -141,7 +139,13 @@ export const MyRewardsPage = () => {
               <button
                 key={tab}
                 type="button"
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  if (tab === 'Available Rewards') {
+                    navigate('/rewards/explore');
+                  } else {
+                    setActiveTab(tab);
+                  }
+                }}
                 className={`relative text-xs sm:text-sm font-bold transition-all pb-1 cursor-pointer ${
                   isActive
                     ? 'text-[#6D28D9]'
@@ -163,10 +167,11 @@ export const MyRewardsPage = () => {
               LEFT COLUMN (COL 1 TO 7)
           ═══════════════════════════════════════════════════ */}
           <div className="lg:col-span-7 space-y-4">
-            {/* 1. "Your rewards, your choices!" Promo Banner */}
+            {/* 1. "Your rewards, your choices!" Promo Banner (Explore Rewards) */}
             <div
-              onClick={() => navigate('/store')}
+              onClick={() => navigate('/rewards/explore')}
               className="relative w-full rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all cursor-pointer group"
+              title="Explore Rewards"
             >
               <img
                 src={rewardsPromoBanner}
@@ -181,7 +186,7 @@ export const MyRewardsPage = () => {
                 <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Reward Categories</h3>
                 <button
                   type="button"
-                  onClick={() => navigate('/store')}
+                  onClick={() => navigate('/rewards/explore')}
                   className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                 >
                   View All
@@ -222,7 +227,7 @@ export const MyRewardsPage = () => {
                 <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Featured Rewards</h3>
                 <button
                   type="button"
-                  onClick={() => navigate('/store')}
+                  onClick={() => navigate('/rewards/explore')}
                   className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                 >
                   View All
@@ -436,7 +441,7 @@ export const MyRewardsPage = () => {
 
                   <button
                     type="button"
-                    onClick={() => navigate('/store')}
+                    onClick={() => navigate('/rewards/explore')}
                     className="w-full py-1.5 rounded-lg bg-[#6D28D9] hover:bg-[#5B21B6] text-white text-xs sm:text-[13px] font-bold transition-all shadow-2xs cursor-pointer"
                   >
                     Redeem Now
@@ -474,7 +479,7 @@ export const MyRewardsPage = () => {
                 <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Trending Rewards</h3>
                 <button
                   type="button"
-                  onClick={() => navigate('/store')}
+                  onClick={() => navigate('/rewards/explore')}
                   className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                 >
                   View All
@@ -544,7 +549,7 @@ export const MyRewardsPage = () => {
                 <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Recommended For You</h3>
                 <button
                   type="button"
-                  onClick={() => navigate('/store')}
+                  onClick={() => navigate('/rewards/explore')}
                   className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                 >
                   View All

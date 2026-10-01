@@ -1,7 +1,6 @@
 // src/modules/events/MyEventsPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import EmployeeSidebar from '../home/components/EmployeeSidebar';
 import {
   ChevronRight,
   Calendar,
@@ -145,8 +144,6 @@ export const MyEventsPage = () => {
   return (
     <div className="h-full w-full bg-[#F8FAFD] flex flex-col overflow-hidden">
       <div className="flex-1 w-full max-w-[1600px] mx-auto flex flex-col md:flex-row h-full overflow-hidden">
-        {/* Left Sidebar (Corporate Employee Navigation with 'My Events' highlighted) */}
-        <EmployeeSidebar activeItem="My Events" />
 
         {/* Main Content Area with User Aurora Background */}
         <main

@@ -33,6 +33,7 @@ import MyBenefitsPage from '../modules/benefits/MyBenefitsPage';
 import ReportsPage from '../modules/reports/ReportsPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
 import MyRewardsPage from '../modules/rewards/MyRewardsPage';
+import ExploreRewardsPage from '../modules/rewards/ExploreRewardsPage';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -120,6 +121,8 @@ export const AppRouter = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/rewards" element={<MyRewardsPage />} />
+          <Route path="/rewards/explore" element={<ExploreRewardsPage />} />
+          <Route path="/explore-rewards" element={<ExploreRewardsPage />} />
           <Route path="/my-rewards" element={<MyRewardsPage />} />
           <Route path="/events" element={<MyEventsPage />} />
           <Route path="/events/all" element={<AllEventsPage />} />
