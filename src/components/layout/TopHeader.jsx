@@ -15,14 +15,10 @@ import MobileNavDrawer from './MobileNavDrawer';
 import RPpriceBadge from '../ui/RPpriceBadge';
 import rpLogo from '../../assets/rp_logo_crisp.png';
 import userAvatar from '../../assets/home/user-avatar.png';
-import {
-  Home,
-  ShoppingBag,
-  LayoutGrid,
-  CreditCard,
-  Bell,
-  ChevronDown,
-} from 'lucide-react';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import AppsIcon from '@mui/icons-material/Apps';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 // Material UI Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -158,146 +154,151 @@ export const TopHeader = () => {
         onClose={() => setIsMobileNavOpen(false)}
       />
 
-      <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)] antialiased select-none">
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 sm:h-18 flex items-center justify-between gap-4">
-          {/* Left: Mobile Hamburger + Brand Logo */}
+      <header className="sticky top-0 z-40 w-full bg-[#EFF2EC]/95 backdrop-blur-md border-b border-[#E2E6DF]/80 select-none py-3.5 px-4 sm:px-6 lg:px-8 xl:px-10 antialiased">
+        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-3">
+          
+          {/* Left Group: [ + / Logo Squircle ] and [ ::: Name Pill ] */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setIsMobileNavOpen(true)}
-              aria-label="Open Navigation Menu"
-              className="p-1.5 -ml-1 text-slate-700 hover:text-purple-700 hover:bg-purple-50 rounded-xl transition-colors md:hidden flex items-center justify-center shrink-0 cursor-pointer"
-            >
-              <MenuIcon sx={{ fontSize: 24 }} />
-            </button>
-
-            <Link to="/" className="flex items-center gap-2.5 text-decoration-none shrink-0 group">
-              <img
-                src={rpLogo}
-                alt="Reward Planners"
-                className="h-10 w-auto max-h-[42px] object-contain group-hover:scale-105 transition-transform shrink-0"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
-              />
-              <div className="flex flex-col text-left leading-none tracking-tight">
-                <span className="font-black text-[15px] sm:text-base leading-tight bg-gradient-to-r from-[#FF5E00] via-[#FF007A] to-[#D946EF] bg-clip-text text-transparent">
-                  Reward
-                </span>
-                <span className="font-black text-[15px] sm:text-base leading-tight bg-gradient-to-r from-[#D946EF] via-[#7C3AED] to-[#4F46E5] bg-clip-text text-transparent">
-                  Planners
-                </span>
-              </div>
-            </Link>
-          </div>
-
-          {/* Center: Clean Nav Links with Custom 3D Icons & Active Indicator */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-3">
             <Link
               to="/"
-              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
-                activeTab === 'home'
-                  ? 'font-bold text-[#6D28D9]'
-                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
-              }`}
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#4A6443] hover:bg-[#3D5437] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 shrink-0"
+              title="Reward Planners Home"
             >
-              <img
-                src={iconHome}
-                alt="Home"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span>Home</span>
-              {activeTab === 'home' && (
-                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
-              )}
+              <AddRoundedIcon sx={{ fontSize: 24, strokeWidth: 2 }} />
             </Link>
 
-            <Link
-              to="/store"
-              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
-                activeTab === 'products'
-                  ? 'font-bold text-[#6D28D9]'
-                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
-              }`}
-            >
-              <img
-                src={iconProducts}
-                alt="Products"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span>Products</span>
-              {activeTab === 'products' && (
-                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
-              )}
-            </Link>
-
-            <Link
-              to="/services"
-              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
-                activeTab === 'services'
-                  ? 'font-bold text-[#6D28D9]'
-                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
-              }`}
-            >
-              <img
-                src={iconServices}
-                alt="Services"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span>Services</span>
-              {activeTab === 'services' && (
-                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
-              )}
-            </Link>
-
-            <Link
-              to="/bbps"
-              className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-[15px] sm:text-base transition-all group ${
-                activeTab === 'payments'
-                  ? 'font-bold text-[#6D28D9]'
-                  : 'font-semibold text-slate-700 hover:text-[#6D28D9] hover:bg-purple-50/60'
-              }`}
-            >
-              <img
-                src={iconPayments}
-                alt="Payments"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain shrink-0 group-hover:scale-110 transition-transform"
-              />
-              <span>Payments</span>
-              {activeTab === 'payments' && (
-                <span className="absolute -bottom-2.5 left-2 right-2 h-[3.5px] bg-gradient-to-r from-[#6D28D9] to-[#EC4899] rounded-full shadow-xs" />
-              )}
-            </Link>
-          </nav>
-
-          {/* Right: 3D Notification Bell + Profile Pill */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            {/* Notification Bell with Clean Single 3D Badge */}
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-50/90 hover:bg-purple-50/80 border border-slate-200/80 hover:border-purple-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+              className="h-10 sm:h-11 px-3.5 sm:px-4 rounded-full bg-[#121815] hover:bg-black text-white flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
+              title="Profile & Settings"
+            >
+              <AppsIcon sx={{ fontSize: 16 }} className="text-zinc-300 group-hover:text-white" />
+              <span className="tracking-tight text-white font-medium">{displayName}</span>
+            </button>
+          </div>
+
+          {/* Center Group: Floating Pill Navigation Capsule */}
+          <div className="hidden md:flex items-center justify-center flex-1 max-w-[500px] mx-2">
+            <nav className="bg-white rounded-full p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center gap-1 w-full justify-between">
+              <Link
+                to="/"
+                className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === 'home'
+                    ? 'bg-[#4A6443] text-white shadow-xs'
+                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                }`}
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/store"
+                className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === 'products'
+                    ? 'bg-[#4A6443] text-white shadow-xs'
+                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                }`}
+              >
+                Products
+              </Link>
+
+              <Link
+                to="/services"
+                className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === 'services'
+                    ? 'bg-[#4A6443] text-white shadow-xs'
+                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                }`}
+              >
+                Services
+              </Link>
+
+              <Link
+                to="/bbps"
+                className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === 'payments'
+                    ? 'bg-[#4A6443] text-white shadow-xs'
+                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                }`}
+              >
+                Payments
+              </Link>
+            </nav>
+          </div>
+
+          {/* Right Group: Notification with pip & Menu button */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Notification Bell with Red Pip */}
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-[#F5F7F4] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-center cursor-pointer transition-all group shrink-0"
               title="Notifications"
               aria-label="Notifications"
             >
-              <img
-                src={iconNotification}
-                alt="Notifications"
-                className="w-7 h-7 sm:w-7.5 sm:h-7.5 object-contain group-hover:scale-110 transition-transform"
-              />
+              <NotificationsOutlinedIcon sx={{ fontSize: 21 }} className="text-[#2D3B2E] group-hover:scale-105 transition-transform" />
+              <span className="w-2.5 h-2.5 bg-[#EF4444] rounded-full border-2 border-white absolute top-2.5 right-2.5 shadow-2xs" />
             </button>
 
-            {/* Profile Avatar Circle Only */}
-            <Link
-              to="/profile"
-              className="w-10 h-10 rounded-full overflow-hidden border border-slate-200/80 hover:border-purple-300 shadow-2xs hover:shadow-xs hover:ring-2 hover:ring-purple-500/25 transition-all cursor-pointer group shrink-0 bg-slate-100 flex items-center justify-center"
-              title="My Profile"
+            {/* Menu / Hamburger button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen(true)}
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-[#F5F7F4] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-center cursor-pointer transition-all group shrink-0"
+              title="Open Navigation Menu"
+              aria-label="Menu"
             >
-              <img
-                src={avatarSrc}
-                alt={displayName}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-              />
-            </Link>
+              <MenuRoundedIcon sx={{ fontSize: 22 }} className="text-[#2D3B2E] group-hover:scale-105 transition-transform" />
+            </button>
           </div>
+
+        </div>
+
+        {/* Mobile / Tablet scrollable tab bar if on small screen */}
+        <div className="md:hidden mt-2.5 pt-2 border-t border-[#E2E6DF]/60">
+          <nav className="bg-white rounded-full p-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-between text-xs font-semibold overflow-x-auto no-scrollbar">
+            <Link
+              to="/"
+              className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
+                activeTab === 'home'
+                  ? 'bg-[#4A6443] text-white shadow-xs'
+                  : 'text-[#5F6B5D]'
+              }`}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/store"
+              className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
+                activeTab === 'products'
+                  ? 'bg-[#4A6443] text-white shadow-xs'
+                  : 'text-[#5F6B5D]'
+              }`}
+            >
+              Products
+            </Link>
+            <Link
+              to="/services"
+              className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
+                activeTab === 'services'
+                  ? 'bg-[#4A6443] text-white shadow-xs'
+                  : 'text-[#5F6B5D]'
+              }`}
+            >
+              Services
+            </Link>
+            <Link
+              to="/bbps"
+              className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
+                activeTab === 'payments'
+                  ? 'bg-[#4A6443] text-white shadow-xs'
+                  : 'text-[#5F6B5D]'
+              }`}
+            >
+              Payments
+            </Link>
+          </nav>
         </div>
       </header>
     </>

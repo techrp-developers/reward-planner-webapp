@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Poppins', sans-serif;
-  --font-display: 'Poppins', sans-serif;
-  --font-body: 'Poppins', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Outfit', sans-serif;
   --color-brand-pink: #FC8BAD;
   --color-brand-purple: #A654CD;
   --color-brand-primary: #A654CD;
@@ -28,14 +28,14 @@
 
 @layer base {
   :root {
-    --font-sans: 'Poppins', sans-serif;
-    font-family: 'Poppins', sans-serif !important;
+    --font-sans: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 
   html, body, #root {
-    background-color: #F8FAFC;
+    background-color: #EFF2EC;
     color: #111827;
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -47,17 +47,17 @@
   }
 
   *, ::before, ::after {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
 
   h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, div, label, table, th, td, ul, ol, li, strong, b, em, i, section, main, aside, nav, header, footer, article, form, figcaption, figure, blockquote, small {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 }
 
-/* Universal strict Poppins font enforcement across all content and elements */
+/* Universal modern Plus Jakarta Sans font enforcement across all content and elements */
 html,
 body,
 #root,
@@ -69,7 +69,7 @@ p, span, a, button, input, select, textarea,
 div, label, table, th, td, ul, ol, li,
 strong, b, em, i, section, main, aside, nav,
 header, footer, article, form, figcaption, figure, blockquote, small {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 .material-icons,

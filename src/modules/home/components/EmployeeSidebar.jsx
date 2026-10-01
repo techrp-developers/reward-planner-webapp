@@ -2,15 +2,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import {
-  Gift,
-  Calendar,
-  Heart,
-  FileText,
-  BarChart2,
-  HelpCircle,
-  LogOut,
-} from 'lucide-react';
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }) => {
   const navigate = useNavigate();
@@ -18,11 +16,11 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
   const isSupportActive = activeTab === 'support' || activeItem === 'support' || activeItem === 'Help & Support';
 
   const menuItems = [
-    { id: 'My Rewards', label: 'My Rewards', icon: Gift, route: '/rewards' },
-    { id: 'My Events', label: 'My Events', icon: Calendar, route: '/events' },
-    { id: 'Health & Wellness', label: 'Health & Wellness', icon: Heart, route: '/wellness' },
-    { id: 'My Benefits', label: 'My Benefits', icon: FileText, route: '/benefits' },
-    { id: 'Reports', label: 'Reports', icon: BarChart2, route: '/reports' },
+    { id: 'My Rewards', label: 'My Rewards', icon: CardGiftcardIcon, route: '/rewards' },
+    { id: 'My Events', label: 'My Events', icon: EventOutlinedIcon, route: '/events' },
+    { id: 'Health & Wellness', label: 'Health & Wellness', icon: FavoriteBorderIcon, route: '/wellness' },
+    { id: 'My Benefits', label: 'My Benefits', icon: DescriptionOutlinedIcon, route: '/benefits' },
+    { id: 'Reports', label: 'Reports', icon: BarChartIcon, route: '/reports' },
   ];
 
   const handleClick = (item) => {
@@ -73,9 +71,9 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
                 }`}
               >
                 <Icon
-                  size={21}
+                  sx={{ fontSize: 22 }}
                   className={`shrink-0 transition-transform group-hover:scale-105 ${
-                    isActive ? 'text-[#6D28D9] stroke-[2.3]' : 'text-[#0a0a5c] stroke-[2.1]'
+                    isActive ? 'text-[#6D28D9]' : 'text-[#0a0a5c]'
                   }`}
                 />
                 <span className="truncate">{item.label}</span>
@@ -103,9 +101,9 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
                 : 'font-medium text-[#0a0a5c] hover:text-[#6D28D9] hover:bg-purple-50/40'
             }`}
           >
-            <HelpCircle
-              size={21}
-              className={`stroke-[2.1] shrink-0 ${
+            <HelpOutlineOutlinedIcon
+              sx={{ fontSize: 22 }}
+              className={`shrink-0 ${
                 isSupportActive
                   ? 'text-[#6D28D9]'
                   : 'text-[#0a0a5c] group-hover:text-[#6D28D9]'
@@ -120,7 +118,7 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
             onClick={handleLogout}
             className="w-full flex items-center gap-3.5 px-6 py-2.5 text-[14.5px] font-medium text-[#EF4444] hover:text-red-700 hover:bg-red-50/50 transition-colors cursor-pointer text-left group"
           >
-            <LogOut size={21} className="text-[#EF4444] stroke-[2.1] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            <LogoutIcon sx={{ fontSize: 22 }} className="text-[#EF4444] shrink-0 group-hover:translate-x-0.5 transition-transform" />
             <span>Logout</span>
           </button>
         </div>
