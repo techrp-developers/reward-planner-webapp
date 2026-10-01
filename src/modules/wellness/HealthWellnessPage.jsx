@@ -19,10 +19,10 @@ import pageBgAurora from '../../assets/page_bg_aurora.png';
 
 // Visual assets
 import wellnessHeroFitness from '../../assets/wellness/wellness_hero_fitness.png';
-import wellnessBannerYoga from '../../assets/wellness/wellness_banner_yoga.png';
-import featuredYogaSession from '../../assets/wellness/featured_yoga_session.png';
-import featuredStepChallenge from '../../assets/wellness/featured_step_challenge.png';
-import featuredNutritionWebinar from '../../assets/wellness/featured_nutrition_webinar.png';
+import wellnessBannerYoga from '../../assets/sidebarpagesimages/feel your best every day.png';
+import featuredYogaSession from '../../assets/sidebarpagesimages/yoga session health and wellness pages.png';
+import featuredStepChallenge from '../../assets/sidebarpagesimages/step challenge.png';
+import featuredNutritionWebinar from '../../assets/sidebarpagesimages/nutrition webinar.png';
 import wellnessClipboardPromo from '../../assets/wellness/wellness_clipboard_promo.png';
 
 export const HealthWellnessPage = () => {
@@ -182,16 +182,13 @@ export const HealthWellnessPage = () => {
                   Home
                 </button>
                 <ChevronRight size={13} className="text-slate-400" />
-                <span className="text-black font-semibold">Health & Wellness</span>
+                <span className="text-[#111827] font-semibold">Health & Wellness</span>
               </nav>
 
-              <h1
-                className="text-2xl sm:text-3xl lg:text-[28px] font-black tracking-tight text-black leading-tight !text-black"
-                style={{ color: '#000000' }}
-              >
-                Health &amp; Wellness
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+                Health &amp; <span className="text-[#6D28D9]">Wellness</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 pt-0.5">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
                 Build healthier habits, join wellness programs and track your progress with ease.
               </p>
             </div>
@@ -241,17 +238,15 @@ export const HealthWellnessPage = () => {
               </div>
 
               {/* Main Hero Banner: Feel your best every day! */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md">
+              <div
+                onClick={() => showToast('Opening wellness programs catalog...')}
+                className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md aspect-[2.6/1]"
+                title="Feel your best every day! - Explore Wellness"
+              >
                 <img
                   src={wellnessBannerYoga}
                   alt="Feel your best every day!"
-                  className="w-full h-auto object-cover block select-none"
-                />
-                {/* Transparent click overlay for CTA */}
-                <div
-                  className="absolute left-[7%] bottom-[14%] sm:bottom-[16%] w-[28%] h-[24%] cursor-pointer z-10"
-                  onClick={() => showToast('Opening wellness programs catalog...')}
-                  title="Explore Wellness"
+                  className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.01] transition-transform duration-300"
                 />
               </div>
 
@@ -342,7 +337,7 @@ export const HealthWellnessPage = () => {
                       className="flex flex-col bg-white rounded-xl border border-slate-100/90 overflow-hidden shadow-3xs hover:shadow-2xs transition-all duration-200 group"
                     >
                       {/* Thumbnail */}
-                      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                         <img
                           src={prog.image}
                           alt={prog.title}

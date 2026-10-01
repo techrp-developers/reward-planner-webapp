@@ -30,6 +30,7 @@ import {
   Sparkles,
   ArrowRight,
   ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
 import HeadphonesOutlinedIcon from '@mui/icons-material/HeadphonesOutlined';
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
@@ -198,15 +199,22 @@ export const CustomerSupportPage = () => {
         {/* Header Title & Intro Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/80 pb-5">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs font-semibold text-purple-700 uppercase tracking-wider">
-              <SupportAgentOutlinedIcon sx={{ fontSize: 18 }} />
-              <span>Dedicated Help Desk & Resolution Portal</span>
-            </div>
-            {/* SOLID PURE BLACK TITLE */}
-            <h1 className="text-2xl sm:text-3xl font-black !text-black tracking-tight">
-              Customer Support & Help Desk
+            <nav className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 mb-0.5" aria-label="Breadcrumb">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="hover:text-[#6D28D9] transition-colors cursor-pointer"
+              >
+                Home
+              </button>
+              <ChevronRight size={13} className="text-slate-400" />
+              <span className="text-[#111827] font-semibold">Help &amp; Support</span>
+            </nav>
+
+            <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+              Help &amp; <span className="text-[#6D28D9]">Support</span>
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 font-medium">
+            <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
               We're here to assist you with reward points, store deliveries, employee benefits, BBPS payments, and platform queries.
             </p>
           </div>
@@ -231,20 +239,20 @@ export const CustomerSupportPage = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <PhoneCall size={20} />
               </div>
-              <h3 className="text-sm font-bold text-gray-900">Toll-Free Helpline</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Toll-Free Helpline</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Direct phone support for immediate issues & redemption assistance.
               </p>
             </div>
             <div className="pt-3 mt-2 border-t border-gray-100">
               <a
                 href="tel:+918660583751"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-blue-600 hover:text-blue-800 transition-colors"
               >
                 <span>+91 8660 583751</span>
                 <ExternalLink size={13} />
               </a>
-              <div className="text-[10px] text-gray-400 mt-0.5">Mon–Sat: 9:00 AM – 7:00 PM</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">Mon–Sat: 9:00 AM – 7:00 PM</div>
             </div>
           </div>
 
@@ -254,20 +262,20 @@ export const CustomerSupportPage = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <Mail size={20} />
               </div>
-              <h3 className="text-sm font-bold text-gray-900">Email Help Desk</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Email Help Desk</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Send official inquiries, bill attachments, and corporate requests.
               </p>
             </div>
             <div className="pt-3 mt-2 border-t border-gray-100">
               <a
                 href="mailto:support@rewardplanners.com"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 hover:text-purple-800 transition-colors truncate max-w-full"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-purple-600 hover:text-purple-800 transition-colors truncate max-w-full"
               >
                 <span className="truncate">support@rewardplanners.com</span>
                 <ExternalLink size={13} className="shrink-0" />
               </a>
-              <div className="text-[10px] text-gray-400 mt-0.5">SLA: Under 24 Business Hours</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">SLA: Under 24 Business Hours</div>
             </div>
           </div>
 
@@ -277,8 +285,8 @@ export const CustomerSupportPage = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <MessageSquare size={20} />
               </div>
-              <h3 className="text-sm font-bold text-gray-900">WhatsApp Corporate</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">WhatsApp Corporate</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Chat directly with our verified relationship desk on WhatsApp.
               </p>
             </div>
@@ -287,12 +295,12 @@ export const CustomerSupportPage = () => {
                 href="https://wa.me/918660583751?text=Hi%20Reward%20Planners%20Support,%20I%20need%20help%20with%20my%20account."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-800 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-emerald-600 hover:text-emerald-800 transition-colors"
               >
                 <span>Start WhatsApp Chat</span>
                 <ExternalLink size={13} />
               </a>
-              <div className="text-[10px] text-gray-400 mt-0.5">Fastest reply for quick Qs</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">Fastest reply for quick Qs</div>
             </div>
           </div>
 
@@ -302,8 +310,8 @@ export const CustomerSupportPage = () => {
               <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <ShieldCheck size={20} />
               </div>
-              <h3 className="text-sm font-bold text-gray-900">Grievance & Policies</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#0A0A5C]">Grievance & Policies</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Read our formal Support & Grievance redressal policy and commitments.
               </p>
             </div>

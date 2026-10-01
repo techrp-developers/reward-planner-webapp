@@ -20,10 +20,10 @@ import pageBgAurora from '../../assets/page_bg_aurora.png';
 
 // Visual assets
 import reportsHeroCharts from '../../assets/reports/reports_hero_charts.png';
-import reportsBannerCharacter from '../../assets/reports/reports_banner_character.png';
-import featuredRewardsSummary from '../../assets/reports/featured_rewards_summary.png';
-import featuredBenefitUsage from '../../assets/reports/featured_benefit_usage.png';
-import featuredWellnessInsights from '../../assets/reports/featured_wellness_insights.png';
+import reportsBannerCharacter from '../../assets/sidebarpagesimages/make smarter decisons my reports pages.png';
+import featuredRewardsSummary from '../../assets/sidebarpagesimages/rewards summary my report pagess.png';
+import featuredBenefitUsage from '../../assets/sidebarpagesimages/benefit usage my reports pages.png';
+import featuredWellnessInsights from '../../assets/sidebarpagesimages/wellness insights my reports pages.png';
 import reportsInsightsPromo from '../../assets/reports/reports_insights_promo.png';
 
 export const ReportsPage = () => {
@@ -183,16 +183,13 @@ export const ReportsPage = () => {
                   Home
                 </button>
                 <ChevronRight size={13} className="text-slate-400" />
-                <span className="text-black font-semibold">Reports</span>
+                <span className="text-[#111827] font-semibold">Reports</span>
               </nav>
 
-              <h1
-                className="text-2xl sm:text-3xl lg:text-[28px] font-black tracking-tight text-black leading-tight !text-black"
-                style={{ color: '#000000' }}
-              >
-                Reports
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+                Reports &amp; <span className="text-[#6D28D9]">Analytics</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 pt-0.5">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
                 Track rewards, benefits and engagement insights with clear and actionable reporting.
               </p>
             </div>
@@ -242,17 +239,15 @@ export const ReportsPage = () => {
               </div>
 
               {/* Main Hero Banner: Make smarter decisions! */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md">
+              <div
+                onClick={() => showToast('Opening workplace analytics dashboard...')}
+                className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md aspect-[2.6/1]"
+                title="Make smarter decisions - View Insights"
+              >
                 <img
                   src={reportsBannerCharacter}
                   alt="Make smarter decisions!"
-                  className="w-full h-auto object-cover block select-none"
-                />
-                {/* Transparent click overlay for CTA */}
-                <div
-                  className="absolute left-[7%] bottom-[14%] sm:bottom-[16%] w-[28%] h-[24%] cursor-pointer z-10"
-                  onClick={() => showToast('Opening workplace analytics dashboard...')}
-                  title="View Insights"
+                  className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.01] transition-transform duration-300"
                 />
               </div>
 

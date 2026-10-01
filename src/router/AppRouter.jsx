@@ -32,6 +32,7 @@ import HealthWellnessPage from '../modules/wellness/HealthWellnessPage';
 import MyBenefitsPage from '../modules/benefits/MyBenefitsPage';
 import ReportsPage from '../modules/reports/ReportsPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
+import MyRewardsPage from '../modules/rewards/MyRewardsPage';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -58,7 +59,10 @@ export const AppRouter = () => {
     location.pathname === '/my-benefits';
   const isReportsPage =
     location.pathname.startsWith('/reports');
-  const isFixedLayout = isHomePage || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage;
+  const isRewardsPage =
+    location.pathname.startsWith('/rewards') ||
+    location.pathname === '/my-rewards';
+  const isFixedLayout = isHomePage || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage || isRewardsPage;
 
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
@@ -115,6 +119,8 @@ export const AppRouter = () => {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<HomePage />} />
+          <Route path="/rewards" element={<MyRewardsPage />} />
+          <Route path="/my-rewards" element={<MyRewardsPage />} />
           <Route path="/events" element={<MyEventsPage />} />
           <Route path="/events/all" element={<AllEventsPage />} />
           <Route path="/all-events" element={<AllEventsPage />} />

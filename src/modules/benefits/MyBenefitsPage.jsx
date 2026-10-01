@@ -21,10 +21,10 @@ import pageBgAurora from '../../assets/page_bg_aurora.png';
 
 // Visual assets
 import benefitsHeroShield from '../../assets/benefits/benefits_hero_shield.png';
-import benefitsBannerCharacter from '../../assets/benefits/benefits_banner_character.png';
-import featuredHealthInsurance from '../../assets/benefits/featured_health_insurance.png';
-import featuredMealBenefits from '../../assets/benefits/featured_meal_benefits.png';
-import featuredLearningVoucher from '../../assets/benefits/featured_learning_voucher.png';
+import benefitsBannerCharacter from '../../assets/sidebarpagesimages/my benefits hero section.png';
+import featuredHealthInsurance from '../../assets/sidebarpagesimages/health insurance my benefits pages.png';
+import featuredMealBenefits from '../../assets/sidebarpagesimages/meal benefits from my benefits pages.png';
+import featuredLearningVoucher from '../../assets/sidebarpagesimages/learning voucher my benefits.png';
 import benefitsCardPromo from '../../assets/benefits/benefits_card_promo.png';
 
 export const MyBenefitsPage = () => {
@@ -184,16 +184,13 @@ export const MyBenefitsPage = () => {
                   Home
                 </button>
                 <ChevronRight size={13} className="text-slate-400" />
-                <span className="text-black font-semibold">My Benefits</span>
+                <span className="text-[#111827] font-semibold">My Benefits</span>
               </nav>
 
-              <h1
-                className="text-2xl sm:text-3xl lg:text-[28px] font-black tracking-tight text-black leading-tight !text-black"
-                style={{ color: '#000000' }}
-              >
-                My Benefits
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+                My <span className="text-[#6D28D9]">Benefits</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 pt-0.5">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
                 Access, manage and use your employee benefits with ease.
               </p>
             </div>
@@ -243,17 +240,15 @@ export const MyBenefitsPage = () => {
               </div>
 
               {/* Main Hero Banner: Unlock benefits that work for you! */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md">
+              <div
+                onClick={() => showToast('Opening employee benefits catalog...')}
+                className="relative rounded-2xl overflow-hidden shadow-xs border border-purple-900/10 group cursor-pointer transition-all duration-300 hover:shadow-md aspect-[2.6/1]"
+                title="Unlock benefits that work for you! - Explore Benefits"
+              >
                 <img
                   src={benefitsBannerCharacter}
                   alt="Unlock benefits that work for you!"
-                  className="w-full h-auto object-cover block select-none"
-                />
-                {/* Transparent click overlay for CTA */}
-                <div
-                  className="absolute left-[7%] bottom-[14%] sm:bottom-[16%] w-[28%] h-[24%] cursor-pointer z-10"
-                  onClick={() => showToast('Opening employee benefits catalog...')}
-                  title="Explore Benefits"
+                  className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.01] transition-transform duration-300"
                 />
               </div>
 
@@ -346,7 +341,7 @@ export const MyBenefitsPage = () => {
                         className="flex flex-col bg-white rounded-xl border border-slate-100/90 overflow-hidden shadow-3xs hover:shadow-2xs transition-all duration-200 group"
                       >
                         {/* Thumbnail */}
-                        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                           <img
                             src={ben.image}
                             alt={ben.title}

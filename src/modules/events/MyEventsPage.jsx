@@ -16,10 +16,10 @@ import {
 
 import pageBgAurora from '../../assets/page_bg_aurora.png';
 import eventHeroCalendar from '../../assets/events/event_hero_calendar.png';
-import eventBannerStage from '../../assets/events/event_banner_stage.png';
-import featuredWellness from '../../assets/events/featured_wellness.png';
-import featuredFestive from '../../assets/events/featured_festive.png';
-import featuredLeadership from '../../assets/events/featured_leadership.png';
+import eventBannerStage from '../../assets/sidebarpagesimages/my events posterrr 1.png';
+import featuredWellness from '../../assets/sidebarpagesimages/events page wellness image.png';
+import featuredFestive from '../../assets/sidebarpagesimages/events page festive celebration.png';
+import featuredLeadership from '../../assets/sidebarpagesimages/events page leadership celebration.png';
 import eventTicketsPromo from '../../assets/events/event_tickets_promo.png';
 
 export const MyEventsPage = () => {
@@ -185,16 +185,13 @@ export const MyEventsPage = () => {
                   Home
                 </button>
                 <ChevronRight size={13} className="text-slate-400" />
-                <span className="text-black font-semibold">My Events</span>
+                <span className="text-[#111827] font-semibold">My Events</span>
               </nav>
 
-              <h1
-                className="text-2xl sm:text-3xl lg:text-[28px] font-black tracking-tight text-black leading-tight !text-black"
-                style={{ color: '#000000' }}
-              >
-                My Events
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+                My <span className="text-[#6D28D9]">Events</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 pt-0.5">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
                 Discover, register and attend experiences that keep your workplace engaging.
               </p>
             </div>
@@ -228,10 +225,10 @@ export const MyEventsPage = () => {
                       key={tab}
                       type="button"
                       onClick={() => handleTabClick(tab)}
-                      className={`text-xs sm:text-sm lg:text-[14.5px] font-semibold transition-all relative cursor-pointer pb-1 ${
+                      className={`text-xs sm:text-sm font-bold transition-all relative cursor-pointer pb-1 ${
                         isActive
-                          ? 'text-[#6D28D9] font-bold after:content-[""] after:absolute after:bottom-[-10px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#6D28D9] after:rounded-full'
-                          : 'text-slate-600 hover:text-[#0A0A5C]'
+                          ? 'text-[#6D28D9] after:content-[""] after:absolute after:bottom-[-10px] after:left-0 after:right-0 after:h-[2.5px] after:bg-[#6D28D9] after:rounded-full'
+                          : 'text-slate-700 hover:text-[#0A0A5C]'
                       }`}
                     >
                       {tab}
@@ -243,12 +240,13 @@ export const MyEventsPage = () => {
               {/* Banner: Don't miss what's next! */}
               <div
                 onClick={() => navigate('/events/all')}
-                className="relative rounded-2xl overflow-hidden shadow-xs cursor-pointer group transition-all duration-200 hover:shadow-md border border-purple-900/10 shrink-0"
+                className="relative rounded-2xl overflow-hidden shadow-xs cursor-pointer group transition-all duration-200 hover:shadow-md border border-purple-900/10 shrink-0 aspect-[2.6/1]"
+                title="Don't miss what's next! Explore Events"
               >
                 <img
                   src={eventBannerStage}
                   alt="Don't miss what's next! Explore and join exciting company events"
-                  className="w-full h-auto block select-none group-hover:scale-[1.01] transition-transform duration-300"
+                  className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.01] transition-transform duration-300"
                 />
               </div>
 
@@ -263,7 +261,7 @@ export const MyEventsPage = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/events/all')}
-                    className="text-xs sm:text-sm font-semibold text-[#2563EB] hover:underline cursor-pointer"
+                    className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                   >
                     View All
                   </button>
@@ -340,10 +338,9 @@ export const MyEventsPage = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/events/all')}
-                    className="text-xs sm:text-sm font-semibold text-[#2563EB] hover:underline cursor-pointer inline-flex items-center gap-1"
+                    className="text-xs sm:text-sm font-semibold text-[#6D28D9] hover:underline cursor-pointer"
                   >
-                    <span>View All</span>
-                    <ArrowRight size={13} className="stroke-[2.5]" />
+                    View All
                   </button>
                 </div>
 
@@ -359,7 +356,7 @@ export const MyEventsPage = () => {
                           className="bg-white rounded-xl flex flex-col justify-between"
                         >
                           {/* Event Thumbnail */}
-                          <div className="w-full h-14 sm:h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-2xs">
+                          <div className="w-full aspect-[4/3] rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-2xs">
                             <img
                               src={event.image}
                               alt={event.title}
@@ -415,16 +412,6 @@ export const MyEventsPage = () => {
                       );
                     })}
                   </div>
-
-                  {/* Carousel Right Arrow Button */}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/events/all')}
-                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-7 sm:h-7 bg-white shadow-md border border-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:text-[#6D28D9] hover:scale-105 transition-all z-10 cursor-pointer"
-                    aria-label="Next Events"
-                  >
-                    <ChevronRight size={15} />
-                  </button>
                 </div>
               </section>
 

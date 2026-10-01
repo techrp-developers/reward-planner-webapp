@@ -18,7 +18,7 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
   const isSupportActive = activeTab === 'support' || activeItem === 'support' || activeItem === 'Help & Support';
 
   const menuItems = [
-    { id: 'My Rewards', label: 'My Rewards', icon: Gift, route: '/profile?tab=rewards' },
+    { id: 'My Rewards', label: 'My Rewards', icon: Gift, route: '/rewards' },
     { id: 'My Events', label: 'My Events', icon: Calendar, route: '/events' },
     { id: 'Health & Wellness', label: 'Health & Wellness', icon: Heart, route: '/wellness' },
     { id: 'My Benefits', label: 'My Benefits', icon: FileText, route: '/benefits' },
@@ -52,7 +52,14 @@ export const EmployeeSidebar = ({ activeItem = '', activeTab = '', onItemClick }
         <nav className="space-y-3.5 px-3" aria-label="Employee Sidebar">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeItem === item.id;
+            const isActive =
+              activeItem === item.id ||
+              activeTab === item.id ||
+              (item.id === 'My Rewards' && (activeTab === 'rewards' || activeTab === 'my-rewards' || activeItem === 'rewards' || activeItem === 'my-rewards')) ||
+              (item.id === 'My Events' && (activeTab === 'events' || activeTab === 'my-events' || activeItem === 'events' || activeItem === 'my-events')) ||
+              (item.id === 'Health & Wellness' && (activeTab === 'wellness' || activeTab === 'health-wellness' || activeItem === 'wellness')) ||
+              (item.id === 'My Benefits' && (activeTab === 'benefits' || activeTab === 'my-benefits' || activeItem === 'benefits')) ||
+              (item.id === 'Reports' && (activeTab === 'reports' || activeItem === 'reports'));
 
             return (
               <button

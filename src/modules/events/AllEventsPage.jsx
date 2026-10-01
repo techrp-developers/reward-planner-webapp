@@ -16,9 +16,9 @@ import {
 } from 'lucide-react';
 
 import pageBgAurora from '../../assets/page_bg_aurora.png';
-import featuredWellness from '../../assets/events/featured_wellness.png';
-import featuredFestive from '../../assets/events/featured_festive.png';
-import featuredLeadership from '../../assets/events/featured_leadership.png';
+import featuredWellness from '../../assets/sidebarpagesimages/events page wellness image.png';
+import featuredFestive from '../../assets/sidebarpagesimages/events page festive celebration.png';
+import featuredLeadership from '../../assets/sidebarpagesimages/events page leadership celebration.png';
 
 export const AllEventsPage = () => {
   const navigate = useNavigate();
@@ -240,13 +240,10 @@ export const AllEventsPage = () => {
             {/* Title & Subtitle + Search Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h1
-                  className="text-2xl sm:text-3xl font-black text-black tracking-tight !text-black"
-                  style={{ color: '#000000' }}
-                >
-                  All Company Events
+                <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
+                  All Company <span className="text-[#6D28D9]">Events</span>
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 pt-0.5">
+                <p className="text-xs sm:text-sm text-slate-600 font-medium pt-0.5">
                   Browse, search, and register for all upcoming company activities, sessions, and celebrations.
                 </p>
               </div>

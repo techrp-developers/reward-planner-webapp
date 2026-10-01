@@ -2,9 +2,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Poppins', sans-serif;
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Poppins', sans-serif;
   --color-brand-pink: #FC8BAD;
   --color-brand-purple: #A654CD;
   --color-brand-primary: #A654CD;
@@ -28,14 +28,14 @@
 
 @layer base {
   :root {
-    --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    --font-sans: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif !important;
   }
 
   html, body, #root {
     background-color: #F8FAFC;
     color: #111827;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: 'Poppins', sans-serif !important;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -47,14 +47,36 @@
   }
 
   *, ::before, ::after {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
 
-  h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, div, label, table, th, td, ul, ol, li {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, div, label, table, th, td, ul, ol, li, strong, b, em, i, section, main, aside, nav, header, footer, article, form, figcaption, figure, blockquote, small {
+    font-family: 'Poppins', sans-serif !important;
   }
+}
+
+/* Universal strict Poppins font enforcement across all content and elements */
+html,
+body,
+#root,
+*,
+*::before,
+*::after,
+h1, h2, h3, h4, h5, h6,
+p, span, a, button, input, select, textarea,
+div, label, table, th, td, ul, ol, li,
+strong, b, em, i, section, main, aside, nav,
+header, footer, article, form, figcaption, figure, blockquote, small {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.material-icons,
+.material-icons-outlined,
+.material-icons-round,
+.material-icons-sharp {
+  font-family: 'Material Icons' !important;
 }
 
 /* Hide scrollbar globally across Chrome, Safari, Edge, Firefox, and Opera while retaining smooth scrolling */

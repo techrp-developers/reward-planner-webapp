@@ -11,7 +11,7 @@
     radial-gradient(circle at 14% 16%, rgba(255, 255, 255, 0.7), transparent 22%),
     radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.5), transparent 26%),
     linear-gradient(135deg, #fad2e2 0%, #edd1f4 48%, #dec4f4 100%);
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .auth-card {
