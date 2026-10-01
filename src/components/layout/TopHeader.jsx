@@ -11,14 +11,12 @@ import { useCart } from '../../context/CartContext';
 import { useServiceCart } from '../../context/ServiceCartContext';
 import { fetchGlobalSearchSuggestions } from '../../api/productApi';
 import LocationModal from './LocationModal';
-import MobileNavDrawer from './MobileNavDrawer';
+import AccountMenu from './AccountMenu';
+import NotificationsPanel from './NotificationsPanel';
 import RPpriceBadge from '../ui/RPpriceBadge';
 import rpLogo from '../../assets/rp_logo_crisp.png';
 import userAvatar from '../../assets/home/user-avatar.png';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AppsIcon from '@mui/icons-material/Apps';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 // Material UI Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -50,7 +48,6 @@ export const TopHeader = () => {
   const routerLocation = useRouterLocation();
 
   // Mobile Navigation Drawer (Hamburger) State
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const displayName = user?.name || user?.full_name || 'Shrinivas Karur';
   const avatarSrc = user?.avatar || user?.userImage || userAvatar || iconProfile;
@@ -148,45 +145,40 @@ export const TopHeader = () => {
       {/* Preserved Location Modal for address selection */}
       <LocationModal />
 
-      {/* Preserved Mobile Navigation Drawer */}
-      <MobileNavDrawer
-        isOpen={isMobileNavOpen}
-        onClose={() => setIsMobileNavOpen(false)}
-      />
 
-      <header className="sticky top-0 z-40 w-full bg-[#EFF2EC]/95 backdrop-blur-md border-b border-[#E2E6DF]/80 select-none py-3.5 px-4 sm:px-6 lg:px-8 xl:px-10 antialiased">
-        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-4 px-4 sm:px-8 lg:px-12 antialiased">
+        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-4">
           
           {/* Left Group: [ + / Logo Squircle ] and [ ::: Name Pill ] */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <Link
               to="/"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#4A6443] hover:bg-[#3D5437] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 shrink-0"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0"
               title="Reward Planners Home"
             >
-              <AddRoundedIcon sx={{ fontSize: 24, strokeWidth: 2 }} />
+              <img src={rpLogo} alt="RewardPlanners" className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-full" />
             </Link>
 
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="h-10 sm:h-11 px-3.5 sm:px-4 rounded-full bg-[#121815] hover:bg-black text-white flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
+              className="h-10 sm:h-11 px-4 rounded-full bg-[#1C0E28] hover:bg-black text-white flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
               title="Profile & Settings"
             >
               <AppsIcon sx={{ fontSize: 16 }} className="text-zinc-300 group-hover:text-white" />
-              <span className="tracking-tight text-white font-medium">{displayName}</span>
+              <span className="tracking-tight text-white font-medium truncate max-w-[100px] sm:max-w-[180px]">{displayName}</span>
             </button>
           </div>
 
           {/* Center Group: Floating Pill Navigation Capsule */}
           <div className="hidden md:flex items-center justify-center flex-1 max-w-[500px] mx-2">
-            <nav className="bg-white rounded-full p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center gap-1 w-full justify-between">
+            <nav className="bg-white rounded-full p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[#E4DCE9]/80 flex items-center gap-1 w-full justify-between">
               <Link
                 to="/"
                 className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === 'home'
-                    ? 'bg-[#4A6443] text-white shadow-xs'
-                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                    ? 'bg-[#1C0E28] text-white shadow-xs'
+                    : 'text-[#776B80] hover:text-[#1C0E28] hover:bg-[#F6F2F8]'
                 }`}
               >
                 Dashboard
@@ -196,8 +188,8 @@ export const TopHeader = () => {
                 to="/store"
                 className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === 'products'
-                    ? 'bg-[#4A6443] text-white shadow-xs'
-                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                    ? 'bg-[#1C0E28] text-white shadow-xs'
+                    : 'text-[#776B80] hover:text-[#1C0E28] hover:bg-[#F6F2F8]'
                 }`}
               >
                 Products
@@ -207,8 +199,8 @@ export const TopHeader = () => {
                 to="/services"
                 className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === 'services'
-                    ? 'bg-[#4A6443] text-white shadow-xs'
-                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                    ? 'bg-[#1C0E28] text-white shadow-xs'
+                    : 'text-[#776B80] hover:text-[#1C0E28] hover:bg-[#F6F2F8]'
                 }`}
               >
                 Services
@@ -218,8 +210,8 @@ export const TopHeader = () => {
                 to="/bbps"
                 className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === 'payments'
-                    ? 'bg-[#4A6443] text-white shadow-xs'
-                    : 'text-[#5F6B5D] hover:text-[#121815] hover:bg-[#F5F7F4]'
+                    ? 'bg-[#1C0E28] text-white shadow-xs'
+                    : 'text-[#776B80] hover:text-[#1C0E28] hover:bg-[#F6F2F8]'
                 }`}
               >
                 Payments
@@ -228,42 +220,24 @@ export const TopHeader = () => {
           </div>
 
           {/* Right Group: Notification with pip & Menu button */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* Notification Bell with Red Pip */}
-            <button
-              type="button"
-              onClick={() => navigate('/profile')}
-              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-[#F5F7F4] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-center cursor-pointer transition-all group shrink-0"
-              title="Notifications"
-              aria-label="Notifications"
-            >
-              <NotificationsOutlinedIcon sx={{ fontSize: 21 }} className="text-[#2D3B2E] group-hover:scale-105 transition-transform" />
-              <span className="w-2.5 h-2.5 bg-[#EF4444] rounded-full border-2 border-white absolute top-2.5 right-2.5 shadow-2xs" />
-            </button>
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <NotificationsPanel />
 
-            {/* Menu / Hamburger button */}
-            <button
-              type="button"
-              onClick={() => setIsMobileNavOpen(true)}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-[#F5F7F4] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-center cursor-pointer transition-all group shrink-0"
-              title="Open Navigation Menu"
-              aria-label="Menu"
-            >
-              <MenuRoundedIcon sx={{ fontSize: 22 }} className="text-[#2D3B2E] group-hover:scale-105 transition-transform" />
-            </button>
+
+            <AccountMenu />
           </div>
 
         </div>
 
         {/* Mobile / Tablet scrollable tab bar if on small screen */}
-        <div className="md:hidden mt-2.5 pt-2 border-t border-[#E2E6DF]/60">
-          <nav className="bg-white rounded-full p-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E2E6DF]/80 flex items-center justify-between text-xs font-semibold overflow-x-auto no-scrollbar">
+        <div className="md:hidden mt-2 pt-2 border-t border-[#E4DCE9]/60">
+          <nav className="bg-white rounded-full p-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E4DCE9]/80 flex items-center justify-between text-xs font-semibold overflow-x-auto no-scrollbar">
             <Link
               to="/"
               className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
                 activeTab === 'home'
-                  ? 'bg-[#4A6443] text-white shadow-xs'
-                  : 'text-[#5F6B5D]'
+                  ? 'bg-[#1C0E28] text-white shadow-xs'
+                  : 'text-[#776B80]'
               }`}
             >
               Dashboard
@@ -272,8 +246,8 @@ export const TopHeader = () => {
               to="/store"
               className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
                 activeTab === 'products'
-                  ? 'bg-[#4A6443] text-white shadow-xs'
-                  : 'text-[#5F6B5D]'
+                  ? 'bg-[#1C0E28] text-white shadow-xs'
+                  : 'text-[#776B80]'
               }`}
             >
               Products
@@ -282,8 +256,8 @@ export const TopHeader = () => {
               to="/services"
               className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
                 activeTab === 'services'
-                  ? 'bg-[#4A6443] text-white shadow-xs'
-                  : 'text-[#5F6B5D]'
+                  ? 'bg-[#1C0E28] text-white shadow-xs'
+                  : 'text-[#776B80]'
               }`}
             >
               Services
@@ -292,8 +266,8 @@ export const TopHeader = () => {
               to="/bbps"
               className={`flex-1 text-center py-1.5 px-2.5 rounded-full transition-all ${
                 activeTab === 'payments'
-                  ? 'bg-[#4A6443] text-white shadow-xs'
-                  : 'text-[#5F6B5D]'
+                  ? 'bg-[#1C0E28] text-white shadow-xs'
+                  : 'text-[#776B80]'
               }`}
             >
               Payments

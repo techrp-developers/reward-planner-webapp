@@ -40,8 +40,6 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import { useAuth } from '../../context/AuthContext';
 import runner from '../../assets/sidebarpagesimages/step challenge.png';
-import dining from '../../assets/servicescards/bg-dineout-dining.jpg';
-import gift from '../../assets/home/promo-giftbox.png';
 import './HomePage.css';
 import OccasionCalendar from './components/OccasionCalendar';
 
@@ -141,22 +139,26 @@ export const HomePage = () => {
   ]);
 
   const [showAllTasks, setShowAllTasks] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDate, setTaskDate] = useState('');
+
+  const addTask = (event) => {
+    event.preventDefault();
+    const title = taskTitle.trim();
+    if (!title) return;
+    const time = taskDate
+      ? new Date(taskDate).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : 'No due date';
+    setTasks(previous => [{ id: crypto.randomUUID(), title, time, icon: AssignmentTurnedInOutlinedIcon, completed: false }, ...previous]);
+    setTaskTitle('');
+    setTaskDate('');
+    setIsAddingTask(false);
+    showToast('Task added to your list.');
+  };
 
   const toggleTask = (taskId) => {
-    setTasks(prev =>
-      prev.map(t => {
-        if (t.id === taskId) {
-          const nextState = !t.completed;
-          if (nextState) {
-            showToast(`Task "${t.title}" completed! +25 RP Coins 🎉`);
-          } else {
-            showToast(`Task "${t.title}" marked as pending.`);
-          }
-          return { ...t, completed: nextState };
-        }
-        return t;
-      })
-    );
+    setTasks(previous => previous.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task));
   };
 
   // Top Performers data matching podium layout in reference image (media_1790841692615.png)
@@ -341,25 +343,25 @@ export const HomePage = () => {
       )}
 
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
-      <div className="dashboard-content w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-5 space-y-6">
+      <div className="dashboard-content">
 
         {/* ── 0. DASHBOARD HEADER BANNER MATCHING REFERENCE IMAGE ── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 pt-1">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#152419] tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-semibold text-[#24162F] tracking-tight leading-tight">
               Today's Overview
             </h1>
-            <p className="text-xs sm:text-sm text-[#5E6D60] font-medium mt-1">
-              Manage employee recognition, peer kudos, daily activities, and rewards from one place.
+            <p className="text-xs sm:text-sm text-[#776B80] font-medium mt-1">
+              View employee recognition, team updates, upcoming events, and your daily activities in one place.
             </p>
           </div>
 
           <div className="flex flex-col items-start sm:items-end shrink-0">
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#152419]">
-              <ApartmentOutlinedIcon sx={{ fontSize: 18 }} className="text-[#4A6443]" />
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#24162F]">
+              <ApartmentOutlinedIcon sx={{ fontSize: 18 }} className="text-[#1C0E28]" />
               <span>Reward Planners Enterprise</span>
             </div>
-            <div className="text-xs text-[#5E6D60] font-medium mt-0.5">
+            <div className="text-xs text-[#776B80] font-medium mt-0.5">
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 day: 'numeric',
@@ -371,24 +373,24 @@ export const HomePage = () => {
         </div>
 
         {/* ── 1. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
           
           {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
-          <div className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#E2E6DF]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-md transition-all flex flex-col justify-between">
+          <div className="bg-white rounded-[24px] p-4 border border-[#E4DCE9]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-sm transition-all flex flex-col justify-between">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-3.5 border-b border-[#E2E6DF]/60">
+              <div className="flex items-center justify-between pb-4 border-b border-[#E4DCE9]/60">
                 <div>
-                  <h3 className="text-base sm:text-lg font-extrabold text-[#152419] tracking-tight">
+                  <h3 className="text-base sm:text-lg font-semibold text-[#24162F] tracking-tight">
                     Top Performers
                   </h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#5E6D60]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#776B80]">
                     Company Leaderboard
                   </span>
                 </div>
 
                 {/* Month Switcher Pills */}
-                <div className="bg-[#F5F7F4] p-1 rounded-full border border-[#E2E6DF]/60 flex items-center gap-1 text-xs font-semibold text-[#5E6D60]">
+                <div className="bg-[#F6F2F8] p-1 rounded-full border border-[#E4DCE9]/60 flex items-center gap-1 text-xs font-semibold text-[#776B80]">
                   {['June', 'July', 'August'].map((m) => {
                     const isActive = activeMonth === m;
                     return (
@@ -398,8 +400,8 @@ export const HomePage = () => {
                         onClick={() => setActiveMonth(m)}
                         className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                           isActive
-                            ? 'bg-[#4A6443] text-white shadow-xs font-bold'
-                            : 'text-[#5E6D60] hover:text-[#152419]'
+                            ? 'bg-[#1C0E28] text-white shadow-xs font-bold'
+                            : 'text-[#776B80] hover:text-[#24162F]'
                         }`}
                       >
                         {m}
@@ -424,7 +426,7 @@ export const HomePage = () => {
                         <img
                           src={p2.avatar}
                           alt={p2.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E2E6DF] shadow-sm"
+                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E4DCE9] shadow-sm"
                         />
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#10B981] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
                           2
@@ -434,16 +436,16 @@ export const HomePage = () => {
                         <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
                         <span>{p2.score}</span>
                       </div>
-                      <div className="text-xs sm:text-sm font-bold text-[#152419] mt-0.5 leading-snug break-words">
+                      <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p2.name}
                       </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#5E6D60] leading-tight mt-0.5 font-medium">
+                      <div className="text-[10px] sm:text-[11px] text-[#776B80] leading-tight mt-0.5 font-medium">
                         {p2.role}
                       </div>
                     </div>
 
                     {/* Rank 1 (Center, Elevated - Gold Crown badge, Star 5.0) */}
-                    <div className="flex flex-col items-center text-center w-26 sm:w-30 -mt-3">
+                    <div className="flex flex-col items-center text-center w-26 sm:w-30 -mt-4">
                       <div className="relative mb-2">
                         <img
                           src={p1.avatar}
@@ -454,14 +456,14 @@ export const HomePage = () => {
                           <EmojiEventsIcon sx={{ fontSize: 18 }} className="text-white" />
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1.5 font-extrabold text-slate-900 text-base sm:text-lg">
+                      <div className="flex items-center justify-center gap-1 mt-1.5 font-semibold text-slate-900 text-base sm:text-lg">
                         <StarIcon sx={{ fontSize: 20 }} className="text-amber-400" />
                         <span>{p1.score}</span>
                       </div>
-                      <div className="text-sm sm:text-base font-extrabold text-[#152419] mt-0.5 leading-snug break-words">
+                      <div className="text-sm sm:text-base font-semibold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p1.name}
                       </div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full text-xs text-[#3B5436] bg-[#EDF4EB] border border-[#D5E3D2] font-semibold leading-tight mt-1">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full text-xs text-[#1C0E28] bg-[#F0E9F5] border border-[#E4D8ED] font-semibold leading-tight mt-1">
                         {p1.role}
                       </div>
                     </div>
@@ -472,7 +474,7 @@ export const HomePage = () => {
                         <img
                           src={p3.avatar}
                           alt={p3.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E2E6DF] shadow-sm"
+                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E4DCE9] shadow-sm"
                         />
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#F59E0B] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
                           3
@@ -482,10 +484,10 @@ export const HomePage = () => {
                         <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
                         <span>{p3.score}</span>
                       </div>
-                      <div className="text-xs sm:text-sm font-bold text-[#152419] mt-0.5 leading-snug break-words">
+                      <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p3.name}
                       </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#5E6D60] leading-tight mt-0.5 font-medium">
+                      <div className="text-[10px] sm:text-[11px] text-[#776B80] leading-tight mt-0.5 font-medium">
                         {p3.role}
                       </div>
                     </div>
@@ -494,33 +496,33 @@ export const HomePage = () => {
               })()}
 
               {/* Performers Ranked List (Ranks 4, 5, 6 with Star ratings) */}
-              <div className="border-t border-[#E2E6DF]/60 pt-3 space-y-2">
+              <div className="border-t border-[#E4DCE9]/60 pt-4 space-y-2">
                 {(performersData[activeMonth]?.list || performersData.July.list).map((p, idx) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-[#F5F7F4] transition-all border border-transparent hover:border-[#E2E6DF]/60"
+                    className="flex items-center justify-between p-2 rounded-2xl hover:bg-[#F6F2F8] transition-all border border-transparent hover:border-[#E4DCE9]/60"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="w-5 h-5 rounded-full bg-[#F5F7F4] text-[#5E6D60] text-[10px] font-bold flex items-center justify-center shrink-0">
+                    <div className="flex items-center gap-4">
+                      <span className="w-5 h-5 rounded-full bg-[#F6F2F8] text-[#776B80] text-[10px] font-bold flex items-center justify-center shrink-0">
                         {idx + 4}
                       </span>
                       <img
                         src={p.avatar}
                         alt={p.name}
-                        className="w-10 h-10 rounded-full object-cover border border-[#E2E6DF] shadow-2xs shrink-0"
+                        className="w-10 h-10 rounded-full object-cover border border-[#E4DCE9] shadow-2xs shrink-0"
                       />
                       <div>
-                        <div className="text-xs sm:text-sm font-bold text-[#152419]">
+                        <div className="text-xs sm:text-sm font-bold text-[#24162F]">
                           {p.name}
                         </div>
-                        <div className="text-[11px] text-[#5E6D60] font-medium">
+                        <div className="text-[11px] text-[#776B80] font-medium">
                           {p.role}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="hidden sm:inline-block text-[11px] font-semibold text-[#5E6D60] bg-[#F5F7F4] px-2.5 py-0.5 rounded-full border border-[#E2E6DF]/60">
+                      <span className="hidden sm:inline-block text-[11px] font-semibold text-[#776B80] bg-[#F6F2F8] px-2.5 py-0.5 rounded-full border border-[#E4DCE9]/60">
                         {p.points}
                       </span>
                       <div className="flex items-center gap-1 font-bold text-slate-800 text-xs sm:text-sm">
@@ -533,42 +535,42 @@ export const HomePage = () => {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#E2E6DF]/60 flex items-center justify-between text-[11px] text-[#5E6D60] font-medium">
+            <div className="mt-4 pt-4 border-t border-[#E4DCE9]/60 flex items-center justify-between text-[11px] text-[#776B80] font-medium">
               <span>Dynamic quarterly rankings</span>
-              <span className="text-[#3B5436] font-bold flex items-center gap-1 bg-[#EDF4EB] px-2.5 py-0.5 rounded-full border border-[#D5E3D2]">
+              <span className="text-[#1C0E28] font-bold flex items-center gap-1 bg-[#F0E9F5] px-2.5 py-0.5 rounded-full border border-[#E4D8ED]">
                 <AutoAwesomeIcon sx={{ fontSize: 13 }} /> Peer Recognition Model
               </span>
             </div>
           </div>
 
           {/* Card 2: Ultra-Premium Announcements & Spotlights */}
-          <div className="bg-white rounded-[28px] p-6 sm:p-7 border border-[#E2E6DF]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+          <div className="bg-white rounded-[24px] p-4 border border-[#E4DCE9]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-sm transition-all duration-300 flex flex-col justify-between">
             <div>
               {/* Header with Category & Carousel Controls */}
-              <div className="flex items-center justify-between pb-3.5 border-b border-[#E2E6DF]/60">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-2xl bg-[#EDF4EB] flex items-center justify-center text-[#4A6443]">
+              <div className="flex items-center justify-between pb-4 border-b border-[#E4DCE9]/60">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-2xl bg-[#F0E9F5] flex items-center justify-center text-[#1C0E28]">
                     <CampaignOutlinedIcon sx={{ fontSize: 19 }} />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-[#152419] leading-tight">
+                    <h3 className="text-base sm:text-lg font-semibold text-[#24162F] leading-tight">
                       Announcements
                     </h3>
-                    <span className="text-[11px] text-[#5E6D60] font-medium">
+                    <span className="text-[11px] text-[#776B80] font-medium">
                       Company Updates & Spotlights
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <span className="text-xs text-[#5E6D60] font-semibold mr-1">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <span className="text-xs text-[#776B80] font-semibold mr-1">
                     {announcementIndex + 1}/{announcements.length}
                   </span>
                   <button
                     type="button"
                     onClick={() => setAnnouncementIndex((idx) => (idx > 0 ? idx - 1 : announcements.length - 1))}
                     aria-label="Previous announcement"
-                    className="w-7 h-7 rounded-full border border-[#E2E6DF] hover:bg-[#F5F7F4] flex items-center justify-center text-[#2D3B2E] transition-colors cursor-pointer active:scale-95"
+                    className="w-7 h-7 rounded-full border border-[#E4DCE9] hover:bg-[#F6F2F8] flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
                   >
                     <ChevronLeftIcon sx={{ fontSize: 16 }} />
                   </button>
@@ -576,7 +578,7 @@ export const HomePage = () => {
                     type="button"
                     onClick={() => setAnnouncementIndex((idx) => (idx < announcements.length - 1 ? idx + 1 : 0))}
                     aria-label="Next announcement"
-                    className="w-7 h-7 rounded-full border border-[#E2E6DF] hover:bg-[#F5F7F4] flex items-center justify-center text-[#2D3B2E] transition-colors cursor-pointer active:scale-95"
+                    className="w-7 h-7 rounded-full border border-[#E4DCE9] hover:bg-[#F6F2F8] flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
                   >
                     <ChevronRightIcon sx={{ fontSize: 16 }} />
                   </button>
@@ -584,7 +586,7 @@ export const HomePage = () => {
               </div>
 
               {/* Category Quick Pills in responsive 4-col grid (avoids horizontal truncation e.g. Townhall) */}
-              <div className="grid grid-cols-4 gap-1.5 pt-3 pb-4">
+              <div className="grid grid-cols-4 gap-2 pt-4 pb-4">
                 {[
                   { label: 'Spotlight', icon: EmojiEventsIcon, index: 0 },
                   { label: 'Birthday', icon: CakeOutlinedIcon, index: 1 },
@@ -600,8 +602,8 @@ export const HomePage = () => {
                       onClick={() => setAnnouncementIndex(cat.index)}
                       className={`inline-flex items-center justify-center gap-1 py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer truncate ${
                         isActive
-                          ? 'bg-[#4A6443] text-white shadow-xs scale-[1.02]'
-                          : 'bg-[#F5F7F4] text-[#5E6D60] hover:bg-[#E9ECE6]'
+                          ? 'bg-[#1C0E28] text-white shadow-xs scale-[1.02]'
+                          : 'bg-[#F6F2F8] text-[#776B80] hover:bg-[#E9ECE6]'
                       }`}
                     >
                       <CatIcon sx={{ fontSize: 13 }} />
@@ -614,12 +616,12 @@ export const HomePage = () => {
               {/* Main Announcement Slide */}
               {currentAnnouncement.type === 'eotm' ? (
                 /* Premium Employee of the Month Spotlight */
-                <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-[#F5F8F4] via-[#FDFBF7] to-[#FAF6F8] border border-[#E2E6DF] shadow-2xs relative overflow-hidden">
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-[#F4EEF8] via-[#FAF8FC] to-[#F1EAF6] border border-[#E4DCE9] shadow-2xs relative overflow-hidden">
                   {/* Subtle background glow */}
                   <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
 
                   {/* Profile & Badge */}
-                  <div className="flex items-start gap-3.5">
+                  <div className="flex items-start gap-4">
                     <div className="relative shrink-0">
                       <img
                         src={currentAnnouncement.image}
@@ -632,66 +634,66 @@ export const HomePage = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#4A6443] text-white shadow-2xs mb-1">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#1C0E28] text-white shadow-2xs mb-1">
                         <EmojiEventsIcon sx={{ fontSize: 12 }} className="text-white" />
                         <span>{currentAnnouncement.badge}</span>
                       </span>
-                      <h4 className="text-base font-extrabold text-[#152419] truncate">
+                      <h4 className="text-base font-semibold text-[#24162F] truncate">
                         {currentAnnouncement.name}
                       </h4>
-                      <p className="text-xs font-semibold text-[#5E6D60] truncate">
-                        {currentAnnouncement.role} • <span className="text-[#88988A] font-medium">{currentAnnouncement.department}</span>
+                      <p className="text-xs font-semibold text-[#776B80] truncate">
+                        {currentAnnouncement.role} • <span className="text-[#93849F] font-medium">{currentAnnouncement.department}</span>
                       </p>
                     </div>
                   </div>
 
                   {/* Recognition Statement */}
-                  <p className="text-xs text-[#2D3B2E] leading-relaxed font-medium mt-3 bg-white/95 p-2.5 rounded-xl border border-[#E2E6DF]/80 shadow-2xs">
+                  <p className="text-xs text-[#55435F] leading-relaxed font-medium mt-4 bg-white/95 p-2 rounded-xl border border-[#E4DCE9]/80 shadow-2xs">
                     "{currentAnnouncement.desc}"
                   </p>
 
                   {/* Highlight Metrics */}
-                  <div className="grid grid-cols-3 gap-1.5 mt-3 text-center">
-                    <div className="p-2 rounded-xl bg-white border border-[#E2E6DF] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#5E6D60] font-semibold uppercase tracking-wider">
+                  <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
+                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
                         <MonetizationOnOutlinedIcon sx={{ fontSize: 12 }} className="text-amber-500" />
                         <span>Award</span>
                       </div>
-                      <div className="text-xs font-extrabold text-amber-600 mt-0.5">{currentAnnouncement.bonus}</div>
+                      <div className="text-xs font-semibold text-amber-600 mt-0.5">{currentAnnouncement.bonus}</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-white border border-[#E2E6DF] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#5E6D60] font-semibold uppercase tracking-wider">
-                        <TrendingUpIcon sx={{ fontSize: 12 }} className="text-[#4A6443]" />
+                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
+                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
+                        <TrendingUpIcon sx={{ fontSize: 12 }} className="text-[#1C0E28]" />
                         <span>Impact</span>
                       </div>
-                      <div className="text-xs font-extrabold text-[#4A6443] mt-0.5">Top 1%</div>
+                      <div className="text-xs font-semibold text-[#1C0E28] mt-0.5">Top 1%</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-white border border-[#E2E6DF] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#5E6D60] font-semibold uppercase tracking-wider">
+                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
+                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
                         <VerifiedOutlinedIcon sx={{ fontSize: 12 }} className="text-rose-500" />
                         <span>Delivery</span>
                       </div>
-                      <div className="text-xs font-extrabold text-rose-600 mt-0.5">100% On-Time</div>
+                      <div className="text-xs font-semibold text-rose-600 mt-0.5">100% On-Time</div>
                     </div>
                   </div>
 
                   {/* Interactive Peer Reactions with Material UI Icons */}
-                  <div className="mt-3 pt-2.5 border-t border-[#E2E6DF]/60 flex items-center justify-between">
-                    <span className="text-[11px] text-[#5E6D60] font-medium">Join the celebration:</span>
-                    <div className="flex items-center gap-1.5">
+                  <div className="mt-4 pt-2.5 border-t border-[#E4DCE9]/60 flex items-center justify-between">
+                    <span className="text-[11px] text-[#776B80] font-medium">Join the celebration:</span>
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => handleReaction('kudos')}
-                        className="px-2.5 py-1 rounded-full bg-white hover:bg-[#EDF4EB] text-[#2D3B2E] text-[11px] font-bold border border-[#E2E6DF] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                        className="px-2.5 py-1 rounded-full bg-white hover:bg-[#F0E9F5] text-[#55435F] text-[11px] font-bold border border-[#E4DCE9] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
                       >
-                        <ThumbUpAltOutlinedIcon sx={{ fontSize: 13 }} className="text-[#4A6443]" />
+                        <ThumbUpAltOutlinedIcon sx={{ fontSize: 13 }} className="text-[#1C0E28]" />
                         <span>Kudos</span>
-                        <strong className="text-[#4A6443]">({reactionCounts.kudos})</strong>
+                        <strong className="text-[#1C0E28]">({reactionCounts.kudos})</strong>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleReaction('celebrated')}
-                        className="px-2.5 py-1 rounded-full bg-white hover:bg-rose-50 text-[#2D3B2E] text-[11px] font-bold border border-[#E2E6DF] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                        className="px-2.5 py-1 rounded-full bg-white hover:bg-rose-50 text-[#55435F] text-[11px] font-bold border border-[#E4DCE9] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
                       >
                         <CelebrationOutlinedIcon sx={{ fontSize: 13 }} className="text-rose-600" />
                         <span>Celebrate</span>
@@ -702,34 +704,34 @@ export const HomePage = () => {
                 </div>
               ) : (
                 /* Other Announcements (Birthday, Anniversary, Townhall) */
-                <div className={`rounded-2xl p-4 sm:p-5 bg-gradient-to-br ${currentAnnouncement.color} border border-[#E2E6DF] shadow-2xs relative overflow-hidden flex flex-col justify-between min-h-[270px]`}>
+                <div className={`rounded-2xl p-4 bg-gradient-to-br ${currentAnnouncement.color} border border-[#E4DCE9] shadow-2xs relative overflow-hidden flex flex-col justify-between min-h-[270px]`}>
                   <div>
-                    <div className="flex items-center gap-3 mb-2.5">
+                    <div className="flex items-center gap-4 mb-2.5">
                       <div className="w-11 h-11 rounded-xl bg-white shadow-xs flex items-center justify-center text-rose-500 shrink-0">
                         {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 24 } })}
                       </div>
                       <div>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#4A6443] bg-white px-2 py-0.5 rounded-full mb-1 shadow-2xs">
-                          {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 12 }, className: "text-[#4A6443]" })}
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1C0E28] bg-white px-2 py-0.5 rounded-full mb-1 shadow-2xs">
+                          {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 12 }, className: "text-[#1C0E28]" })}
                           <span>{currentAnnouncement.badge}</span>
                         </span>
-                        <h4 className="text-base font-bold text-[#152419]">
+                        <h4 className="text-base font-bold text-[#24162F]">
                           {currentAnnouncement.name}
                         </h4>
                       </div>
                     </div>
 
-                    <div className="bg-white/90 p-3 rounded-xl border border-white text-xs text-[#2D3B2E] leading-relaxed font-medium mt-1">
+                    <div className="bg-white/90 p-3 rounded-xl border border-white text-xs text-[#55435F] leading-relaxed font-medium mt-1">
                       {currentAnnouncement.desc}
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-[#E2E6DF]/60 flex items-center justify-between text-[11px] text-[#5E6D60] font-medium">
+                  <div className="mt-4 pt-2.5 border-t border-[#E4DCE9]/60 flex items-center justify-between text-[11px] text-[#776B80] font-medium">
                     <span className="flex items-center gap-1">
-                      <EventOutlinedIcon sx={{ fontSize: 13 }} className="text-[#88988A]" />
+                      <EventOutlinedIcon sx={{ fontSize: 13 }} className="text-[#93849F]" />
                       Reward Planners Calendar
                     </span>
-                    <span className="text-[#4A6443] font-bold flex items-center gap-1">
+                    <span className="text-[#1C0E28] font-bold flex items-center gap-1">
                       <GroupsOutlinedIcon sx={{ fontSize: 13 }} />
                       Company-Wide Event
                     </span>
@@ -747,7 +749,7 @@ export const HomePage = () => {
                     showToast('Opening Reward Points Store & Claims...');
                     navigate('/rewards/explore');
                   }}
-                  className="w-full py-2.5 rounded-xl bg-[#4A6443] hover:bg-[#3D5437] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                  className="w-full py-2.5 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
                   <MilitaryTechOutlinedIcon sx={{ fontSize: 17 }} />
                   <span>{currentAnnouncement.cta} & Explore Store</span>
@@ -757,7 +759,7 @@ export const HomePage = () => {
                 <button
                   type="button"
                   onClick={() => showToast(`Warm wishes and greetings sent to ${currentAnnouncement.person}! 🎈`)}
-                  className="w-full py-2.5 rounded-xl bg-[#4A6443] hover:bg-[#3D5437] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                  className="w-full py-2.5 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
                   <CelebrationOutlinedIcon sx={{ fontSize: 17 }} />
                   <span>{currentAnnouncement.cta}</span>
@@ -766,7 +768,7 @@ export const HomePage = () => {
               )}
 
               {/* Dots Indicator */}
-              <div className="flex items-center justify-center gap-1.5 mt-3">
+              <div className="flex items-center justify-center gap-2 mt-4">
                 {announcements.map((_, i) => (
                   <button
                     key={i}
@@ -774,8 +776,8 @@ export const HomePage = () => {
                     onClick={() => setAnnouncementIndex(i)}
                     className={`h-1.5 rounded-full transition-all cursor-pointer ${
                       announcementIndex === i
-                        ? 'w-6 bg-[#4A6443]'
-                        : 'w-1.5 bg-[#E2E6DF] hover:bg-[#CAD1C6]'
+                        ? 'w-6 bg-[#1C0E28]'
+                        : 'w-1.5 bg-[#E4DCE9] hover:bg-[#CAD1C6]'
                     }`}
                     aria-label={`Go to announcement ${i + 1}`}
                   />
@@ -785,20 +787,20 @@ export const HomePage = () => {
           </div>
 
           {/* Card 3: Onboarding Task (To-Do List matching reference media_1790850980239.jpg) */}
-          <div className="bg-gradient-to-b from-[#151B17] via-[#121815] to-[#0E1310] rounded-[28px] p-6 sm:p-7 border border-white/[0.08] shadow-[0_4px_24px_-2px_rgba(20,34,25,0.06)] hover:shadow-xl transition-all duration-300 flex flex-col justify-between text-white md:col-span-2 xl:col-span-1">
+          <div className="bg-gradient-to-b from-[#321B44] via-[#1C0E28] to-[#1C0E28] rounded-[24px] p-4 border border-white/[0.08] shadow-[0_4px_24px_-2px_rgba(20,34,25,0.06)] hover:shadow-sm transition-all duration-300 flex flex-col justify-between text-white md:col-span-2 xl:col-span-1">
             <div>
               {/* Header: "Onboarding Task" left, "2/8" right */}
-              <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center text-[#E2B842]">
                     <AssignmentTurnedInOutlinedIcon sx={{ fontSize: 19 }} />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-tight">
-                      Onboarding Task
+                      My to-do list
                     </h3>
                     <span className="text-[11px] text-zinc-400 font-medium">
-                      Daily Activity & Checklist
+                      Your daily tasks and reminders
                     </span>
                   </div>
                 </div>
@@ -812,30 +814,44 @@ export const HomePage = () => {
               {/* Progress Bar with dual-tone olive to gold glow */}
               <div className="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden my-4 p-[1px]">
                 <div
-                  className="bg-gradient-to-r from-[#4A6443] via-[#65885D] to-[#E2B842] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(226,184,66,0.3)]"
+                  className="bg-gradient-to-r from-[#1C0E28] via-[#9876B0] to-[#C1A4D3] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(226,184,66,0.3)]"
                   style={{
                     width: `${(tasks.filter((t) => t.completed).length / tasks.length) * 100}%`
                   }}
                 />
               </div>
 
-              {/* Task List Items matching reference image */}
+              <button type="button" className="todo-add-toggle" onClick={() => setIsAddingTask(value => !value)} aria-expanded={isAddingTask} aria-controls="add-task-form">
+                {isAddingTask ? 'Cancel' : '+ Add task'}
+              </button>
+              {isAddingTask && (
+                <form id="add-task-form" className="todo-add-form" onSubmit={addTask}>
+                  <label htmlFor="task-title">Task name</label>
+                  <input id="task-title" autoFocus value={taskTitle} onChange={event => setTaskTitle(event.target.value)} placeholder="What would you like to do?" maxLength={120} required />
+                  <label htmlFor="task-date">Due date <span>(optional)</span></label>
+                  <input id="task-date" type="datetime-local" value={taskDate} onChange={event => setTaskDate(event.target.value)} />
+                  <button type="submit" disabled={!taskTitle.trim()}>Add to my list</button>
+                  <p>Tasks are kept for this visit.</p>
+                </form>
+              )}
+
+              {/* Task list */}
               <div className="space-y-2 pt-1">
                 {(showAllTasks ? tasks : tasks.slice(0, 5)).map((task) => {
                   const IconComponent = task.icon;
                   return (
-                    <div
+                    <button type="button" aria-pressed={task.completed}
                       key={task.id}
                       onClick={() => toggleTask(task.id)}
-                      className="flex items-center justify-between p-2 sm:p-2.5 rounded-2xl hover:bg-white/[0.06] transition-all cursor-pointer group border border-transparent hover:border-white/[0.06]"
+                      className="w-full text-left flex items-center justify-between gap-2 p-2 sm:p-2 rounded-2xl hover:bg-white/[0.06] transition-all cursor-pointer group border border-transparent hover:border-white/[0.06]"
                     >
                       {/* Left: Icon circle + Title & Timestamp */}
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-4">
                         <div
                           className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0 transition-all ${
                             task.completed
                               ? 'bg-white/[0.08] text-zinc-500'
-                              : 'bg-white text-[#121815] shadow-md group-hover:scale-105'
+                              : 'bg-white text-[#1C0E28] shadow-md group-hover:scale-105'
                           }`}
                         >
                           <IconComponent sx={{ fontSize: 20 }} />
@@ -865,22 +881,22 @@ export const HomePage = () => {
                       <div
                         className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all ${
                           task.completed
-                            ? 'bg-[#E2B842] text-[#121815] shadow-[0_0_8px_rgba(226,184,66,0.4)]'
+                            ? 'bg-[#E2B842] text-[#1C0E28] shadow-[0_0_8px_rgba(226,184,66,0.4)]'
                             : 'bg-white/[0.06] group-hover:bg-white/[0.12] border border-white/[0.15]'
                         }`}
                       >
                         {task.completed && (
-                          <CheckIcon sx={{ fontSize: 15 }} className="text-[#121815]" />
+                          <CheckIcon sx={{ fontSize: 15 }} className="text-[#1C0E28]" />
                         )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
             </div>
 
             {/* Card Footer: View All toggle & Reward Coins note */}
-            <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between text-[11px]">
+            <div className="mt-4 pt-4 border-t border-white/[0.08] flex items-center justify-between text-[11px]">
               <button
                 type="button"
                 onClick={() => setShowAllTasks(!showAllTasks)}
@@ -889,10 +905,7 @@ export const HomePage = () => {
                 <span>{showAllTasks ? 'Show fewer tasks' : `View all (${tasks.length}) tasks`}</span>
               </button>
 
-              <span className="text-[#E2B842] font-semibold text-[11px] flex items-center gap-1 bg-[#E2B842]/10 px-2.5 py-0.5 rounded-full border border-[#E2B842]/25">
-                <AutoAwesomeIcon sx={{ fontSize: 13 }} className="text-[#E2B842]" />
-                +25 RP Coins / task
-              </span>
+
             </div>
           </div>
 
@@ -944,29 +957,7 @@ export const HomePage = () => {
           </div>
         </section>
 
-        {/* ── 4. DISCOVER MORE PROMOTIONS (FULL-WIDTH) ── */}
-        <section className="dashboard-discover" aria-label="Discover more">
-          <article className="dashboard-rewards-promo">
-            <div>
-              <span className="dashboard-pill"><CardGiftcardIcon sx={{ fontSize: 15 }} /> SOMETHING FOR YOU</span>
-              <h2>Make room for<br />a little rewarding.</h2>
-              <p>Discover gifts, experiences and everyday favourites.</p>
-              <Link to="/rewards/explore">Explore rewards <ArrowForwardIcon sx={{ fontSize: 17 }} /></Link>
-            </div>
-            <img src={gift} alt="Colourful gift box" />
-          </article>
 
-          <article
-            className="dashboard-dining-promo"
-            style={{ backgroundImage: `linear-gradient(90deg, rgba(36,25,15,.88), rgba(36,25,15,.2)), url("${dining}")` }}
-          >
-            <span className="dashboard-pill">COMING SOON · DINE OUT</span>
-            <h2>Good food.<br />Great company.</h2>
-            <p>Your next favourite table is on its way.</p>
-          </article>
-        </section>
-
-        <p className="dashboard-signoff">A more rewarding everyday, with RewardPlanners.</p>
       </div>
 
       {/* Mobile Navigation Bar */}

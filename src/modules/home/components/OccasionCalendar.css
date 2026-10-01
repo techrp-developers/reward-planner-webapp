@@ -1,4 +1,4 @@
-﻿.occasions { margin-top: 34px; }
+.occasions { margin-top: 34px; }
 .occasions-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
 .occasions-heading h2 { font-size: 24px; font-weight: 650; letter-spacing: -.04em; line-height: 1.4; }
 .occasions-heading > div > p:last-child { color: #7b8191; font-size: 11px; margin-top: 6px; }
@@ -67,3 +67,34 @@
   .occasion-calendar, .occasion-agenda { padding: 16px; border-radius: 20px; }.occasion-toolbar { align-items: flex-start; flex-wrap: wrap; }.occasion-toolbar h3 { font-size: 13px; }
   .occasion-week-controls { flex-wrap: wrap; margin-bottom: 12px; }.occasion-week-controls p { font-size: 11px; }.occasion-agenda-list { grid-template-columns: 1fr; }.occasion-scroll-hint { display: block; font-size: 9px; color: #9990a6; margin-bottom: 10px; }
 }
+
+/* Match the dashboard's plum palette and 8/16px rhythm. */
+.dashboard .occasions { margin: 0; }
+.occasions-heading { margin-bottom: 16px; gap: 16px; }
+.occasions-heading h2 { color: #24162F; font-size: 22px; font-weight: 600; }
+.occasion-preview { background: #EAE1F1; color: #685276; padding: 8px; }
+.occasion-layout { gap: 16px; }
+.occasion-calendar, .occasion-agenda { padding: 16px; border-color: #E4DCE9; border-radius: 24px; box-shadow: none; }
+.occasion-toolbar, .occasion-week-controls, .occasion-agenda-heading { gap: 8px; }
+.occasion-toolbar h3 svg, .occasion-detail-category { color: #705082; }
+.occasion-filter select { background: #F7F3FA; border-color: #E4DCE9; padding: 8px; color: #65516F; }
+.occasion-week-controls { margin: 16px 0; }
+.occasion-week-controls > div { gap: 8px; }
+.occasion-week-controls button { width: 32px; height: 32px; color: #553767; }
+.occasion-week-controls button:hover:not(:disabled) { background: #F0E9F5; color: #1C0E28; }
+.occasion-day, .occasion-agenda-item > span:nth-child(2) > small { color: #776B80; }
+.occasion-weekend, .occasion-detail { background: #F6F2F9; }
+.occasion-peach { background: #EEE4F5; color: #6B4781; }
+.occasion-blue { background: #E4D7EE; color: #4E2B65; }
+.occasion-mint { background: #F0EAF5; color: #766080; }
+.occasion-lavender { background: #E9E0EF; color: #60476E; }
+.occasion-legend { gap: 16px; padding-top: 16px; color: #776B80; }
+.legend-peach { background: #AD8FC0; }.legend-blue { background: #64417B; }.legend-mint { background: #B6A1C3; }
+.occasion-agenda-list { margin-top: 16px; }
+.occasion-agenda-item { gap: 8px; padding: 8px 0; }
+.occasion-agenda-item[aria-pressed="true"] > span:nth-child(2) > strong, .occasion-agenda-item:hover > span:nth-child(2) > strong { color: #1C0E28; }
+.occasion-detail { padding: 16px; }
+.occasion-agenda-list + .occasion-detail { margin-top: 16px; }
+.occasion-detail h4 { color: #1C0E28; }.occasion-detail p, .occasion-detail > div span { color: #776B80; }
+.occasion-detail > div { gap: 8px; margin-top: 8px; }
+.occasions button:focus-visible, .occasions select:focus-visible, .occasion-grid-scroll:focus-visible { outline-color: #78538F; }
