@@ -15,6 +15,7 @@ import AccountMenu from './AccountMenu';
 import NotificationsPanel from './NotificationsPanel';
 import RPpriceBadge from '../ui/RPpriceBadge';
 import rpLogo from '../../assets/rp_logo_crisp.png';
+import pointsCoin from '../../assets/rewards/reward_coins_stack.png';
 import userAvatar from '../../assets/home/user-avatar.png';
 import AppsIcon from '@mui/icons-material/Apps';
 
@@ -116,7 +117,11 @@ export const TopHeader = () => {
     navigate(`/store?search=${encodeURIComponent(searchQuery.trim())}`);
   };
 
-  const coinBalance = Number(user?.wallet_points || user?.points || user?.steps?.coins || 2450);
+  const rawPoints = user?.rewardPoints ?? user?.wallet_points ?? user?.points ?? user?.steps?.coins;
+  const numericPoints = rawPoints == null || rawPoints === '' ? null : Number(rawPoints);
+  const coinBalance = numericPoints !== null && Number.isFinite(numericPoints) && numericPoints >= 0
+    ? numericPoints.toLocaleString('en-IN', { maximumFractionDigits: 2 })
+    : '—';
   const firstName = user?.name ? user.name.trim().split(' ')[0] : (user?.first_name || 'Profile');
 
   const isEcommercePath =
@@ -162,16 +167,16 @@ export const TopHeader = () => {
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="h-10 sm:h-11 px-4 rounded-full bg-[#1C0E28] hover:bg-black text-white flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
-              title="Profile & Settings"
+              className="h-10 sm:h-11 px-2 sm:px-4 rounded-full bg-[#1C0E28] hover:bg-black text-white flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
+              title="Profile & Settings" aria-label="Profile and settings"
             >
               <AppsIcon sx={{ fontSize: 16 }} className="text-zinc-300 group-hover:text-white" />
-              <span className="tracking-tight text-white font-medium truncate max-w-[100px] sm:max-w-[180px]">{displayName}</span>
+              <span className="hidden sm:inline tracking-tight text-white font-medium truncate max-w-[120px]">{displayName}</span>
             </button>
           </div>
 
           {/* Center Group: Floating Pill Navigation Capsule */}
-          <div className="hidden md:flex items-center justify-center flex-1 max-w-[500px] mx-2">
+          <div className="hidden xl:flex items-center justify-center flex-1 max-w-[500px] mx-2">
             <nav className="bg-white rounded-full p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[#E4DCE9]/80 flex items-center gap-1 w-full justify-between">
               <Link
                 to="/"
@@ -221,6 +226,10 @@ export const TopHeader = () => {
 
           {/* Right Group: Notification with pip & Menu button */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <Link to="/rewards" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-2 pr-2 sm:pr-4 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
+              <img src={pointsCoin} alt="" className="hidden sm:block w-8 h-8 object-contain" />
+              <span><strong className="block text-xs sm:text-sm font-semibold leading-tight max-w-[96px] truncate">{coinBalance}</strong><span className="block text-[9px] sm:text-[10px] text-[#776B80] mt-1 whitespace-nowrap">RP Points</span></span>
+            </Link>
             <NotificationsPanel />
 
 
@@ -230,7 +239,7 @@ export const TopHeader = () => {
         </div>
 
         {/* Mobile / Tablet scrollable tab bar if on small screen */}
-        <div className="md:hidden mt-2 pt-2 border-t border-[#E4DCE9]/60">
+        <div className="xl:hidden mt-2 pt-2 border-t border-[#E4DCE9]/60">
           <nav className="bg-white rounded-full p-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#E4DCE9]/80 flex items-center justify-between text-xs font-semibold overflow-x-auto no-scrollbar">
             <Link
               to="/"

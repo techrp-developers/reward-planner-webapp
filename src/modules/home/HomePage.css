@@ -4,6 +4,7 @@
 .dashboard {
   height: 100%;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   background: #F8FAFC;
   color: #0F172A;
   -webkit-font-smoothing: antialiased;

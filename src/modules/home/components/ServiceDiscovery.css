@@ -1,0 +1,26 @@
+.service-shortcuts { display: grid; grid-template-columns: repeat(10,minmax(0,1fr)); gap: 8px; }
+.service-shortcut { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; gap: 8px; padding: 16px 8px; border: 1px solid #ffffffb0; border-radius: 16px; min-width: 0; }
+.service-shortcut strong { font-size: 11px; font-weight: 600; color: #24162f; line-height: 1.4; max-width: 96px; }
+.service-shortcut small { font-size: 9px; color: #776b80; }
+.service-shortcut[href]:hover { border-color: #c8b6d5; box-shadow: 0 4px 12px #1c0e2808; }
+.service-glyph { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; color: white; box-shadow: inset 0 2px 2px #ffffff80, inset 0 -3px 5px #00000012, 0 4px 8px #1c0e2810; }
+.glyph-rose { background: linear-gradient(145deg,#ff859b,#dd365d); }.glyph-blue { background: linear-gradient(145deg,#68bfff,#3275cc); }.glyph-orange { background: linear-gradient(145deg,#ffbf72,#e9812c); }.glyph-purple { background: linear-gradient(145deg,#b58bf4,#8254bf); }.glyph-teal { background: linear-gradient(145deg,#6dd6ce,#229b94); }.glyph-gold { background: linear-gradient(145deg,#f5cf69,#dca02d); }.glyph-indigo { background: linear-gradient(145deg,#a199ee,#6455c4); }
+.tone-rose { background: linear-gradient(145deg,#fff9fb,#fbeaf0); --service-art: #d57593; }.tone-blue { background: linear-gradient(145deg,#f8fcff,#e7f0fc); --service-art: #6593cf; }.tone-orange { background: linear-gradient(145deg,#fffbf6,#fff0df); --service-art: #d4a068; }.tone-purple { background: linear-gradient(145deg,#fcf9ff,#eee5f8); --service-art: #a080c5; }.tone-teal { background: linear-gradient(145deg,#f7fffe,#e2f4f1); --service-art: #63a9a0; }.tone-gold { background: linear-gradient(145deg,#fffdf7,#fcf2d9); --service-art: #c5a45a; }.tone-indigo { background: linear-gradient(145deg,#fbfaff,#eeebfb); --service-art: #8f87c5; }
+.service-discovery-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.service-discovery-heading h2 { font-size: 22px; letter-spacing: -.03em; color: #1c0e28; }
+.service-discovery-heading p { font-size: 12px; color: #776b80; margin-top: 8px; }
+.service-discovery-heading > a { display: inline-flex; gap: 8px; align-items: center; font-size: 12px; color: #553767; white-space: nowrap; }
+.service-discovery-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 16px; }
+.service-discovery-card { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; border-radius: 16px; border: 1px solid #ffffffb0; padding: 16px; min-height: 264px; }
+.service-card-heading { display: flex; gap: 8px; align-items: center; }
+.service-card-heading .service-glyph { width: 32px; height: 32px; border-radius: 10px; }
+.service-card-heading h3 { font-size: 12px; line-height: 1.5; color: #24162f; }
+.service-discovery-card > p { font-size: 11px; color: #776b80; line-height: 1.6; margin-top: 8px; }
+.service-discovery-card ul { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.service-discovery-card li { display: flex; align-items: center; gap: 8px; font-size: 10px; color: #55435f; }
+.service-discovery-card li svg { flex-shrink: 0; color: #88649e; }
+.service-card-art { position: absolute; right: -8px; bottom: -8px; color: var(--service-art); opacity: .25; transform: rotate(-12deg); z-index: -1; }
+.service-discovery-card > a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; margin-top: auto; background: #fff; color: #1c0e28; border-radius: 24px; font-size: 11px; font-weight: 600; }
+.service-discovery-card > a:hover { background: #1c0e28; color: #fff; }
+@media (max-width: 1279px) { .service-shortcuts { grid-template-columns: repeat(5,minmax(0,1fr)); }.service-discovery-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 639px) { .service-shortcuts { display: flex; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin !important; }.service-shortcut { flex: 0 0 104px; }.service-discovery-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }.service-discovery-card { padding: 16px 8px; }.service-discovery-heading { align-items: flex-start; }.service-discovery-heading h2 { font-size: 19px; }.service-discovery-heading p { font-size: 11px; }.service-discovery-heading > a { font-size: 10px; } }

@@ -14,9 +14,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import NorthEastIcon from '@mui/icons-material/NorthEast';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
@@ -39,9 +36,10 @@ import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import { useAuth } from '../../context/AuthContext';
-import runner from '../../assets/sidebarpagesimages/step challenge.png';
 import './HomePage.css';
 import OccasionCalendar from './components/OccasionCalendar';
+import BenefitHighlights from './components/BenefitHighlights';
+import ServiceDiscovery, { ServiceShortcuts } from './components/ServiceDiscovery';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -373,6 +371,8 @@ export const HomePage = () => {
         </div>
 
         {/* ── 1. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
+        <ServiceShortcuts />
+
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
           
           {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
@@ -914,48 +914,10 @@ export const HomePage = () => {
         {/* ── 2. OCCASION CALENDAR SECTION (FULL-WIDTH) ── */}
         <OccasionCalendar />
 
+        <ServiceDiscovery />
+
         {/* ── 3. WELLBEING & FINANCIAL SERVICES SECTION (FULL-WIDTH) ── */}
-        <section className="dashboard-overview" aria-label="Wellbeing and financial services">
-          <article className="wellbeing-card">
-            <img className="wellbeing-art" src={runner} alt="Illustration of a runner in a sunny park" />
-            <div className="wellbeing-shade" />
-            <div className="wellbeing-copy">
-              <span className="dashboard-pill"><FavoriteIcon sx={{ fontSize: 15 }} /> A HEALTHIER EVERYDAY</span>
-              <h2>Small steps.<br />Big difference.</h2>
-              <p>Make time for you. Discover wellness activities that help you feel your best.</p>
-              <Link className="dashboard-primary" to="/wellness">Let's get moving <NorthEastIcon sx={{ fontSize: 18 }} /></Link>
-            </div>
-            <div className="wellbeing-footer">
-              <span><DirectionsWalkIcon sx={{ fontSize: 21 }} /><strong>Move more</strong></span>
-              <span><FavoriteIcon sx={{ fontSize: 21 }} /><strong>Feel better</strong></span>
-              <span><AutoAwesomeIcon sx={{ fontSize: 21 }} /><strong>Build a habit</strong></span>
-            </div>
-          </article>
-
-          <div className="dashboard-finance">
-            <article className="finance-card investment-card">
-              <div className="finance-heading">
-                <span className="finance-icon"><TrendingUpIcon sx={{ fontSize: 23 }} /></span>
-                <h2>Investments</h2>
-                <NorthEastIcon sx={{ fontSize: 19 }} />
-              </div>
-              <h3>A brighter tomorrow<br />starts today.</h3>
-              <p>Explore mutual funds and plan your next milestone.</p>
-              <Link to="/services/mutual-funds">Explore investments <ArrowForwardIcon sx={{ fontSize: 17 }} /></Link>
-            </article>
-
-            <article className="finance-card insurance-card">
-              <div className="finance-heading">
-                <span className="finance-icon"><ShieldOutlinedIcon sx={{ fontSize: 23 }} /></span>
-                <h2>Insurance</h2>
-                <NorthEastIcon sx={{ fontSize: 19 }} />
-              </div>
-              <h3>A little peace of mind.</h3>
-              <p>Find cover for the people and things that matter.</p>
-              <Link to="/insurance">Explore insurance <ArrowForwardIcon sx={{ fontSize: 17 }} /></Link>
-            </article>
-          </div>
-        </section>
+        <BenefitHighlights />
 
 
       </div>
