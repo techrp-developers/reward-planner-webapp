@@ -9,6 +9,7 @@ import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
 import rpLogo from '../assets/rp_logo_crisp.png';
+import MobileBottomBar from '../components/layout/MobileBottomBar';
 
 import LoginPage from '../modules/auth/LoginPage';
 import HomePage from '../modules/home/HomePage';
@@ -24,6 +25,7 @@ import ServiceCartPage from '../modules/services/ServiceCartPage';
 import ServiceCheckoutPage from '../modules/services/ServiceCheckoutPage';
 import MutualFundPage from '../modules/services/MutualFundPage';
 import ServiceBundlePage from '../modules/services/ServiceBundlePage';
+import HealthInsuranceWizard from '../modules/services/HealthInsuranceWizard';
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 
@@ -105,6 +107,14 @@ export const AppRouter = () => {
           <Route path="/services/category/:categoryId" element={<ServiceCategoryPage />} />
           <Route path="/services/detail/:serviceId" element={<ServiceDetailPage />} />
           <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+          <Route path="/services/four-wheeler-license" element={<ServiceDetailPage />} />
+          <Route path="/services/two-wheeler-license" element={<ServiceDetailPage />} />
+          <Route path="/services/domicile-certificate" element={<ServiceDetailPage />} />
+          <Route path="/services/rent-agreement" element={<ServiceDetailPage />} />
+          <Route path="/services/pan-card" element={<ServiceDetailPage />} />
+          <Route path="/services/health-insurance" element={<ServiceDetailPage />} />
+          <Route path="/services/health-insurance/quote" element={<HealthInsuranceWizard />} />
+          <Route path="/insurance/quote" element={<HealthInsuranceWizard />} />
           <Route path="/services/mutual-funds" element={<MutualFundPage />} />
           <Route path="/services/bundle/:bundleId" element={<ServiceBundlePage />} />
           <Route path="/insurance" element={<Navigate to="/services/category/2" replace />} />
@@ -136,6 +146,9 @@ export const AppRouter = () => {
 
       {/* FULL-WIDTH FOOTER (Hidden on dedicated policy pages and e-commerce pages per user specification) */}
       {!isPolicyPage && !isEcommercePage && <Footer />}
+
+      {/* MOBILE RESPONSIVE BOTTOM NAVIGATION BAR */}
+      <MobileBottomBar />
     </div>
   );
 };
