@@ -1,0 +1,292 @@
+/* Single unified white background card container for all shortcut cards */
+.service-shortcuts-panel {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 16px 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 34px;
+}
+
+.service-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.service-shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  gap: 8px;
+  padding: 14px 6px;
+  border-radius: 16px;
+  min-width: 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.service-shortcut strong {
+  font-size: 13px;
+  font-weight: 750;
+  color: #0f172a;
+  line-height: 1.3;
+  max-width: 108px;
+  letter-spacing: -0.01em;
+}
+
+.service-shortcut small {
+  font-size: 10.5px;
+  font-weight: 650;
+  color: #475569;
+}
+
+.service-shortcut[href]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.08);
+}
+
+.service-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  color: white;
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.65), inset 0 -3px 5px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.glyph-rose { background: linear-gradient(145deg, #ff758f, #e11d48); }
+.glyph-blue { background: linear-gradient(145deg, #38bdf8, #2563eb); }
+.glyph-orange { background: linear-gradient(145deg, #fb923c, #ea580c); }
+.glyph-purple { background: linear-gradient(145deg, #c084fc, #9333ea); }
+.glyph-teal { background: linear-gradient(145deg, #2dd4bf, #0d9488); }
+.glyph-gold { background: linear-gradient(145deg, #facc15, #ca8a04); }
+.glyph-indigo { background: linear-gradient(145deg, #818cf8, #4f46e5); }
+
+/* Enriched, more saturated colors for shortcut cards inside the white container */
+.service-shortcut.tone-rose {
+  background: linear-gradient(150deg, #ffe0e9 0%, #ffccd8 100%);
+  border: 1px solid #fca5b9;
+}
+
+.service-shortcut.tone-blue {
+  background: linear-gradient(150deg, #ddf0fd 0%, #c4e4fc 100%);
+  border: 1px solid #90cdf4;
+}
+
+.service-shortcut.tone-orange {
+  background: linear-gradient(150deg, #ffe8cf 0%, #ffd7b0 100%);
+  border: 1px solid #fbd38d;
+}
+
+.service-shortcut.tone-purple {
+  background: linear-gradient(150deg, #f0e2fc 0%, #e2cbf8 100%);
+  border: 1px solid #d6bcfa;
+}
+
+.service-shortcut.tone-teal {
+  background: linear-gradient(150deg, #cbf6f0 0%, #aef0e6 100%);
+  border: 1px solid #81e6d9;
+}
+
+.service-shortcut.tone-gold {
+  background: linear-gradient(150deg, #fef2c0 0%, #fee896 100%);
+  border: 1px solid #f6e05e;
+}
+
+.service-shortcut.tone-indigo {
+  background: linear-gradient(150deg, #dedeff 0%, #c8c8fc 100%);
+  border: 1px solid #b2b2f8;
+}
+
+/* Service Discovery Cards (Lower section) */
+.tone-rose { background: linear-gradient(145deg,#fff9fb,#fbeaf0); --service-art: #d57593; }
+.tone-blue { background: linear-gradient(145deg,#f8fcff,#e7f0fc); --service-art: #6593cf; }
+.tone-orange { background: linear-gradient(145deg,#fffbf6,#fff0df); --service-art: #d4a068; }
+.tone-purple { background: linear-gradient(145deg,#fcf9ff,#eee5f8); --service-art: #a080c5; }
+.tone-teal { background: linear-gradient(145deg,#f7fffe,#e2f4f1); --service-art: #63a9a0; }
+.tone-gold { background: linear-gradient(145deg,#fffdf7,#fcf2d9); --service-art: #c5a45a; }
+.tone-indigo { background: linear-gradient(145deg,#fbfaff,#eeebfb); --service-art: #8f87c5; }
+
+/* White card container for entire More for your everyday section */
+.service-discovery {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 26px 22px 28px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-top: 48px;
+  margin-bottom: 40px;
+}
+
+.service-discovery-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.9);
+}
+
+.service-discovery-heading h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.service-discovery-heading p {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.service-discovery-heading > a {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #4f46e5;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.service-discovery-heading > a:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+
+.service-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.service-discovery-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 20px 18px 20px;
+  min-height: 295px;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-discovery-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.service-card-heading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.service-card-heading .service-glyph {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.service-card-heading h3 {
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.service-discovery-card > p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.55;
+  margin-top: 10px;
+}
+
+.service-discovery-card ul {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.service-discovery-card li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: #334155;
+}
+
+.service-discovery-card li svg {
+  flex-shrink: 0;
+  color: #6366f1;
+}
+
+.service-card-art {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  color: var(--service-art);
+  opacity: 0.22;
+  transform: rotate(-12deg);
+  z-index: -1;
+}
+
+.service-discovery-card > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  margin-top: auto;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 24px;
+  font-size: 12.5px;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.service-discovery-card > a:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+@media (max-width: 1279px) {
+  .service-shortcuts { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .service-discovery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 639px) {
+  .service-shortcuts { display: flex; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin !important; }
+  .service-shortcut { flex: 0 0 104px; }
+  .service-discovery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .service-discovery-card { padding: 16px 8px; }
+  .service-discovery-heading { align-items: flex-start; }
+  .service-discovery-heading h2 { font-size: 19px; }
+  .service-discovery-heading p { font-size: 11px; }
+  .service-discovery-heading > a { font-size: 10px; }
+}
+

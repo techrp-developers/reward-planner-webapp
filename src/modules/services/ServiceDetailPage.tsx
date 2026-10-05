@@ -1,4 +1,4 @@
-// src/modules/services/ServiceDetailPage.jsx
+﻿// src/modules/services/ServiceDetailPage.jsx
 // Web-Based & Mobile-Responsive Service Detail Module
 // Faithfully implements all 5 service designs (Four-Wheeler License, Two-Wheeler License, Domicile, Rent Agreement, PAN Card)
 

@@ -13,6 +13,7 @@
     "types": ["vite/client"]
   },
   "include": [
+    "src/vite-env.d.ts",
     "src/modules/services/**/*.ts",
     "src/modules/services/**/*.tsx",
     "src/components/services/**/*.ts",
