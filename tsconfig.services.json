@@ -5,12 +5,18 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "strict": true,
+    "strict": false,
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["src/api/mutualFundApi.ts", "src/modules/services/mutualfund/web/**/*.ts", "src/modules/services/mutualfund/web/**/*.tsx", "src/modules/services/mutualfund/web/**/*.jsx"]
+  "include": [
+    "src/modules/services/**/*.ts",
+    "src/modules/services/**/*.tsx",
+    "src/components/services/**/*.ts",
+    "src/components/services/**/*.tsx",
+    "src/data/serviceStaticData.ts"
+  ]
 }

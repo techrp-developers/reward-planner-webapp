@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><link rel="icon" href="data:," /><title>Mutual fund component validation</title></head>
+  <body>
+    <div id="mf-test-root"></div>
+    <script type="module">
+      import React from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { BrowserRouter } from 'react-router-dom';
+      import MFScreen from '/src/modules/services/mutualfund/web/MFScreen.tsx';
+      import '/src/index.css';
+      // Standalone component validation; no fake authentication or API responses.
+      createRoot(document.getElementById('mf-test-root')).render(React.createElement(BrowserRouter, null, React.createElement(MFScreen)));
+    </script>
+  </body>
+</html>

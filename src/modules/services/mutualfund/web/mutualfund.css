@@ -5,7 +5,11 @@
 .mf-accent { color: var(--mf-accent); }
 .mf-topic, .mf-calculator-art, .mf-input-value { background: var(--mf-alt); }
 .mf-question-header { background: linear-gradient(135deg, var(--mf-alt), var(--mf-surface)); }
-.mf-calculator-card { background: linear-gradient(135deg, var(--mf-surface), var(--mf-alt)); border-color: var(--mf-border); }
+.dark .mf-calculator-card { background: linear-gradient(135deg, var(--mf-surface), var(--mf-alt)); border-color: var(--mf-border); }
+.dark .mf-calculator-card h3, .dark #calculators-heading { color: var(--mf-text); }
+.dark .mf-calculator-card p { color: var(--mf-muted); }
+.dark .mf-calculator-screen { background: var(--mf-alt); }
+.mf-dialog .mf-calculator-back:focus-visible { outline: 2px solid white; outline-offset: 4px; }
 .mf-learning-section:nth-child(odd) { background: var(--mf-alt); }
 .mf-page button, .mf-page a, .mf-dialog button { cursor: pointer; }
 .mf-primary-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: 9999px; padding: .85rem 1.5rem; background: linear-gradient(135deg, #3545a3, #080b26); color: white; font-size: .875rem; font-weight: 600; box-shadow: 0 4px 12px #3545a320; }

@@ -13,8 +13,30 @@ import PersonIcon from '@mui/icons-material/Person';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CloseIcon from '@mui/icons-material/Close';
 
+export interface HealthInsuranceWizardProps {
+  onClose?: () => void;
+}
+
+export type GenderType = 'male' | 'female';
+
+export interface MemberItem {
+  id: string;
+  label: string;
+  avatar: 'self' | 'spouse' | 'son' | 'daughter';
+  role: string;
+}
+
+export interface PersonalDetailsState {
+  name: string;
+  mobile_number: string;
+  pincode: string;
+  zone: string;
+  city: string;
+  cover_amount: string;
+}
+
 // SVG Avatars matching reference designs
-const AvatarSelf = ({ gender = 'male' }) => (
+const AvatarSelf: React.FC<{ gender?: GenderType }> = ({ gender = 'male' }) => (
   <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
     <circle cx="50" cy="50" r="50" fill={gender === 'male' ? '#60A5FA' : '#F472B6'} />
     {/* Body */}
@@ -35,7 +57,7 @@ const AvatarSelf = ({ gender = 'male' }) => (
   </svg>
 );
 
-const AvatarSpouse = () => (
+const AvatarSpouse: React.FC = () => (
   <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
     <circle cx="50" cy="50" r="50" fill="#38BDF8" />
     {/* Body */}
@@ -53,7 +75,7 @@ const AvatarSpouse = () => (
   </svg>
 );
 
-const AvatarSon = () => (
+const AvatarSon: React.FC = () => (
   <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
     <circle cx="50" cy="50" r="50" fill="#86EFAC" />
     {/* Body */}
@@ -71,7 +93,7 @@ const AvatarSon = () => (
   </svg>
 );
 
-const AvatarDaughter = () => (
+const AvatarDaughter: React.FC = () => (
   <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
     <circle cx="50" cy="50" r="50" fill="#86EFAC" />
     {/* Body */}
@@ -91,22 +113,22 @@ const AvatarDaughter = () => (
   </svg>
 );
 
-export const HealthInsuranceWizard = ({ onClose }) => {
+export const HealthInsuranceWizard: React.FC<HealthInsuranceWizardProps> = ({ onClose }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
 
   // Wizard Step: 1 = Select Member, 2 = Select Age, 3 = Personal Details
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState<number>(1);
 
   // Step 1 State: Gender & Member selections
-  const [gender, setGender] = useState('male');
-  const [isSelfSelected, setIsSelfSelected] = useState(true);
-  const [isSpouseSelected, setIsSpouseSelected] = useState(false);
-  const [sonCount, setSonCount] = useState(0);
-  const [daughterCount, setDaughterCount] = useState(0);
+  const [gender, setGender] = useState<GenderType>('male');
+  const [isSelfSelected, setIsSelfSelected] = useState<boolean>(true);
+  const [isSpouseSelected, setIsSpouseSelected] = useState<boolean>(false);
+  const [sonCount, setSonCount] = useState<number>(0);
+  const [daughterCount, setDaughterCount] = useState<number>(0);
 
   // Step 2 State: Ages for selected members
-  const [ages, setAges] = useState({
+  const [ages, setAges] = useState<Record<string, string>>({
     self: '32 yr',
     spouse: '30 yr',
     son_1: '5 yr',
@@ -116,7 +138,7 @@ export const HealthInsuranceWizard = ({ onClose }) => {
   });
 
   // Step 3 State: Personal details
-  const [personalDetails, setPersonalDetails] = useState({
+  const [personalDetails, setPersonalDetails] = useState<PersonalDetailsState>({
     name: user?.name || user?.first_name || '',
     mobile_number: user?.phone || user?.mobile || '',
     pincode: '400001',
@@ -125,13 +147,13 @@ export const HealthInsuranceWizard = ({ onClose }) => {
     cover_amount: '₹10 Lakh',
   });
 
-  const [formError, setFormError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [enquiryRefId, setEnquiryRefId] = useState('');
+  const [formError, setFormError] = useState<string>('');
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
+  const [enquiryRefId, setEnquiryRefId] = useState<string>('');
 
   // Determine which members are currently selected
-  const activeMembersList = [];
+  const activeMembersList: MemberItem[] = [];
   if (isSelfSelected) activeMembersList.push({ id: 'self', label: 'Self', avatar: 'self', role: 'Family Member' });
   if (isSpouseSelected) activeMembersList.push({ id: 'spouse', label: 'Spouse', avatar: 'spouse', role: 'Family Member' });
   for (let i = 1; i <= sonCount; i++) {
@@ -153,11 +175,11 @@ export const HealthInsuranceWizard = ({ onClose }) => {
 
   const isStep1Valid = activeMembersList.length > 0;
 
-  const handleAgeChange = (memberId, value) => {
+  const handleAgeChange = (memberId: string, value: string) => {
     setAges((prev) => ({ ...prev, [memberId]: value }));
   };
 
-  const handlePersonalDetailChange = (field, value) => {
+  const handlePersonalDetailChange = (field: keyof PersonalDetailsState, value: string) => {
     setPersonalDetails((prev) => ({ ...prev, [field]: value }));
   };
 

@@ -8,6 +8,7 @@ export interface MFArticleSummary {
   title: string;
   short_description: string | null;
   thumbnail: string | null;
+  updated_at?: string | null;
 }
 export interface MFChildCategory {
   id: number;
@@ -16,6 +17,8 @@ export interface MFChildCategory {
   article_count?: number;
   articles?: MFArticleSummary[];
   children?: MFChildCategory[];
+  icon?: string | null;
+  updated_at?: string | null;
 }
 export interface MFCategory extends MFChildCategory {
   icon: string | null;
@@ -28,13 +31,13 @@ export interface MFSection {
   icon: string | null;
   sort_order: number;
   parent_section_id: number | null;
+  updated_at?: string | null;
 }
 export interface MFArticleDetails extends MFArticleSummary {
   article_content: string | null;
   banner_image: string | null;
   cta_text: string | null;
   sort_order: number;
-  updated_at?: string;
   status?: number;
 }
 export interface MFSectionContentResponse {
@@ -44,8 +47,9 @@ export interface MFSectionContentResponse {
 interface ApiResponse<T> { success: boolean; data: T; message?: string }
 
 // This public client deliberately has no login or token-refresh interceptors.
-// Configure the complete v1 base, e.g. http://localhost:5000/v1/.
+// Configure the complete v1 base without changing other modules' clients.
 export const BASE_API_URL = `${(import.meta.env.VITE_MF_API_URL || `${API_BASE_URL}/v1`).replace(/\/+$/, '')}/`;
+export const MF_CATEGORY_ID = Number(import.meta.env.VITE_MF_CATEGORY_ID || 4);
 const api = axios.create({ baseURL: BASE_API_URL, timeout: 15000, headers: { Accept: 'application/json' } });
 
 async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
@@ -76,20 +80,24 @@ function normalizeArticle<T extends MFArticleSummary>(article: T, sectionId: num
 function normalizeSection<T extends MFChildCategory>(section: T): T {
   return {
     ...section,
+    ...('icon' in section ? { icon: normalizeMutualFundImageUrl(section.icon ?? null) } : {}),
     articles: section.articles?.map(article => normalizeArticle(article, section.id)),
     children: section.children?.map(child => normalizeSection(child)),
   };
 }
 
-export const getMutualFundCategories = async (categoryId = 4, signal?: AbortSignal): Promise<MFCategory[]> => {
+export const getMutualFundCategories = async (categoryId = MF_CATEGORY_ID, signal?: AbortSignal): Promise<MFCategory[]> => {
   const categories = await get<MFCategory[]>(`mutual-fund/category-tree/${pathId(categoryId)}`, signal);
+  if (!Array.isArray(categories)) throw new Error('Invalid mutual fund category response.');
   return categories.map(category => normalizeSection(category));
 };
 
 export const getSectionContent = async (sectionId: number, signal?: AbortSignal): Promise<MFSectionContentResponse> => {
   const content = await get<MFSectionContentResponse>(`mutual-fund/section-content/${pathId(sectionId)}`, signal);
+  if (!content.section || !Array.isArray(content.articles)) throw new Error('Invalid mutual fund section response.');
   return {
     ...content,
+    section: { ...content.section, icon: normalizeMutualFundImageUrl(content.section.icon) },
     articles: content.articles.map(article => normalizeArticle(article, content.section.id)),
   };
 };

@@ -1,4 +1,4 @@
-// src/components/services/ServiceBannerCarousel.jsx
+// src/components/services/ServiceBannerCarousel.tsx
 // Senior UI/UX Designer Service Promotional Banner Carousel
 // Preserves exact previous banner card UI, same background images, same content with razor-sharp HD clarity
 
@@ -19,8 +19,28 @@ import bannerRentHD from '../../assets/servicescards/rent-hd.png';
 import bannerHealthHD from '../../assets/servicescards/health-hd.png';
 import bannerTwoWheelerHD from '../../assets/servicescards/two_wheeler-hd.png';
 
+export interface ServiceBannerRedirect {
+  type?: string;
+  id?: number | string | null;
+  url?: string | null;
+}
+
+export interface ServiceBannerItem {
+  id: number | string;
+  title: string;
+  subtitle?: string;
+  image_url?: string;
+  hd_image?: string;
+  fallback_image?: string;
+  redirect?: ServiceBannerRedirect;
+}
+
+export interface ServiceBannerCarouselProps {
+  banners?: ServiceBannerItem[];
+}
+
 // Helper to resolve the matching crystal-clear banner for any service
-export const getServiceBanner = (serviceId, serviceName = '') => {
+export const getServiceBanner = (serviceId: string | number | undefined, serviceName = ''): string => {
   const sName = String(serviceName || '').toLowerCase();
   const sId = Number(serviceId);
 
@@ -35,7 +55,7 @@ export const getServiceBanner = (serviceId, serviceName = '') => {
   return bannerCarHD;
 };
 
-export const DUMMY_SERVICE_BANNERS = [
+export const DUMMY_SERVICE_BANNERS: ServiceBannerItem[] = [
   {
     id: 10,
     title: 'Car Insurance',
@@ -101,11 +121,11 @@ export const DUMMY_SERVICE_BANNERS = [
   },
 ];
 
-export const ServiceBannerCarousel = ({ banners: propBanners }) => {
+export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ banners: propBanners }) => {
   const navigate = useNavigate();
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef(null);
+  const [activeIdx, setActiveIdx] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const timerRef = useRef<any>(null);
 
   const displayBanners = Array.isArray(propBanners) && propBanners.length > 0
     ? propBanners
@@ -121,20 +141,22 @@ export const ServiceBannerCarousel = ({ banners: propBanners }) => {
       setActiveIdx((prev) => (prev + 1) % totalSlides);
     }, 3500);
 
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [isPaused, totalSlides]);
 
-  const handlePrev = (e) => {
+  const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setActiveIdx((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  const handleNext = (e) => {
+  const handleNext = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setActiveIdx((prev) => (prev + 1) % totalSlides);
   };
 
-  const handleBannerClick = (banner) => {
+  const handleBannerClick = (banner: ServiceBannerItem) => {
     if (banner?.redirect?.type === 'service' && banner?.redirect?.id) {
       navigate(`/services/detail/${banner.redirect.id}`);
     } else if (banner?.redirect?.url) {
@@ -158,6 +180,7 @@ export const ServiceBannerCarousel = ({ banners: propBanners }) => {
         {displayBanners.map((banner, i) => {
           // Prefer high-definition local asset for crispness; fallback to API or default
           const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarHD);
+
           return (
             <div
               key={banner.id || i}
@@ -174,9 +197,9 @@ export const ServiceBannerCarousel = ({ banners: propBanners }) => {
                   transform: 'translateZ(0)',
                   backfaceVisibility: 'hidden',
                 }}
-                onError={(e) => {
-                  if (banner.fallback_image && e.target.src !== banner.fallback_image) {
-                    e.target.src = banner.fallback_image;
+                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                  if (banner.fallback_image && (e.target as HTMLImageElement).src !== banner.fallback_image) {
+                    (e.target as HTMLImageElement).src = banner.fallback_image;
                   }
                 }}
               />
@@ -211,7 +234,7 @@ export const ServiceBannerCarousel = ({ banners: propBanners }) => {
           {displayBanners.map((_, i) => (
             <button
               key={i}
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 setActiveIdx(i);
               }}

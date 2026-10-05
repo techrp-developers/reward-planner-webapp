@@ -1,0 +1,544 @@
+{
+  "mode": "standalone component (not signed-in application)",
+  "origin": "http://localhost:5173",
+  "flows": [
+    "Category 4, beginner 5 and informed investor 6 loaded through the live client.",
+    "FAQ section 1 and its article dialog.",
+    "FAQ section 2 and its article dialog.",
+    "FAQ section 3 and its article dialog.",
+    "FAQ section 4 and its article dialog.",
+    "FAQ section 7 and its article dialog.",
+    "FAQ section 8 and its article dialog.",
+    "FAQ section 9 and its article dialog.",
+    "Child section 10, article lookup and normalized dialog images.",
+    "Child section 11, article lookup and normalized dialog images.",
+    "Child section 12, article lookup and normalized dialog images.",
+    "Child section 13, article lookup and normalized dialog images.",
+    "Child section 14, article lookup and normalized dialog images.",
+    "Child section 15, article lookup and normalized dialog images.",
+    "Child section 16, article lookup and normalized dialog images.",
+    "Child section 17, article lookup and normalized dialog images.",
+    "FAQ search includes fetched top-level articles; unmatched query shows an empty state.",
+    "Article CTA closes the dialog and scrolls to planning tools.",
+    "All nine calculator dialogs respond to investment/expense input changes.",
+    "Carousel controls and 390px responsive layout without page overflow.",
+    "Loaded live thumbnails and graceful broken-image fallback."
+  ],
+  "responses": [
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/category-tree/4",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/17/thumbnail-1783077304331.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/18/thumbnail-1783077325692.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/20/thumbnail-1783077388652.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/19/thumbnail-1783077353296.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/21/thumbnail-1783077421919.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/category-tree/4",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/1",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/1/thumbnail-1780903977262.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/2/thumbnail-1780904025239.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/5/thumbnail-1780904121225.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/3/thumbnail-1780904052395.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/4/thumbnail-1780904090424.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/1",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/1/banner-1780903978071.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/2",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/6/thumbnail-1780904614106.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/7/thumbnail-1780904628217.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/9/thumbnail-1780904644112.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/8/thumbnail-1780904636870.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/2",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/6/banner-1780904686903.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/3",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/10/thumbnail-1783075814147.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/11/thumbnail-1783075903781.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/13/thumbnail-1783076189357.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/12/thumbnail-1783076163682.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/3",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/10/banner-1783075815153.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/4",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/14/thumbnail-1783076552871.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/15/thumbnail-1783076583104.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/16/thumbnail-1783076612917.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/4",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/14/banner-1783076553328.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/7",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/58/thumbnail-1783076829036.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/60/thumbnail-1783076946564.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/59/thumbnail-1783076887845.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/61/thumbnail-1783076978314.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/7",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/58/banner-1783076829558.webp?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/8",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/62/thumbnail-1783077061116.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/65/thumbnail-1783077153872.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/63/thumbnail-1783077094265.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/64/thumbnail-1783077123795.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/8",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/62/banner-1783077061553.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/9",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/66/thumbnail-1783076694957.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/67/thumbnail-1783076725900.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/9",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/66/banner-1783076695362.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/45/thumbnail-1783317308318.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/43/thumbnail-1783496656632.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/42/thumbnail-1783335830537.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/44/thumbnail-1783317348822.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/46/thumbnail-1783317270648.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/10",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/10",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/17/banner-1783077304826.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/11",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/22/thumbnail-1783313520615.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/24/thumbnail-1783313613730.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/23/thumbnail-1783313576398.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/25/thumbnail-1783313635391.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/26/thumbnail-1783313656462.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/11",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/22/banner-1783313521662.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/12",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/27/thumbnail-1783314692777.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/28/thumbnail-1783314897043.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/31/thumbnail-1783314974691.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/30/thumbnail-1783314947690.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/29/thumbnail-1783314922905.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/12",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/27/banner-1783314693776.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/13",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/32/thumbnail-1783315034829.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/35/thumbnail-1783335680755.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/33/thumbnail-1783315055410.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/34/thumbnail-1783315078571.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/36/thumbnail-1783315159325.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/13",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/32/banner-1783315035284.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/14",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/38/thumbnail-1783315450663.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/41/thumbnail-1783315531878.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/40/thumbnail-1783315500760.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/37/thumbnail-1783315304747.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/39/thumbnail-1783315477595.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/14",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/37/banner-1783315305259.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/15",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/47/thumbnail-1783317208367.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/15",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/42/banner-1783335830935.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/16",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/49/thumbnail-1783317482441.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/50/thumbnail-1783317505320.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/51/thumbnail-1783317532041.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/48/thumbnail-1783317459820.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/52/thumbnail-1783317558650.webp?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/16",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/48/banner-1783317460480.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/17",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/53/thumbnail-1783487857666.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/54/thumbnail-1783487884156.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/56/thumbnail-1783487975803.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/57/thumbnail-1783487998263.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/55/thumbnail-1783487910995.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/17",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/53/banner-1783487858102.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/1",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/7",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/9",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/2",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/8",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/3",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/4",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/13/thumbnail-1783076189357.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/16/thumbnail-1783076612917.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/14/thumbnail-1783076552871.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/58/thumbnail-1783076829036.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/10/thumbnail-1783075814147.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    },
+    {
+      "url": "https://rewardplanners.com/api/crm/v1/mutual-fund/section-content/10",
+      "status": 200
+    },
+    {
+      "url": "https://cdn.rewardplanners.com/public/mf-articles/17/banner-1783077304826.png?v=2026-07-14%2012%3A30%3A42",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "expectedFailures": [],
+  "passed": true
+}

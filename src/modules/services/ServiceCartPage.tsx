@@ -18,18 +18,18 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
-export const ServiceCartPage = () => {
+export const ServiceCartPage: React.FC = () => {
   const navigate = useNavigate();
   const { serviceCartItems, removeFromCart, cartRewards, loading } = useServiceCart();
-  const [openDocsMap, setOpenDocsMap] = useState({});
-  const [useRewardCoins, setUseRewardCoins] = useState(true);
-  const [busyItemId, setBusyItemId] = useState(null);
+  const [openDocsMap, setOpenDocsMap] = useState<Record<string | number, boolean>>({});
+  const [useRewardCoins, setUseRewardCoins] = useState<boolean>(true);
+  const [busyItemId, setBusyItemId] = useState<string | number | null>(null);
 
-  const toggleDocs = (id) => {
+  const toggleDocs = (id: string | number) => {
     setOpenDocsMap((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleRemove = async (item) => {
+  const handleRemove = async (item: any) => {
     setBusyItemId(item.id);
     try {
       await removeFromCart(item);
@@ -38,7 +38,7 @@ export const ServiceCartPage = () => {
     }
   };
 
-  const handleBuyNowSingle = (item) => {
+  const handleBuyNowSingle = (item: any) => {
     if (item.isBundle) {
       navigate(`/services/checkout?mode=buy_now&bundleId=${item.bundle_id}`);
     } else {
@@ -153,8 +153,8 @@ export const ServiceCartPage = () => {
                       src={imageSrc}
                       alt={item.service_name}
                       className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.target.src = fallbackImg;
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                        (e.target as HTMLImageElement).src = fallbackImg;
                       }}
                     />
                   </div>

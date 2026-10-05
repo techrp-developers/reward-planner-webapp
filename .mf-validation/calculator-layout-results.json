@@ -1,0 +1,38 @@
+{
+  "mode": "live-data component harness, not authenticated application",
+  "checks": [
+    "SIP Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Goal SIP Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Smart Goal Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Inflation Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Cost of Delay: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Lumpsum Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Retirement Planning: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Step-Up SIP Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "SWP Calculator: exact labels, correct form, result updates, clamping, keyboard open/back, Tab/Shift+Tab and focus restoration.",
+    "Escape closes the calculator dialog.",
+    "Live FAQ section and full article dialog still use the existing header and close action."
+  ],
+  "layouts": [
+    {
+      "width": 390,
+      "columns": 1,
+      "equalCardHeights": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 768,
+      "columns": 2,
+      "equalCardHeights": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "columns": 3,
+      "equalCardHeights": true,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

@@ -15,13 +15,13 @@ import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 
 
-export const ServiceCategoryPage = () => {
-  const { categoryId } = useParams();
+export const ServiceCategoryPage: React.FC = () => {
+  const { categoryId } = useParams<{ categoryId?: string }>();
   const navigate = useNavigate();
-  const [category, setCategory] = useState(null);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [search, setSearch] = useState<string>('');
 
   
   useEffect(() => {
@@ -148,10 +148,11 @@ export const ServiceCategoryPage = () => {
                         alt={srv.name}
                         className="w-full h-full object-contain drop-shadow-2xs"
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
-                        onError={(e) => {
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                           const fallback = getServiceBanner(srv.id, srv.name);
-                          if (e.target.src !== fallback) {
-                            e.target.src = fallback;
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== fallback) {
+                            target.src = fallback;
                           }
                         }}
                       />

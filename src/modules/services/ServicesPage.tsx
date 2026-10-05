@@ -19,14 +19,14 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
-export const ServicesPage = () => {
+export const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [banners, setBanners] = useState([]);
-  const [bundles, setBundles] = useState([]);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
+  const [bundles, setBundles] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     let isMounted = true;
@@ -59,7 +59,7 @@ export const ServicesPage = () => {
     };
   }, []);
 
-  const handleCategoryClick = (cat) => {
+  const handleCategoryClick = (cat: any) => {
     const displayType = String(cat.display_type || 'list').toLowerCase();
     const catName = String(cat.name || '').toLowerCase();
 
@@ -256,9 +256,10 @@ export const ServicesPage = () => {
                       alt={bundle.name}
                       className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500 drop-shadow-2xs"
                       style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      onError={(e) => {
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                         const fb = getServiceBanner(bundle.id, bundle.name);
-                        if (e.target.src !== fb) e.target.src = fb;
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== fb) target.src = fb;
                       }}
                     />
                     {savings > 0 && (
@@ -346,9 +347,10 @@ export const ServicesPage = () => {
                         alt={srv.name}
                         className="w-full h-full object-contain drop-shadow-2xs"
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
-                        onError={(e) => {
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                           const fb = getServiceBanner(srv.id, srv.name);
-                          if (e.target.src !== fb) e.target.src = fb;
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== fb) target.src = fb;
                         }}
                       />
                     </div>

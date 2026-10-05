@@ -1,7 +1,98 @@
-// src/data/serviceStaticData.js
+// src/data/serviceStaticData.ts
 // Comprehensive fallback data and metadata for the 5 key services matching the UI mockups
 
-export const SERVICE_SLUG_MAP = {
+export interface ServiceVariant {
+  id: number;
+  service_id?: number;
+  title: string;
+  price: string;
+  original_price: string;
+  savings_text?: string;
+  is_popular?: boolean;
+  features?: string[];
+  details?: string[];
+  short_description?: string;
+  journey?: Array<{ title?: string; content: Array<string | [string, string]> }>;
+  trust_stats?: string[];
+  image_url?: string;
+}
+
+export interface OverviewItem {
+  id: number;
+  text: string;
+  iconType: 'guide' | 'eligibility' | 'schedule' | 'tracking' | 'delivery' | 'thumb' | 'speed' | 'support' | string;
+}
+
+export interface JourneyStep {
+  step: string;
+  title: string;
+  desc: string;
+  color: 'purple' | 'blue' | 'teal' | 'orange' | string;
+  iconType: 'edit' | 'document' | 'calendar' | 'truck' | string;
+}
+
+export interface TrustStat {
+  value: string;
+  label: string;
+  color: 'purple' | 'blue' | 'teal' | string;
+  iconType: 'badge' | 'percent' | 'clock' | string;
+}
+
+export interface RequiredDocument {
+  id: number;
+  name: string;
+  step: string;
+  iconType: 'id_card' | 'photo' | 'document' | string;
+  is_mandatory: boolean | number;
+  subtext?: string;
+}
+
+export interface EnquiryField {
+  field_name: string;
+  label: string;
+  field_type: 'text' | 'tel' | 'email' | 'textarea' | string;
+  placeholder?: string;
+  is_required: boolean;
+  options?: string[];
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface ServiceEntity {
+  id: number;
+  category_id?: number;
+  category_name?: string;
+  name: string;
+  description: string;
+  price: string;
+  original_price: string;
+  estimated_days?: number;
+  rating?: number;
+  review_count?: number;
+  hero_image?: string;
+  service_image?: string;
+  form_title?: string;
+  form_subtitle?: string;
+  cta_text?: string;
+  is_insurance_wizard?: boolean;
+}
+
+export interface StaticServiceItem {
+  service: ServiceEntity;
+  variants: ServiceVariant[];
+  overview: OverviewItem[];
+  journey: JourneyStep[];
+  trust_stats: TrustStat[];
+  documents: RequiredDocument[];
+  enquiry_fields: EnquiryField[];
+  faqs: FAQItem[];
+  safety?: any;
+}
+
+export const SERVICE_SLUG_MAP: Record<string, number> = {
   'four-wheeler-driving-licence': 4,
   'four-wheeler-license': 4,
   '4-wheeler': 4,
@@ -20,7 +111,7 @@ export const SERVICE_SLUG_MAP = {
   'mediclaim': 12,
 };
 
-export const resolveServiceId = (param) => {
+export const resolveServiceId = (param: string | number | undefined): number => {
   if (!param) return 1;
   const num = Number(param);
   if (!isNaN(num) && num > 0) return num;
@@ -28,7 +119,7 @@ export const resolveServiceId = (param) => {
   return SERVICE_SLUG_MAP[normalized] || 1;
 };
 
-export const STATIC_SERVICES_DATA = {
+export const STATIC_SERVICES_DATA: Record<number, StaticServiceItem> = {
   // 1. FOUR-WHEELER DRIVING LICENSE (ID: 4)
   4: {
     service: {

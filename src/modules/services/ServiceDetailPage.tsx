@@ -48,7 +48,7 @@ import PhotoCameraFrontOutlinedIcon from '@mui/icons-material/PhotoCameraFrontOu
 // Team Advisors Images (Mock / crisp avatars for bottom support banner)
 import userAvatar1 from '../../assets/home/user-avatar.png';
 
-const shouldHideAddToCartForService = (serviceId, serviceName) => {
+const shouldHideAddToCartForService = (serviceId: string | number | undefined, serviceName = ''): boolean => {
   const sId = Number(serviceId || 0);
   const normalizedName = String(serviceName || '').toLowerCase();
   return (
@@ -62,8 +62,8 @@ const shouldHideAddToCartForService = (serviceId, serviceName) => {
   );
 };
 
-export const ServiceDetailPage = () => {
-  const { serviceId } = useParams();
+export const ServiceDetailPage: React.FC = () => {
+  const { serviceId } = useParams<{ serviceId?: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
   const { addToCart, serviceCartCount } = useServiceCart();
@@ -72,23 +72,23 @@ export const ServiceDetailPage = () => {
   const resolvedId = useMemo(() => resolveServiceId(serviceId), [serviceId]);
   const staticData = useMemo(() => STATIC_SERVICES_DATA[resolvedId] || STATIC_SERVICES_DATA[1], [resolvedId]);
 
-  const [serviceData, setServiceData] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [formValues, setFormValues] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [openFaqIdx, setOpenFaqIdx] = useState(null);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [enquiryRefId, setEnquiryRefId] = useState('');
-  const [formError, setFormError] = useState('');
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [addingToCart, setAddingToCart] = useState(false);
-  const [isInsuranceWizardOpen, setIsInsuranceWizardOpen] = useState(false);
+  const [serviceData, setServiceData] = useState<any>(null);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
+  const [enquiryRefId, setEnquiryRefId] = useState<string>('');
+  const [formError, setFormError] = useState<string>('');
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [addingToCart, setAddingToCart] = useState<boolean>(false);
+  const [isInsuranceWizardOpen, setIsInsuranceWizardOpen] = useState<boolean>(false);
 
   const isInsuranceService = Number(resolvedId) === 12 || Boolean(staticData?.service?.is_insurance_wizard);
   const primaryCtaLabel = isInsuranceService ? 'Enquire Now' : 'Buy Now';
 
-  const enquiryFormRef = useRef(null);
+  const enquiryFormRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -247,7 +247,7 @@ export const ServiceDetailPage = () => {
     }
   };
 
-  const handleFieldChange = (fieldName, value) => {
+  const handleFieldChange = (fieldName: string, value: string) => {
     setFormValues((prev) => ({ ...prev, [fieldName]: value }));
   };
 
@@ -295,7 +295,7 @@ export const ServiceDetailPage = () => {
     }
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       openAuth('login');
@@ -483,10 +483,11 @@ export const ServiceDetailPage = () => {
                   src={heroImageSrc}
                   alt={service.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                  onError={(e) => {
+                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                     const fallback = getServiceBanner(resolvedId, service.name);
-                    if (e.target.src !== fallback) {
-                      e.target.src = fallback;
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== fallback) {
+                      target.src = fallback;
                     }
                   }}
                 />

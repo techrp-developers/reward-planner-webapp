@@ -18,19 +18,19 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { useServiceCart } from '../../context/ServiceCartContext';
 
-export const ServiceBundlePage = () => {
-  const { bundleId } = useParams();
+export const ServiceBundlePage: React.FC = () => {
+  const { bundleId } = useParams<{ bundleId?: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
   const { addBundle, serviceCartCount } = useServiceCart();
 
-  const [bundleData, setBundleData] = useState(null);
-  const [formValues, setFormValues] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [addingPack, setAddingPack] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [bundleData, setBundleData] = useState<any>(null);
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [addingPack, setAddingPack] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>('');
 
   useEffect(() => {
     let isMounted = true;
@@ -64,11 +64,11 @@ export const ServiceBundlePage = () => {
   const enquiryFields = bundleData?.enquiry_fields || [];
   const trustStats = bundleData?.sections?.trust_stats || [];
 
-  const handleFieldChange = (field, val) => {
+  const handleFieldChange = (field: string, val: string) => {
     setFormValues((prev) => ({ ...prev, [field]: val }));
   };
 
-  const handleEnquirySubmit = async (e) => {
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       openAuth('login');
@@ -183,10 +183,11 @@ export const ServiceBundlePage = () => {
                   transform: 'translateZ(0)',
                   backfaceVisibility: 'hidden',
                 }}
-                onError={(e) => {
+                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                   const fallback = getServiceBanner(bundle.id, bundle.name);
-                  if (e.target.src !== fallback) {
-                    e.target.src = fallback;
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== fallback) {
+                    target.src = fallback;
                   }
                 }}
               />
@@ -222,9 +223,10 @@ export const ServiceBundlePage = () => {
                       alt={item.title}
                       className="w-full h-full object-contain drop-shadow-2xs"
                       style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      onError={(e) => {
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                         const fb = getServiceBanner(item.id, item.title || item.service_name);
-                        if (e.target.src !== fb) e.target.src = fb;
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== fb) target.src = fb;
                       }}
                     />
                   </div>
@@ -361,7 +363,7 @@ export const ServiceBundlePage = () => {
                 );
               })}
 
-              <GradientButton type="submit" loading={submitting} className="w-full py-3.5 text-xs font-bold mt-2 shadow-sm">
+              <GradientButton type="submit" onClick={() => {}} loading={submitting} className="w-full py-3.5 text-xs font-bold mt-2 shadow-sm">
                 <span>{isAuthenticated ? 'Book This Pack Now' : 'Sign In to Book'}</span>
               </GradientButton>
 

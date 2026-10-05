@@ -34,7 +34,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 
-export const ServiceCheckoutPage = () => {
+export const ServiceCheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, isAuthenticated, openAuth } = useAuth();
@@ -53,20 +53,20 @@ export const ServiceCheckoutPage = () => {
     : null;
 
   // Address state
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [addressLoading, setAddressLoading] = useState(false);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | string | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
+  const [addressLoading, setAddressLoading] = useState<boolean>(false);
 
   // Checkout calculation state
-  const [previewData, setPreviewData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [useRewardCoins, setUseRewardCoins] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [previewData, setPreviewData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [useRewardCoins, setUseRewardCoins] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   // Order Confirmed State
-  const [confirmedOrder, setConfirmedOrder] = useState(null);
+  const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
 
   // 1. Fetch User Addresses
   useEffect(() => {
@@ -528,7 +528,7 @@ export const ServiceCheckoutPage = () => {
             {showAddressForm ? (
               <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200">
                 <AddressForm
-                  onSubmit={handleAddNewAddress}
+                  onSave={handleAddNewAddress}
                   onCancel={() => setShowAddressForm(false)}
                 />
               </div>

@@ -1,0 +1,7 @@
+[
+  {
+    "type": "requestfailed",
+    "url": "https://checkout-static-next.razorpay.com/build/undefined",
+    "error": "net::ERR_BLOCKED_BY_ORB"
+  }
+]
