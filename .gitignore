@@ -1,3 +1,4 @@
 node_modules
 /.env
 /.mf-validation/browser-profile/
+/.insurance-validation/

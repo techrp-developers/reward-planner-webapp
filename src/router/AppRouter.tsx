@@ -26,7 +26,8 @@ import ServiceCartPage from '../modules/services/ServiceCartPage';
 import ServiceCheckoutPage from '../modules/services/ServiceCheckoutPage';
 import MutualFundPage from '../modules/services/MutualFundPage';
 import ServiceBundlePage from '../modules/services/ServiceBundlePage';
-import HealthInsuranceWizard from '../modules/services/HealthInsuranceWizard';
+import InsuranceQuotePage from '../modules/services/insurance/InsuranceQuotePageFlow';
+import InsuranceProductsPage from '../modules/services/insurance/InsuranceProductsPage';
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 import MyEventsPage from '../modules/events/MyEventsPage';
@@ -152,11 +153,16 @@ export const AppRouter = () => {
             {/* SERVICES FULL SUITE */}
             <Route path="/services/cart" element={<ServiceCartPage />} />
             <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
+            <Route path="/services/category/2" element={<InsuranceProductsPage />} />
             <Route path="/services/category/:categoryId" element={<ServiceCategoryPage />} />
             <Route path="/services/detail/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
-            <Route path="/services/health-insurance/quote" element={<HealthInsuranceWizard />} />
-            <Route path="/insurance/quote" element={<HealthInsuranceWizard />} />
+            <Route path="/services/health-insurance/quote" element={<InsuranceQuotePage key="health" insuranceType="health" />} />
+            <Route path="/insurance/quote" element={<InsuranceQuotePage key="health-alias" insuranceType="health" />} />
+            <Route path="/services/super-top-up/quote" element={<InsuranceQuotePage key="supertopup" insuranceType="supertopup" />} />
+            <Route path="/services/personal-accident/quote" element={<InsuranceQuotePage key="personal-accident" insuranceType="personal_accident" />} />
+            <Route path="/insurance/super-top-up/quote" element={<InsuranceQuotePage key="supertopup-alias" insuranceType="supertopup" />} />
+            <Route path="/insurance/personal-accident/quote" element={<InsuranceQuotePage key="personal-accident-alias" insuranceType="personal_accident" />} />
             <Route path="/services/mutual-funds" element={<MutualFundPage />} />
             <Route path="/services/bundle/:bundleId" element={<ServiceBundlePage />} />
             <Route path="/insurance" element={<Navigate to="/services/category/2" replace />} />

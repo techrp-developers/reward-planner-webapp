@@ -10,6 +10,7 @@ import {
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
 import { stripHtml } from '../../components/common/RichText';
+import { getInsuranceQuotePath } from './insurance/insuranceProducts';
 
 // Material UI Icons
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
@@ -63,7 +64,9 @@ export const ServicesPage: React.FC = () => {
     const displayType = String(cat.display_type || 'list').toLowerCase();
     const catName = String(cat.name || '').toLowerCase();
 
-    if (displayType === 'content' || catName.includes('mutual fund')) {
+    if (Number(cat.id) === 2 || catName.includes('insurance')) {
+      navigate('/insurance');
+    } else if (displayType === 'content' || catName.includes('mutual fund')) {
       navigate('/services/mutual-funds');
     } else if (displayType === 'direct' && cat.direct_service_id) {
       navigate(`/services/detail/${cat.direct_service_id}`);
@@ -336,7 +339,7 @@ export const ServicesPage: React.FC = () => {
               return (
                 <div
                   key={srv.id}
-                  onClick={() => navigate(`/services/detail/${srv.id}`)}
+                  onClick={() => navigate(getInsuranceQuotePath(srv.id, srv.name) || `/services/detail/${srv.id}`)}
                   className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group space-y-4"
                 >
                   <div className="flex gap-3.5 items-start">

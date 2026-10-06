@@ -11,7 +11,7 @@ import { useServiceCart } from '../../context/ServiceCartContext';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
 import RichText from '../../components/common/RichText';
 import { resolveServiceId, STATIC_SERVICES_DATA } from '../../data/serviceStaticData';
-import HealthInsuranceWizard from './HealthInsuranceWizard';
+import { getInsuranceQuotePath } from './insurance/insuranceProducts';
 
 // Material UI Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -83,10 +83,7 @@ export const ServiceDetailPage: React.FC = () => {
   const [formError, setFormError] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
-  const [isInsuranceWizardOpen, setIsInsuranceWizardOpen] = useState<boolean>(false);
 
-  const isInsuranceService = Number(resolvedId) === 12 || Boolean(staticData?.service?.is_insurance_wizard);
-  const primaryCtaLabel = isInsuranceService ? 'Enquire Now' : 'Buy Now';
 
   const enquiryFormRef = useRef<HTMLDivElement | null>(null);
 
@@ -133,6 +130,9 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Consolidated service entity (API data prioritized, static mock guarantees full UX fidelity)
   const service = serviceData?.service || staticData.service;
+  const insuranceQuotePath = getInsuranceQuotePath(resolvedId, service?.name);
+  const isInsuranceService = Boolean(insuranceQuotePath);
+  const primaryCtaLabel = isInsuranceService ? 'Compare quotes' : 'Buy Now';
   const variants = (serviceData?.variants && serviceData.variants.length > 0)
     ? serviceData.variants
     : staticData.variants;
@@ -600,7 +600,7 @@ export const ServiceDetailPage: React.FC = () => {
                 {/* Solid Deep Navy/Purple Buy Now or Enquire Now Pill Button */}
                 <button
                   type="button"
-                  onClick={isInsuranceService ? () => setIsInsuranceWizardOpen(true) : handleBuyNow}
+                  onClick={insuranceQuotePath ? () => navigate(insuranceQuotePath) : handleBuyNow}
                   className="w-full sm:flex-1 py-3.5 px-6 rounded-full bg-[#1E1260] hover:bg-[#150C48] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <BoltIcon sx={{ fontSize: 18 }} />
@@ -963,7 +963,7 @@ export const ServiceDetailPage: React.FC = () => {
               <div className="space-y-2.5 pt-1">
                 <button
                   type="button"
-                  onClick={isInsuranceService ? () => setIsInsuranceWizardOpen(true) : handleBuyNow}
+                  onClick={insuranceQuotePath ? () => navigate(insuranceQuotePath) : handleBuyNow}
                   className="w-full py-4 rounded-full bg-[#1E1260] hover:bg-[#150C48] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <BoltIcon sx={{ fontSize: 18 }} />
@@ -1113,17 +1113,6 @@ export const ServiceDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* HEALTH INSURANCE 3-STEP QUOTE WIZARD MODAL */}
-      {isInsuranceWizardOpen && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsInsuranceWizardOpen(false);
-          }}
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
-        >
-          <HealthInsuranceWizard onClose={() => setIsInsuranceWizardOpen(false)} />
-        </div>
-      )}
 
     </div>
   );
