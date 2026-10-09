@@ -7,9 +7,9 @@ import ServicesPage from '../services/ServicesPage';
 import BBPSPage from '../bbps/BBPSPage';
 import './CinematicModuleStage.css';
 
-function getModuleIndex(pathname) {
-  if (pathname.startsWith('/store') || pathname.startsWith('/deals')) return 1;
-  if (pathname.startsWith('/services')) return 2;
+function getModuleIndex(pathname: string) {
+  if (pathname.startsWith('/services')) return 1;
+  if (pathname.startsWith('/store') || pathname.startsWith('/deals')) return 2;
   if (pathname.startsWith('/bbps')) return 3;
   return 0; // Default to Dashboard ('/')
 }
@@ -40,7 +40,7 @@ export default function CinematicModuleStage() {
         if (viewportRef.current) {
           viewportRef.current.scrollLeft = 0;
         }
-      }, 700);
+      }, 320);
       return () => clearTimeout(timer);
     }
   }, [targetIndex, activeIndex]);
@@ -65,31 +65,31 @@ export default function CinematicModuleStage() {
       >
         {/* Screen 0: Dashboard */}
         <div
-          className={`cinematic-stage-screen screen-dashboard ${activeIndex === 0 ? 'is-active' : ''}`}
+          className={`cinematic-stage-screen screen-dashboard no-scrollbar ${activeIndex === 0 ? 'is-active' : ''}`}
           aria-hidden={activeIndex !== 0}
         >
           <HomePage />
         </div>
 
-        {/* Screen 1: Products */}
+        {/* Screen 1: Services */}
         <div
-          className={`cinematic-stage-screen screen-products ${activeIndex === 1 ? 'is-active' : ''}`}
+          className={`cinematic-stage-screen screen-services no-scrollbar ${activeIndex === 1 ? 'is-active' : ''}`}
           aria-hidden={activeIndex !== 1}
-        >
-          <ProductListingPage />
-        </div>
-
-        {/* Screen 2: Services */}
-        <div
-          className={`cinematic-stage-screen screen-services ${activeIndex === 2 ? 'is-active' : ''}`}
-          aria-hidden={activeIndex !== 2}
         >
           <ServicesPage />
         </div>
 
+        {/* Screen 2: Products */}
+        <div
+          className={`cinematic-stage-screen screen-products no-scrollbar ${activeIndex === 2 ? 'is-active' : ''}`}
+          aria-hidden={activeIndex !== 2}
+        >
+          <ProductListingPage />
+        </div>
+
         {/* Screen 3: Payments */}
         <div
-          className={`cinematic-stage-screen screen-payments ${activeIndex === 3 ? 'is-active' : ''}`}
+          className={`cinematic-stage-screen screen-payments no-scrollbar ${activeIndex === 3 ? 'is-active' : ''}`}
           aria-hidden={activeIndex !== 3}
         >
           <BBPSPage />

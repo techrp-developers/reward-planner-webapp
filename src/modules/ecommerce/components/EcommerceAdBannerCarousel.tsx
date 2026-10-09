@@ -1,150 +1,113 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
 
-import banner1 from '../../../assets/banners/bannerimge1.png';
-import banner2 from '../../../assets/banners/bannerimage2.png';
-import banner3 from '../../../assets/banners/bannerimage3.png';
-import bannerSmartwatch3D from '../../../assets/banners/banner_smartwatch_3d.jpg';
-import bannerEarbuds3D from '../../../assets/banners/banner_earbuds_3d.jpg';
-import bannerKitchen3D from '../../../assets/banners/banner_kitchen_3d.jpg';
+import bannerCookwareLight3D from '../../../assets/banners/banner_cookware_light_3d.jpg';
+import bannerFashionLight3D from '../../../assets/banners/banner_fashion_light_3d.jpg';
+import bannerSmarthomeLight3D from '../../../assets/banners/banner_smarthome_light_3d.jpg';
+import bannerSmartwatchLight3D from '../../../assets/banners/banner_smartwatch_light_3d.jpg';
+import bannerEarbudsLight3D from '../../../assets/banners/banner_earbuds_light_3d.jpg';
+import bannerGreenSuperfoods3D from '../../../assets/banners/banner_green_superfoods_3d.jpg';
+import bannerPurplePerfume3D from '../../../assets/banners/banner_purple_perfume_3d.jpg';
+import bannerNachosLight3D from '../../../assets/banners/banner_nachos_light_3d.jpg';
 
 const AD_BANNERS = [
   {
-    id: 'banner-1',
-    image: banner1,
-    title: 'Colgate Total - Up to 50% Off',
-    subtitle: 'Prevent dental issues • Upgrade to Colgate Total',
-    categoryId: 3, // Beauty / Personal Care
-    tag: 'Personal Care',
-    objectFit: 'object-contain',
-    bgColor: 'bg-white',
+    id: 'banner-cookware',
+    image: bannerCookwareLight3D,
+    title: 'Chef Collection Cookware - Up to 35% Off',
+    subtitle: 'Cast Iron Pans • Dutch Pots • Glassware Sets',
+    categoryId: 4, // Home & Kitchen
+    tag: 'Kitchen & Dining',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#f4f8f5]',
+    is3D: true,
   },
   {
-    id: 'banner-2',
-    image: banner2,
-    title: 'Lava Virat Curve',
-    subtitle: 'Watch now • Launch event is live',
-    categoryId: 1, // Electronics
-    tag: 'Mobiles',
+    id: 'banner-fashion',
+    image: bannerFashionLight3D,
+    title: 'Soho Socks Gift Sets - Flat 40% Off',
+    subtitle: 'Pure Combed Cotton • Luxury Edition Boxes',
+    categoryId: 7, // Fashion
+    tag: 'Fashion & Style',
     objectFit: 'object-cover',
-    bgColor: 'bg-[#0f172a]',
+    bgColor: 'bg-[#fff5f5]',
+    is3D: true,
+  },
+  {
+    id: 'banner-smarthome',
+    image: bannerSmarthomeLight3D,
+    title: 'Smart Home Essentials - Up to 35% Off',
+    subtitle: 'Nexlev Garment Steamers • Cordless Cleaners',
+    categoryId: 4, // Home & Kitchen
+    tag: 'Smart Living',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#f0f9ff]',
+    is3D: true,
   },
   {
     id: 'banner-smartwatch',
-    image: bannerSmartwatch3D,
-    title: 'Ultra Watch Series - Flat 10% Off',
-    subtitle: 'Fitness & AMOLED Display • Save 10% Now',
+    image: bannerSmartwatchLight3D,
+    title: 'Ultra Watch Series - Flat 15% Off',
+    subtitle: 'AMOLED Display • Fitness Tracker • Calling',
     categoryId: 1, // Electronics / Wearables
     tag: 'Smart Wearables',
     objectFit: 'object-cover',
-    bgColor: 'bg-[#0a0f2d]',
+    bgColor: 'bg-[#f0f9ff]',
     is3D: true,
-  },
-  {
-    id: 'banner-3',
-    image: banner3,
-    title: 'Kurta Sets - Min. 75% Off',
-    subtitle: 'Top ethnic collection! Early Bird Deals',
-    categoryId: 7, // Fashion
-    tag: 'Fashion',
-    objectFit: 'object-cover',
-    bgColor: 'bg-[#581c87]',
   },
   {
     id: 'banner-earbuds',
-    image: bannerEarbuds3D,
-    title: 'Pro Sound Earbuds - Flat 20% Off',
-    subtitle: 'Spatial Audio & ANC • Save 20% Now',
+    image: bannerEarbudsLight3D,
+    title: 'Pro Wireless Audio - Up to 20% Off',
+    subtitle: 'Active Noise Cancellation • Spatial Sound',
     categoryId: 1, // Electronics / Audio
     tag: 'Wireless Audio',
     objectFit: 'object-cover',
-    bgColor: 'bg-[#050b28]',
+    bgColor: 'bg-[#faf5ff]',
     is3D: true,
   },
   {
-    id: 'banner-kitchen',
-    image: bannerKitchen3D,
-    title: 'Smart Kitchen Sale - Up to 20% Off',
-    subtitle: 'Air Fryers & Blenders • Save 10% - 20%',
-    categoryId: 4, // Home & Kitchen
-    tag: 'Home & Kitchen',
+    id: 'banner-superfoods',
+    image: bannerGreenSuperfoods3D,
+    title: 'Organic Superfoods & Nuts - Up to 30% Off',
+    subtitle: 'Raw Almonds, Cashews & Royal Dates',
+    categoryId: 2, // Food & Beverages
+    tag: 'Organic & Healthy',
     objectFit: 'object-cover',
-    bgColor: 'bg-[#180a02]',
+    bgColor: 'bg-[#f0fdf4]',
+    is3D: true,
+  },
+  {
+    id: 'banner-perfumes',
+    image: bannerPurplePerfume3D,
+    title: 'Luxury Fragrance - Flat 25% Off',
+    subtitle: 'Designer Eau De Parfum Sets',
+    categoryId: 3, // Beauty / Fragrance
+    tag: 'Luxury Fragrance',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#2e0854]',
+    is3D: true,
+  },
+  {
+    id: 'banner-nachos',
+    image: bannerNachosLight3D,
+    title: 'Gourmet Nacho Crunch - Flat 30% Off',
+    subtitle: 'Artisan Cheese, Salsa & Peri Peri Snacks',
+    categoryId: 2, // Food & Beverages
+    tag: 'Fiesta Snacks',
+    objectFit: 'object-cover',
+    bgColor: 'bg-[#fef9c3]',
     is3D: true,
   },
 ];
 
-export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const scrollRef = useRef(null);
-  const cardRefs = useRef([]);
+interface EcommerceAdBannerCarouselProps {
+  onSelectCategory?: (categoryId: number) => void;
+}
 
-  // Scroll smoothly to a specific slide index
-  const scrollToSlide = useCallback((index) => {
-    const targetIndex = (index + AD_BANNERS.length) % AD_BANNERS.length;
-    setActiveIndex(targetIndex);
+export const EcommerceAdBannerCarousel: React.FC<EcommerceAdBannerCarouselProps> = ({ onSelectCategory }) => {
+  const [isHovered, setIsHovered] = useState(false);
 
-    const container = scrollRef.current;
-    const card = cardRefs.current[targetIndex];
-    if (container && card) {
-      const containerWidth = container.offsetWidth;
-      const cardWidth = card.offsetWidth;
-      const cardLeft = card.offsetLeft;
-      
-      const targetScroll = cardLeft - (containerWidth / 2) + (cardWidth / 2);
-      container.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth',
-      });
-    }
-  }, []);
-
-  // Detect which slide is currently in the center during manual scroll
-  const handleScroll = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const containerCenter = container.scrollLeft + container.offsetWidth / 2;
-    let closestIndex = 0;
-    let minDistance = Infinity;
-
-    cardRefs.current.forEach((card, idx) => {
-      if (!card) return;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      const distance = Math.abs(containerCenter - cardCenter);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestIndex = idx;
-      }
-    });
-
-    if (closestIndex !== activeIndex) {
-      setActiveIndex(closestIndex);
-    }
-  };
-
-  // Next and Previous Handlers
-  const handleNext = () => {
-    scrollToSlide(activeIndex + 1);
-  };
-
-  const handlePrev = () => {
-    scrollToSlide(activeIndex - 1);
-  };
-
-  // Autoplay Effect (cycles every 4.5 seconds, pauses on hover)
-  useEffect(() => {
-    if (isPaused) return;
-
-    const timer = setInterval(() => {
-      scrollToSlide(activeIndex + 1);
-    }, 4500);
-
-    return () => clearInterval(timer);
-  }, [activeIndex, isPaused, scrollToSlide]);
-
-  const handleBannerClick = (banner) => {
+  const handleBannerClick = (banner: typeof AD_BANNERS[0]) => {
     if (onSelectCategory && banner.categoryId) {
       onSelectCategory(banner.categoryId);
     }
@@ -152,93 +115,92 @@ export const EcommerceAdBannerCarousel = ({ onSelectCategory }) => {
 
   return (
     <section
-      className="relative w-full group/adcarousel"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      className="relative w-full group/adcarousel overflow-hidden select-none py-1"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setIsHovered(false)}
       aria-label="Promotional Banners"
     >
-      {/* Scrollable Track Container */}
-      <div className="relative w-full">
-        {/* Previous Navigation Button */}
-        <button
-          type="button"
-          onClick={handlePrev}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-md border border-gray-100 flex items-center justify-center opacity-0 group-hover/adcarousel:opacity-100 transition-all duration-200 cursor-pointer hover:scale-105"
-          aria-label="Previous Banner"
-        >
-          <ChevronLeft size={20} />
-        </button>
+      {/* Embedded CSS Keyframes for buttery-smooth GPU accelerated continuous right-to-left slide */}
+      <style>{`
+        @keyframes bannerMarqueeSlow {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
+        .banner-marquee-track {
+          display: flex;
+          width: max-content;
+          will-change: transform;
+          animation: bannerMarqueeSlow 46s linear infinite;
+        }
+        .banner-marquee-track.is-paused {
+          animation-play-state: paused;
+        }
+        @media (hover: hover) {
+          .group\\/adcarousel:hover .banner-marquee-track {
+            animation-play-state: paused;
+          }
+        }
+      `}</style>
 
-        {/* Banners Row */}
+      {/* Infinite Seamless Scrolling Track */}
+      <div className="relative w-full overflow-hidden">
         <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="relative flex items-center gap-3.5 sm:gap-5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 sm:px-2"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className={`banner-marquee-track flex items-center gap-3.5 sm:gap-5 ${
+            isHovered ? 'is-paused' : ''
+          }`}
         >
-          {AD_BANNERS.map((banner, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <div
-                key={banner.id}
-                ref={(el) => { cardRefs.current[index] = el; }}
-                onClick={() => handleBannerClick(banner)}
-                style={{ scrollSnapAlign: 'center' }}
-                className={`relative w-[82vw] sm:w-[410px] md:w-[460px] lg:w-[510px] shrink-0 aspect-[16/8] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 group/card ${
-                  banner.bgColor || 'bg-white'
-                } ${
-                  isActive
-                    ? 'shadow-xl scale-[1.015] ring-2 ring-purple-400/40'
-                    : 'shadow-xs hover:shadow-xl opacity-90 hover:opacity-100 hover:scale-[1.01]'
-                }`}
-              >
-                <img
-                  src={banner.image}
-                  alt={banner.title}
-                  loading={index < 2 ? 'eager' : 'lazy'}
-                  className={`w-full h-full ${
-                    banner.objectFit || 'object-cover'
-                  } select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-[1.02]`}
-                  draggable={false}
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Next Navigation Button */}
-        <button
-          type="button"
-          onClick={handleNext}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-md border border-gray-100 flex items-center justify-center opacity-0 group-hover/adcarousel:opacity-100 transition-all duration-200 cursor-pointer hover:scale-105"
-          aria-label="Next Banner"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
-
-      {/* Centered Pagination Dots (Matching exact mobile app indicator) */}
-      <div className="flex items-center justify-center gap-1.5 pt-2.5 pb-1">
-        {AD_BANNERS.map((banner, idx) => {
-          const isActive = idx === activeIndex;
-          return (
-            <button
-              key={banner.id}
-              type="button"
-              onClick={() => scrollToSlide(idx)}
-              aria-label={`Go to banner ${idx + 1}`}
-              className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
-                isActive
-                  ? 'w-5 bg-gray-700'
-                  : 'w-1.5 bg-gray-300 hover:bg-gray-400'
+          {/* First Complete Sequence */}
+          {AD_BANNERS.map((banner, index) => (
+            <div
+              key={`banner-seq1-${banner.id}-${index}`}
+              onClick={() => handleBannerClick(banner)}
+              className={`relative w-[78vw] sm:w-[410px] md:w-[460px] lg:w-[500px] shrink-0 aspect-[16/8] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 shadow-xs hover:shadow-xl hover:scale-[1.02] group/card ${
+                banner.bgColor || 'bg-white'
               }`}
-            />
-          );
-        })}
+            >
+              <img
+                src={banner.image}
+                alt={banner.title}
+                loading={index < 3 ? 'eager' : 'lazy'}
+                className={`w-full h-full ${
+                  banner.objectFit || 'object-cover'
+                } select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-[1.03]`}
+                draggable={false}
+              />
+            </div>
+          ))}
+
+          {/* Second Duplicate Sequence (Enables 100% Seamless Infinite Loop) */}
+          {AD_BANNERS.map((banner, index) => (
+            <div
+              key={`banner-seq2-${banner.id}-${index}`}
+              onClick={() => handleBannerClick(banner)}
+              className={`relative w-[78vw] sm:w-[410px] md:w-[460px] lg:w-[500px] shrink-0 aspect-[16/8] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border border-gray-100/80 shadow-xs hover:shadow-xl hover:scale-[1.02] group/card ${
+                banner.bgColor || 'bg-white'
+              }`}
+            >
+              <img
+                src={banner.image}
+                alt={banner.title}
+                loading="lazy"
+                className={`w-full h-full ${
+                  banner.objectFit || 'object-cover'
+                } select-none pointer-events-none transition-transform duration-500 group-hover/card:scale-[1.03]`}
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Subtle Purple-Pink Bottom Glow Strip (Inspired by mobile reference) */}
-      <div className="w-36 h-0.5 mx-auto rounded-full bg-gradient-to-r from-purple-400/40 via-pink-400/40 to-indigo-400/40 blur-[1px] pointer-events-none" />
+      {/* Subtle Purple-Pink Bottom Glow Strip */}
+      <div className="w-36 h-0.5 mx-auto mt-2 rounded-full bg-gradient-to-r from-purple-400/40 via-pink-400/40 to-indigo-400/40 blur-[1px] pointer-events-none" />
     </section>
   );
 };

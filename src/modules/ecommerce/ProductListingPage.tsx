@@ -20,6 +20,7 @@ import EcommerceFlashSale from './components/EcommerceFlashSale';
 import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
 import EcommerceFeaturedWeek from './components/EcommerceFeaturedWeek';
 import EcommerceCategoryTabGrid from './components/EcommerceCategoryTabGrid';
+import navratriBanner from '../../assets/home/Navratri_banner.png';
 import { Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import Pagination from '@mui/material/Pagination';
@@ -322,31 +323,54 @@ export const ProductListingPage = () => {
       {isLandingMode ? (
         <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-8">
           {/* Top End-Corner: 'All Products' Link & Shopping Cart in One Row (Below Header, Above Categories) */}
-          <div className="flex justify-end items-center gap-2 sm:gap-3 mb-1">
-            <button
-              type="button"
-              onClick={() => handleSelectCategory('all')}
-              className="text-sm font-bold text-gray-700 hover:text-[#7C3AED] flex items-center gap-1 transition-colors cursor-pointer group py-1.5 px-3 rounded-xl hover:bg-white hover:shadow-2xs border border-transparent hover:border-gray-200"
-            >
-              <span>All Products</span>
-              <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform text-gray-500 group-hover:text-[#7C3AED]" />
-            </button>
+          <div className="flex justify-between items-center gap-2 sm:gap-3 mb-1 pt-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-800 border border-amber-300/60 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                Festive Season Offers
+              </span>
+            </div>
 
-            {/* Shopping Cart Button with Live Badge */}
-            <button
-              type="button"
-              onClick={() => navigate('/cart')}
-              className="relative p-2 rounded-xl text-gray-700 hover:text-[#7C3AED] bg-white border border-gray-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center justify-center group"
-              title="Shopping Cart"
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />
-              {totalQuantity > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EC4899] text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
-                  {totalQuantity}
-                </span>
-              )}
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => handleSelectCategory('all')}
+                className="text-sm font-bold text-gray-700 hover:text-[#7C3AED] flex items-center gap-1 transition-colors cursor-pointer group py-1.5 px-3 rounded-xl hover:bg-white hover:shadow-2xs border border-transparent hover:border-gray-200"
+              >
+                <span>All Products</span>
+                <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform text-gray-500 group-hover:text-[#7C3AED]" />
+              </button>
+
+              {/* Shopping Cart Button with Live Badge */}
+              <button
+                type="button"
+                onClick={() => navigate('/cart')}
+                className="relative p-2 rounded-xl text-gray-700 hover:text-[#7C3AED] bg-white border border-gray-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center justify-center group"
+                title="Shopping Cart"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart size={20} className="group-hover:scale-105 transition-transform" />
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#EC4899] text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+                    {totalQuantity}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* NAVRATRI SPECIAL FESTIVE HERO BANNER */}
+          <div
+            onClick={() => handleSelectCategory('all')}
+            className="relative w-full h-[180px] sm:h-[270px] md:h-[350px] lg:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002]"
+            title="Navratri Special - Shop Now"
+          >
+            <img
+              src={navratriBanner}
+              alt="Navratri Special - Shop • Celebrate • Save"
+              className="w-full h-full object-cover object-[center_42%] select-none pointer-events-none transition-transform duration-500 group-hover:scale-[1.01]"
+              draggable={false}
+            />
           </div>
 
           {/* ADVERTISEMENT HERO BANNER CAROUSEL (EXACT BANNERS MATCHING APP REFERENCE) */}

@@ -1,6 +1,7 @@
 // src/modules/home/HomePage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { todoApi } from '../../api/todoApi';
 // Material UI Icons
 import StarIcon from '@mui/icons-material/Star';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -35,6 +36,8 @@ import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlin
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useAuth } from '../../context/AuthContext';
 import './HomePage.css';
 import OccasionCalendar from './components/OccasionCalendar';
@@ -43,7 +46,7 @@ import ServiceDiscovery, { ServiceShortcuts } from './components/ServiceDiscover
 
 export const HomePage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated, openAuth } = useAuth();
   const rawName = user?.name || user?.first_name;
   const name = rawName && !/^\d+$/.test(String(rawName).trim()) ? String(rawName).trim().split(' ')[0] : 'Sylas';
   const avatar = user?.userImage || user?.avatar;
@@ -76,88 +79,301 @@ export const HomePage = () => {
     showToast(`Reaction added! Thank you for celebrating our team members! 🎉`);
   };
 
-  // Onboarding Tasks state matching reference image (media_1790843021317.png)
-  const [tasks, setTasks] = useState<any[]>([
+  // Helper to map an appropriate icon based on task title/context
+  const getTaskIcon = (title?: string) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('interview') || t.includes('desktop') || t.includes('laptop')) return DesktopWindowsOutlinedIcon;
+    if (t.includes('team') || t.includes('meeting') || t.includes('sync') || t.includes('1-on-1')) return PeopleOutlinedIcon;
+    if (t.includes('chat') || t.includes('discuss') || t.includes('talk')) return ChatBubbleOutlineOutlinedIcon;
+    if (t.includes('security') || t.includes('compliance')) return ShieldOutlinedIcon;
+    if (t.includes('setup') || t.includes('work') || t.includes('dev')) return BusinessCenterOutlinedIcon;
+    if (t.includes('goal') || t.includes('review') || t.includes('plan')) return StraightenIcon;
+    if (t.includes('policy') || t.includes('link')) return LinkIcon;
+    if (t.includes('fast') || t.includes('urgent') || t.includes('electric')) return BoltIcon;
+    return AssignmentTurnedInOutlinedIcon;
+  };
+
+  // Initial Onboarding Tasks state matching reference design
+  const initialFallbackTasks = [
     {
-      id: 1,
+      id: '1',
       title: 'Interview',
       time: 'Sep 13, 08:30',
       icon: DesktopWindowsOutlinedIcon,
       completed: true
     },
     {
-      id: 2,
+      id: '2',
       title: 'Team Meeting',
       time: 'Sep 13, 10:30',
       icon: BoltIcon,
       completed: true
     },
     {
-      id: 3,
+      id: '3',
       title: 'Project Update',
       time: 'Sep 13, 13:00',
       icon: ChatBubbleOutlineOutlinedIcon,
       completed: false
     },
     {
-      id: 4,
+      id: '4',
       title: 'Discuss Q3 Goals',
       time: 'Sep 13, 14:45',
       icon: StraightenIcon,
       completed: false
     },
     {
-      id: 5,
+      id: '5',
       title: 'HR Policy Review',
       time: 'Sep 13, 16:30',
       icon: LinkIcon,
       completed: false
     },
     {
-      id: 6,
+      id: '6',
       title: 'Security Compliance',
       time: 'Sep 14, 11:00',
       icon: ShieldOutlinedIcon,
       completed: false
     },
     {
-      id: 7,
+      id: '7',
       title: 'Development Setup',
       time: 'Sep 14, 14:00',
       icon: BusinessCenterOutlinedIcon,
       completed: false
     },
     {
-      id: 8,
+      id: '8',
       title: 'Manager 1-on-1 Sync',
       time: 'Sep 15, 10:00',
       icon: PeopleOutlinedIcon,
       completed: false
     }
-  ]);
+  ];
 
+  const [tasks, setTasks] = useState<any[]>(initialFallbackTasks);
   const [showAllTasks, setShowAllTasks] = useState(false);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDate, setTaskDate] = useState('');
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
 
-  const addTask = (event) => {
+  // Fetch live tasks from backend
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchLiveTasks() {
+      try {
+        const liveTodos = await todoApi.getTodos();
+        if (isMounted && Array.isArray(liveTodos) && liveTodos.length > 0) {
+          const formatted = liveTodos.map((item) => ({
+            id: String(item.id),
+            title: item.title,
+            time: item.time || (item.date ? `${item.date} ${item.startTime || ''}`.trim() : 'No due date'),
+            rawDate: item.date || '',
+            completed: Boolean(item.completed),
+            icon: getTaskIcon(item.title),
+          }));
+          setTasks(formatted);
+        }
+      } catch (err) {
+        console.warn('Could not load live todos, keeping fallback tasks:', err);
+      }
+    }
+    fetchLiveTasks();
+
+    const handleTodoRefresh = () => fetchLiveTasks();
+    window.addEventListener('rp_todo_updated', handleTodoRefresh);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('rp_todo_updated', handleTodoRefresh);
+    };
+  }, []);
+
+  const addTask = async (event: React.FormEvent) => {
     event.preventDefault();
     const title = taskTitle.trim();
     if (!title) return;
-    const time = taskDate
-      ? new Date(taskDate).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-      : 'No due date';
-    setTasks(previous => [{ id: crypto.randomUUID(), title, time, icon: AssignmentTurnedInOutlinedIcon, completed: false }, ...previous]);
-    setTaskTitle('');
-    setTaskDate('');
-    setIsAddingTask(false);
-    showToast('Task added to your list.');
+
+    const token = sessionStorage.getItem('rp_access_token') || localStorage.getItem('rp_access_token');
+    if (!token && !isAuthenticated) {
+      showToast('Please sign in to save tasks to your account.');
+      if (openAuth) openAuth('login');
+      return;
+    }
+
+    const dateObj = taskDate ? new Date(taskDate) : new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const task_date = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}`;
+    
+    const startHours = pad(dateObj.getHours());
+    const startMinutes = pad(dateObj.getMinutes());
+    const start_time = `${startHours}:${startMinutes}:00`;
+
+    const endDateObj = new Date(dateObj.getTime() + 60 * 60 * 1000);
+    const end_time = `${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}:00`;
+
+    try {
+      const res = await todoApi.createTodo({
+        task_date,
+        start_time,
+        end_time,
+        title,
+        subtitle: 'Dashboard task',
+        reminder_time: start_time,
+      });
+
+      if (res?.success) {
+        const displayTime = taskDate
+          ? new Date(taskDate).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+          : `${startHours}:${startMinutes} - ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+
+        const newTask = {
+          id: String(res.todoId || Date.now()),
+          title,
+          time: displayTime,
+          rawDate: taskDate,
+          icon: getTaskIcon(title),
+          completed: false
+        };
+
+        setTasks(previous => [newTask, ...previous]);
+        setTaskTitle('');
+        setTaskDate('');
+        setIsAddingTask(false);
+        showToast('Task saved to your database! ✓');
+        window.dispatchEvent(new CustomEvent('rp_todo_updated'));
+      } else {
+        showToast(res?.message || 'Could not save task. Please try again.');
+      }
+    } catch (err: any) {
+      console.error('Backend task create error:', err);
+      const errMsg = err?.response?.data?.message || err?.message || 'Failed to save task to database';
+      showToast(`Error: ${errMsg}`);
+    }
   };
 
-  const toggleTask = (taskId) => {
-    setTasks(previous => previous.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task));
+  const startEditingTask = (task: any, event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
+    setEditingTaskId(String(task.id));
+    setEditTitle(task.title);
+    setEditDate(task.rawDate || '');
   };
+
+  const cancelEditing = (event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
+    setEditingTaskId(null);
+    setEditTitle('');
+    setEditDate('');
+  };
+
+  const saveEditTask = async (event: React.FormEvent, taskId: string | number) => {
+    event.preventDefault();
+    const title = editTitle.trim();
+    if (!title) return;
+
+    setIsSubmittingEdit(true);
+    const numericId = Number(taskId);
+
+    if (!isNaN(numericId) && numericId > 0) {
+      const dateObj = editDate ? new Date(editDate) : new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const task_date = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}`;
+
+      const startHours = pad(dateObj.getHours());
+      const startMinutes = pad(dateObj.getMinutes());
+      const start_time = `${startHours}:${startMinutes}:00`;
+
+      const endDateObj = new Date(dateObj.getTime() + 60 * 60 * 1000);
+      const end_time = `${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}:00`;
+
+      try {
+        const res = await todoApi.updateTodo(taskId, {
+          title,
+          task_date,
+          start_time,
+          end_time,
+          reminder_time: start_time,
+        });
+
+        if (res?.success) {
+          const displayTime = editDate
+            ? new Date(editDate).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+            : `${startHours}:${startMinutes} - ${pad(endDateObj.getHours())}:${pad(endDateObj.getMinutes())}`;
+
+          setTasks(previous => previous.map(task =>
+            task.id === String(taskId)
+              ? { ...task, title, time: displayTime, rawDate: editDate, icon: getTaskIcon(title) }
+              : task
+          ));
+          setEditingTaskId(null);
+          showToast('Task updated successfully! ✓');
+          window.dispatchEvent(new CustomEvent('rp_todo_updated'));
+        } else {
+          showToast(res?.message || 'Could not update task');
+        }
+      } catch (err: any) {
+        console.error('Backend updateTodo error:', err);
+        const errMsg = err?.response?.data?.message || err?.message || 'Failed to update task';
+        showToast(`Error: ${errMsg}`);
+      } finally {
+        setIsSubmittingEdit(false);
+      }
+    } else {
+      setTasks(previous => previous.map(task =>
+        task.id === String(taskId)
+          ? { ...task, title, icon: getTaskIcon(title) }
+          : task
+      ));
+      setEditingTaskId(null);
+      setIsSubmittingEdit(false);
+      showToast('Task updated');
+    }
+  };
+
+  const deleteTask = async (taskId: string | number, event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
+    const numericId = Number(taskId);
+
+    if (!isNaN(numericId) && numericId > 0) {
+      try {
+        const res = await todoApi.deleteTodo(taskId);
+        if (res?.success) {
+          setTasks(previous => previous.filter(task => task.id !== String(taskId)));
+          showToast('Task deleted successfully! ✓');
+          window.dispatchEvent(new CustomEvent('rp_todo_updated'));
+        } else {
+          showToast(res?.message || 'Could not delete task');
+        }
+      } catch (err: any) {
+        console.error('Backend deleteTask error:', err);
+        const errMsg = err?.response?.data?.message || err?.message || 'Failed to delete task';
+        showToast(`Error: ${errMsg}`);
+      }
+    } else {
+      setTasks(previous => previous.filter(task => task.id !== String(taskId)));
+      showToast('Task removed');
+    }
+  };
+
+  const toggleTask = async (taskId: string | number) => {
+    setTasks(previous => previous.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task));
+    
+    const numericId = Number(taskId);
+    if (!isNaN(numericId) && numericId > 0) {
+      try {
+        await todoApi.completeTodo(taskId);
+        window.dispatchEvent(new CustomEvent('rp_todo_updated'));
+      } catch (err) {
+        console.warn('Backend completeTodo error:', err);
+      }
+    }
+  };
+
 
   // Top Performers data matching podium layout in reference image (media_1790841692615.png)
   const performersData = {
@@ -324,7 +540,7 @@ export const HomePage = () => {
   const currentAnnouncement = announcements[announcementIndex];
 
   return (
-    <div className="dashboard font-['Poppins',sans-serif]">
+    <div className="dashboard no-scrollbar font-['Poppins',sans-serif]">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#0A0A5C] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
@@ -379,21 +595,21 @@ export const HomePage = () => {
         <section className="engagement-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch mb-16 sm:mb-20">
           
           {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
-          <div className="bg-white rounded-[24px] p-5 border border-[#E4DCE9]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-sm transition-all flex flex-col justify-between">
+          <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all flex flex-col justify-between bg-[#E0C3F2] border border-[#C79FE0] text-[#24162F]">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#E4DCE9]/60">
+              <div className="flex items-center justify-between pb-4 border-b border-[#C79FE0]/70">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-[#24162F] tracking-tight">
                     Top Performers
                   </h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#776B80]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#6B537B]">
                     Company Leaderboard
                   </span>
                 </div>
 
                 {/* Month Switcher Pills */}
-                <div className="bg-[#F6F2F8] p-1 rounded-full border border-[#E4DCE9]/60 flex items-center gap-1 text-xs font-semibold text-[#776B80]">
+                <div className="bg-white/80 p-1 rounded-full border border-[#C79FE0]/80 flex items-center gap-1 text-xs font-semibold text-[#6B537B]">
                   {['June', 'July', 'August'].map((m) => {
                     const isActive = activeMonth === m;
                     return (
@@ -404,7 +620,7 @@ export const HomePage = () => {
                         className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                           isActive
                             ? 'bg-[#1C0E28] text-white shadow-xs font-bold'
-                            : 'text-[#776B80] hover:text-[#24162F]'
+                            : 'text-[#6B537B] hover:text-[#24162F]'
                         }`}
                       >
                         {m}
@@ -429,20 +645,20 @@ export const HomePage = () => {
                         <img
                           src={p2.avatar}
                           alt={p2.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E4DCE9] shadow-sm"
+                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#C79FE0]/80 shadow-sm"
                         />
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#10B981] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
                           2
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-slate-800 text-sm sm:text-base">
+                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-[#24162F] text-sm sm:text-base">
                         <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
                         <span>{p2.score}</span>
                       </div>
                       <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p2.name}
                       </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#776B80] leading-tight mt-0.5 font-medium">
+                      <div className="text-[10px] sm:text-[11px] text-[#6B537B] leading-tight mt-0.5 font-medium">
                         {p2.role}
                       </div>
                     </div>
@@ -459,14 +675,14 @@ export const HomePage = () => {
                           <EmojiEventsIcon sx={{ fontSize: 18 }} className="text-white" />
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1.5 font-semibold text-slate-900 text-base sm:text-lg">
+                      <div className="flex items-center justify-center gap-1 mt-1.5 font-semibold text-[#24162F] text-base sm:text-lg">
                         <StarIcon sx={{ fontSize: 20 }} className="text-amber-400" />
                         <span>{p1.score}</span>
                       </div>
                       <div className="text-sm sm:text-base font-semibold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p1.name}
                       </div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full text-xs text-[#1C0E28] bg-[#F0E9F5] border border-[#E4D8ED] font-semibold leading-tight mt-1">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full text-xs text-[#1C0E28] bg-white/80 border border-[#C79FE0]/80 font-semibold leading-tight mt-1">
                         {p1.role}
                       </div>
                     </div>
@@ -477,20 +693,20 @@ export const HomePage = () => {
                         <img
                           src={p3.avatar}
                           alt={p3.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#E4DCE9] shadow-sm"
+                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#C79FE0]/80 shadow-sm"
                         />
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#F59E0B] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
                           3
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-slate-800 text-sm sm:text-base">
+                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-[#24162F] text-sm sm:text-base">
                         <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
                         <span>{p3.score}</span>
                       </div>
                       <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
                         {p3.name}
                       </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#776B80] leading-tight mt-0.5 font-medium">
+                      <div className="text-[10px] sm:text-[11px] text-[#6B537B] leading-tight mt-0.5 font-medium">
                         {p3.role}
                       </div>
                     </div>
@@ -499,36 +715,36 @@ export const HomePage = () => {
               })()}
 
               {/* Performers Ranked List (Ranks 4, 5, 6 with Star ratings) */}
-              <div className="border-t border-[#E4DCE9]/60 pt-4 space-y-2">
+              <div className="border-t border-[#C79FE0]/70 pt-4 space-y-2">
                 {(performersData[activeMonth]?.list || performersData.July.list).map((p, idx) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-2 rounded-2xl hover:bg-[#F6F2F8] transition-all border border-transparent hover:border-[#E4DCE9]/60"
+                    className="flex items-center justify-between p-2 rounded-2xl hover:bg-white/60 transition-all border border-transparent hover:border-[#C79FE0]/60"
                   >
                     <div className="flex items-center gap-4">
-                      <span className="w-5 h-5 rounded-full bg-[#F6F2F8] text-[#776B80] text-[10px] font-bold flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-white/80 text-[#6B537B] text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#C79FE0]/80">
                         {idx + 4}
                       </span>
                       <img
                         src={p.avatar}
                         alt={p.name}
-                        className="w-10 h-10 rounded-full object-cover border border-[#E4DCE9] shadow-2xs shrink-0"
+                        className="w-10 h-10 rounded-full object-cover border border-[#C79FE0]/80 shadow-2xs shrink-0"
                       />
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-[#24162F]">
                           {p.name}
                         </div>
-                        <div className="text-[11px] text-[#776B80] font-medium">
+                        <div className="text-[11px] text-[#6B537B] font-medium">
                           {p.role}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="hidden sm:inline-block text-[11px] font-semibold text-[#776B80] bg-[#F6F2F8] px-2.5 py-0.5 rounded-full border border-[#E4DCE9]/60">
+                      <span className="hidden sm:inline-block text-[11px] font-semibold text-[#6B537B] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#C79FE0]/80">
                         {p.points}
                       </span>
-                      <div className="flex items-center gap-1 font-bold text-slate-800 text-xs sm:text-sm">
+                      <div className="flex items-center gap-1 font-bold text-[#24162F] text-xs sm:text-sm">
                         <StarIcon sx={{ fontSize: 16 }} className="text-amber-400" />
                         <span>{p.score}</span>
                       </div>
@@ -538,21 +754,21 @@ export const HomePage = () => {
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-[#E4DCE9]/60 flex items-center justify-between text-[11px] text-[#776B80] font-medium">
+            <div className="mt-4 pt-4 border-t border-[#C79FE0]/70 flex items-center justify-between text-[11px] text-[#6B537B] font-medium">
               <span>Dynamic quarterly rankings</span>
-              <span className="text-[#1C0E28] font-bold flex items-center gap-1 bg-[#F0E9F5] px-2.5 py-0.5 rounded-full border border-[#E4D8ED]">
+              <span className="text-[#1C0E28] font-bold flex items-center gap-1 bg-white/80 px-2.5 py-0.5 rounded-full border border-[#C79FE0]/80">
                 <AutoAwesomeIcon sx={{ fontSize: 13 }} /> Peer Recognition Model
               </span>
             </div>
           </div>
 
           {/* Card 2: Ultra-Premium Announcements & Spotlights */}
-          <div className="bg-white rounded-[24px] p-5 border border-[#E4DCE9]/80 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.03)] hover:shadow-sm transition-all duration-300 flex flex-col justify-between">
+          <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all duration-300 flex flex-col justify-between bg-[#FCD7BD] border border-[#E9AC85]">
             <div>
               {/* Header with Category & Carousel Controls */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#E4DCE9]/60">
+              <div className="flex items-center justify-between pb-4 border-b border-[#E9AC85]/70">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-2xl bg-[#F0E9F5] flex items-center justify-center text-[#1C0E28]">
+                  <div className="w-9 h-9 rounded-2xl bg-white/80 border border-[#E9AC85]/80 flex items-center justify-center text-[#1C0E28]">
                     <CampaignOutlinedIcon sx={{ fontSize: 19 }} />
                   </div>
                   <div>
@@ -573,7 +789,7 @@ export const HomePage = () => {
                     type="button"
                     onClick={() => setAnnouncementIndex((idx) => (idx > 0 ? idx - 1 : announcements.length - 1))}
                     aria-label="Previous announcement"
-                    className="w-7 h-7 rounded-full border border-[#E4DCE9] hover:bg-[#F6F2F8] flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
+                    className="w-7 h-7 rounded-full border border-[#E9AC85] bg-white/70 hover:bg-white flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
                   >
                     <ChevronLeftIcon sx={{ fontSize: 16 }} />
                   </button>
@@ -581,7 +797,7 @@ export const HomePage = () => {
                     type="button"
                     onClick={() => setAnnouncementIndex((idx) => (idx < announcements.length - 1 ? idx + 1 : 0))}
                     aria-label="Next announcement"
-                    className="w-7 h-7 rounded-full border border-[#E4DCE9] hover:bg-[#F6F2F8] flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
+                    className="w-7 h-7 rounded-full border border-[#E9AC85] bg-white/70 hover:bg-white flex items-center justify-center text-[#55435F] transition-colors cursor-pointer active:scale-95"
                   >
                     <ChevronRightIcon sx={{ fontSize: 16 }} />
                   </button>
@@ -606,7 +822,7 @@ export const HomePage = () => {
                       className={`inline-flex items-center justify-center gap-1 py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer truncate ${
                         isActive
                           ? 'bg-[#1C0E28] text-white shadow-xs scale-[1.02]'
-                          : 'bg-[#F6F2F8] text-[#776B80] hover:bg-[#E9ECE6]'
+                          : 'bg-white/70 border border-[#E9AC85] text-[#776B80] hover:bg-white'
                       }`}
                     >
                       <CatIcon sx={{ fontSize: 13 }} />
@@ -749,8 +965,8 @@ export const HomePage = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    showToast('Opening Reward Points Store & Claims...');
-                    navigate('/rewards/explore');
+                    showToast('Opening Products Store & Deals...');
+                    navigate('/store');
                   }}
                   className="w-full py-2.5 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
@@ -780,7 +996,7 @@ export const HomePage = () => {
                     className={`h-1.5 rounded-full transition-all cursor-pointer ${
                       announcementIndex === i
                         ? 'w-6 bg-[#1C0E28]'
-                        : 'w-1.5 bg-[#E4DCE9] hover:bg-[#CAD1C6]'
+                        : 'w-1.5 bg-[#E9AC85]/60 hover:bg-[#E9AC85]'
                     }`}
                     aria-label={`Go to announcement ${i + 1}`}
                   />
@@ -841,15 +1057,72 @@ export const HomePage = () => {
               {/* Task list */}
               <div className="space-y-2 pt-1">
                 {(showAllTasks ? tasks : tasks.slice(0, 5)).map((task) => {
-                  const IconComponent = task.icon;
+                  const IconComponent = task.icon || AssignmentTurnedInOutlinedIcon;
+                  const isEditing = editingTaskId === String(task.id);
+
+                  if (isEditing) {
+                    return (
+                      <form
+                        key={task.id}
+                        onSubmit={(e) => saveEditTask(e, task.id)}
+                        className="todo-edit-box"
+                      >
+                        <div className="flex items-center justify-between text-[11px] text-zinc-300 font-semibold px-0.5">
+                          <span>Edit Task</span>
+                          <button
+                            type="button"
+                            onClick={cancelEditing}
+                            className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                            title="Cancel editing"
+                          >
+                            <CloseIcon sx={{ fontSize: 14 }} />
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          maxLength={120}
+                          placeholder="Task name"
+                          autoFocus
+                          required
+                        />
+                        <div className="flex items-center gap-2 pt-0.5">
+                          <input
+                            type="datetime-local"
+                            value={editDate}
+                            onChange={(e) => setEditDate(e.target.value)}
+                          />
+                          <button
+                            type="submit"
+                            disabled={!editTitle.trim() || isSubmittingEdit}
+                            className="todo-edit-btn-save"
+                          >
+                            {isSubmittingEdit ? 'Saving...' : 'Save'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEditing}
+                            className="todo-edit-btn-cancel"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    );
+                  }
+
                   return (
-                    <button type="button" aria-pressed={task.completed}
+                    <div
                       key={task.id}
-                      onClick={() => toggleTask(task.id)}
-                      className="w-full text-left flex items-center justify-between gap-2 p-2 sm:p-2 rounded-2xl hover:bg-white/[0.06] transition-all cursor-pointer group border border-transparent hover:border-white/[0.06]"
+                      className="w-full text-left flex items-center justify-between gap-2 p-2 sm:p-2 rounded-2xl hover:bg-white/[0.06] transition-all group border border-transparent hover:border-white/[0.06]"
                     >
-                      {/* Left: Icon circle + Title & Timestamp */}
-                      <div className="flex items-center gap-4">
+                      {/* Left: Icon circle + Title & Timestamp (clickable to toggle completion) */}
+                      <button
+                        type="button"
+                        onClick={() => toggleTask(task.id)}
+                        className="flex items-center gap-3 sm:gap-4 flex-1 text-left min-w-0 bg-transparent border-none p-0 cursor-pointer"
+                      >
                         <div
                           className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0 transition-all ${
                             task.completed
@@ -860,9 +1133,9 @@ export const HomePage = () => {
                           <IconComponent sx={{ fontSize: 20 }} />
                         </div>
 
-                        <div>
+                        <div className="min-w-0 pr-1">
                           <div
-                            className={`text-xs sm:text-sm transition-colors ${
+                            className={`text-xs sm:text-sm truncate transition-colors ${
                               task.completed
                                 ? 'font-medium text-zinc-400 line-through decoration-zinc-500/60'
                                 : 'font-semibold text-white'
@@ -878,21 +1151,49 @@ export const HomePage = () => {
                             {task.time}
                           </div>
                         </div>
-                      </div>
+                      </button>
 
-                      {/* Right: Checkmark Badge */}
-                      <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                          task.completed
-                            ? 'bg-[#E2B842] text-[#1C0E28] shadow-[0_0_8px_rgba(226,184,66,0.4)]'
-                            : 'bg-white/[0.06] group-hover:bg-white/[0.12] border border-white/[0.15]'
-                        }`}
-                      >
-                        {task.completed && (
-                          <CheckIcon sx={{ fontSize: 15 }} className="text-[#1C0E28]" />
-                        )}
+                      {/* Right: Actions (Edit, Delete, Checkmark) */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => startEditingTask(task, e)}
+                          title="Edit task"
+                          aria-label={`Edit ${task.title}`}
+                          className="todo-action-btn edit"
+                        >
+                          <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => deleteTask(task.id, e)}
+                          title="Delete task"
+                          aria-label={`Delete ${task.title}`}
+                          className="todo-action-btn delete"
+                        >
+                          <DeleteOutlineOutlinedIcon sx={{ fontSize: 17 }} />
+                        </button>
+
+                        {/* Checkmark Badge */}
+                        <button
+                          type="button"
+                          onClick={() => toggleTask(task.id)}
+                          title={task.completed ? 'Mark pending' : 'Mark completed'}
+                          aria-label={task.completed ? 'Mark pending' : 'Mark completed'}
+                          aria-pressed={task.completed}
+                          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                            task.completed
+                              ? 'bg-[#E2B842] text-[#1C0E28] shadow-[0_0_8px_rgba(226,184,66,0.4)]'
+                              : 'bg-white/[0.06] hover:bg-white/[0.15] border border-white/[0.15]'
+                          }`}
+                        >
+                          {task.completed && (
+                            <CheckIcon sx={{ fontSize: 15 }} className="text-[#1C0E28]" />
+                          )}
+                        </button>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -923,7 +1224,7 @@ export const HomePage = () => {
       {/* Mobile Navigation Bar */}
       <nav className="dashboard-mobile-nav" aria-label="Dashboard navigation">
         <Link to="/" aria-current="page"><HomeOutlinedIcon sx={{ fontSize: 21 }} />Home</Link>
-        <Link to="/rewards"><CardGiftcardIcon sx={{ fontSize: 21 }} />Rewards</Link>
+        <Link to="/store"><CardGiftcardIcon sx={{ fontSize: 21 }} />Products</Link>
         <Link to="/profile"><PersonOutlinedIcon sx={{ fontSize: 21 }} />Profile</Link>
       </nav>
     </div>

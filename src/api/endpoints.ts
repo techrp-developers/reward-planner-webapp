@@ -1,7 +1,7 @@
 // src/api/endpoints.js
 // Complete backend route map for Reward Planners Backend
 
-export const API_BASE_URL = 'https://rewardplanners.com/api/crm';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_URL || 'https://cdn.rewardplanners.com';
 
 export const ENDPOINTS = {
@@ -133,4 +133,22 @@ export const ENDPOINTS = {
     myTickets: '/v1/support/my-tickets',
     recentOrders: '/v1/support/recent-orders',
   },
+  todo: {
+    list: '/v1/todo',
+    create: '/v1/todo',
+    update: (id: string | number) => `/v1/todo/${id}`,
+    complete: (id: string | number) => `/v1/todo/${id}/complete`,
+    completeMultiple: '/v1/todo/complete/multiple',
+    updateReminder: (id: string | number) => `/v1/todo/${id}/reminder`,
+    delete: (id: string | number) => `/v1/todo/${id}`,
+    deleteMultiple: '/v1/todo/delete/multiple',
+  },
+  notification: {
+    myNotifications: '/v1/notification/my-notification',
+    badge: '/v1/notification/notification-badge',
+    markRead: (id: string | number) => `/v1/notification/read/${id}`,
+    markAllRead: '/v1/notification/read-all',
+    delete: (id: string | number) => `/v1/notification/${id}`,
+  },
 };
+

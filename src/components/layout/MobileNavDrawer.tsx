@@ -367,17 +367,6 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
 
               <button
                 type="button"
-                onClick={() => handleLinkClick('/store')}
-                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
-              >
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
-                  <img src={iconProducts} alt="Products" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
-                </div>
-                <span className="text-xs font-bold text-white">Products</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => handleLinkClick('/services')}
                 className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
               >
@@ -385,6 +374,17 @@ export const MobileNavDrawer = ({ isOpen, onClose }) => {
                   <img src={iconServices} alt="Services" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
                 </div>
                 <span className="text-xs font-bold text-white">Services</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleLinkClick('/store')}
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 border border-white/10 text-left transition-colors cursor-pointer group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center p-1 shrink-0">
+                  <img src={iconProducts} alt="Products" className="w-full h-full object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-bold text-white">Products</span>
               </button>
 
               <button

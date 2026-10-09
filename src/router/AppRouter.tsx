@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import ScrollToTop from '../components/common/ScrollToTop';
 import TopHeader from '../components/layout/TopHeader';
 import MegaMenuStrip from '../components/layout/MegaMenuStrip';
-import Footer from '../components/layout/Footer';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
 import rpLogo from '../assets/rp_logo_crisp.png';
@@ -27,14 +26,8 @@ import MutualFundPage from '../modules/services/MutualFundPage';
 import ServiceBundlePage from '../modules/services/ServiceBundlePage';
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
-import MyEventsPage from '../modules/events/MyEventsPage';
-import AllEventsPage from '../modules/events/AllEventsPage';
-import HealthWellnessPage from '../modules/wellness/HealthWellnessPage';
-import MyBenefitsPage from '../modules/benefits/MyBenefitsPage';
-import ReportsPage from '../modules/reports/ReportsPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
-import MyRewardsPage from '../modules/rewards/MyRewardsPage';
-import ExploreRewardsPage from '../modules/rewards/ExploreRewardsPage';
+import NotificationsPage from '../modules/notifications/NotificationsPage';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -56,22 +49,7 @@ export const AppRouter = () => {
     location.pathname === '/bbps';
 
   const isHomePage = location.pathname === '/';
-  const isEventsPage =
-    location.pathname.startsWith('/events') ||
-    location.pathname === '/my-events' ||
-    location.pathname === '/all-events';
-  const isWellnessPage =
-    location.pathname.startsWith('/wellness') ||
-    location.pathname === '/health-wellness';
-  const isBenefitsPage =
-    location.pathname.startsWith('/benefits') ||
-    location.pathname === '/my-benefits';
-  const isReportsPage =
-    location.pathname.startsWith('/reports');
-  const isRewardsPage =
-    location.pathname.startsWith('/rewards') ||
-    location.pathname === '/my-rewards';
-  const isFixedLayout = isStageRoute || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage || isRewardsPage;
+  const isFixedLayout = isStageRoute;
 
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
@@ -115,7 +93,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] ${isFixedLayout ? 'h-screen overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
@@ -124,25 +102,20 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
+      <main className={`flex-1 w-full overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
         {isStageRoute ? (
           <CinematicModuleStage />
         ) : (
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/rewards" element={<MyRewardsPage />} />
-            <Route path="/rewards/explore" element={<ExploreRewardsPage />} />
-            <Route path="/explore-rewards" element={<ExploreRewardsPage />} />
-            <Route path="/my-rewards" element={<MyRewardsPage />} />
-            <Route path="/events" element={<MyEventsPage />} />
-            <Route path="/events/all" element={<AllEventsPage />} />
-            <Route path="/all-events" element={<AllEventsPage />} />
-            <Route path="/my-events" element={<MyEventsPage />} />
-            <Route path="/wellness" element={<HealthWellnessPage />} />
-            <Route path="/health-wellness" element={<HealthWellnessPage />} />
-            <Route path="/benefits" element={<MyBenefitsPage />} />
-            <Route path="/my-benefits" element={<MyBenefitsPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/rewards" element={<Navigate to="/store" replace />} />
+            <Route path="/rewards/*" element={<Navigate to="/store" replace />} />
+            <Route path="/my-rewards" element={<Navigate to="/store" replace />} />
+            <Route path="/events" element={<Navigate to="/" replace />} />
+            <Route path="/events/*" element={<Navigate to="/" replace />} />
+            <Route path="/wellness" element={<Navigate to="/" replace />} />
+            <Route path="/benefits" element={<Navigate to="/" replace />} />
+            <Route path="/reports" element={<Navigate to="/" replace />} />
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
@@ -177,6 +150,7 @@ export const AppRouter = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/orders" element={<ProfilePage />} />
             <Route path="/wallet" element={<ProfilePage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/birthdays" element={<Navigate to="/" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -188,9 +162,6 @@ export const AppRouter = () => {
 
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
-
-      {/* FULL-WIDTH FOOTER (Hidden on fixed layout app pages, policy pages, and e-commerce per user specification) */}
-      {!isPolicyPage && !isEcommercePage && !isFixedLayout && <Footer />}
     </div>
   );
 };

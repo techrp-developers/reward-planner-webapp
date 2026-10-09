@@ -21,7 +21,6 @@ import { AddressCard } from '../../components/address/AddressCard';
 import { AddressForm } from '../../components/address/AddressForm';
 import { toBackendAddressPayload } from '../../constants/addressConstants';
 import { OrdersModal } from './OrdersModal';
-import ProfileNavigation from './ProfileNavigation';
 
 // Material UI Icons
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
@@ -528,7 +527,6 @@ export const ProfilePage = () => {
         </div>
       </div>
 
-      <ProfileNavigation />
 
       {/* ── USER INFO SECTION (CONTACT & WORK DIRECTORY) ───────────────────────── */}
       <div className="flex flex-col gap-2">

@@ -39,9 +39,9 @@ export default function AccountMenu() {
         aria-haspopup="menu"
         aria-expanded={Boolean(anchor)}
         aria-controls={anchor ? 'account-menu' : undefined}
-        className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-[#F6F2F8] border border-[#E4DCE9] flex items-center justify-center cursor-pointer shrink-0 text-[#1C0E28] focus-visible:outline-2 focus-visible:outline-[#78538F] focus-visible:outline-offset-2"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white hover:bg-[#F6F2F8] border border-[#E4DCE9] flex items-center justify-center cursor-pointer shrink-0 text-[#1C0E28] shadow-2xs hover:shadow-xs transition-shadow focus-visible:outline-2 focus-visible:outline-[#78538F] focus-visible:outline-offset-2"
       >
-        <MenuRoundedIcon sx={{ fontSize: 22 }} />
+        <MenuRoundedIcon sx={{ fontSize: 20 }} />
       </button>
       <Menu
         id="account-menu"

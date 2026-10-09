@@ -79,10 +79,15 @@ header, footer, article, form, figcaption, figure, blockquote, small {
   font-family: 'Material Icons' !important;
 }
 
-/* Visible scrollbars in page content, panels and horizontal lists. */
+/* Visible scrollbars in page content and vertical panels */
 ::-webkit-scrollbar {
   width: 10px;
-  height: 8px;
+  height: 0px;
+}
+::-webkit-scrollbar:horizontal {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 ::-webkit-scrollbar-track {
   background: #F3F0F5;
@@ -97,11 +102,13 @@ header, footer, article, form, figcaption, figure, blockquote, small {
   background: #553767;
 }
 /* Utility class for hidden scrollbar */
-.no-scrollbar {
+.no-scrollbar,
+.scrollbar-none {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;

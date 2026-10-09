@@ -4,11 +4,19 @@
 .dashboard {
   height: 100%;
   overflow-y: auto;
-  scrollbar-gutter: stable;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   background: #F8FAFC;
   color: #0F172A;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.dashboard::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .dashboard-content {
@@ -16,6 +24,8 @@
   max-width: 1680px;
   margin: 0 auto;
   padding: 16px 16px 16px;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
 .dashboard a {
@@ -491,7 +501,7 @@
 }
 
 /* Dashboard palette and spacing: 8px details, 16px cards and gutters. */
-.dashboard { --dashboard-accent: #1C0E28; --dashboard-ink: #24162F; --dashboard-muted: #776B80; --dashboard-border: #E4DCE9; background: #F3F0F5; color: var(--dashboard-ink); }
+.dashboard { --dashboard-accent: #1C0E28; --dashboard-ink: #24162F; --dashboard-muted: #776B80; --dashboard-border: #E4DCE9; background: #F3F0F5; color: var(--dashboard-ink); overflow-x: hidden !important; }
 .dashboard-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 .dashboard-content > * { margin-top: 0; margin-bottom: 0; }
 .dashboard :is(h1,h2,h3,h4) { font-weight: 600; }
@@ -534,8 +544,103 @@
 .todo-add-form label span, .todo-add-form p { color: #c2b1ce; font-size: 11px; }
 .todo-add-form input { width: 100%; min-width: 0; background: #fff; color: #1c0e28; border: 1px solid #e4dce9; border-radius: 8px; padding: 8px; font-size: 12px; }
 .todo-add-form button { padding: 8px 16px; border-radius: 8px; color: #1c0e28; background: #eee5f4; font-size: 12px; font-weight: 600; cursor: pointer; }
-.todo-add-form button:disabled { opacity: .5; cursor: default; }
 .todo-add-form input:focus-visible, .todo-add-form button:focus-visible, .todo-add-toggle:focus-visible { outline: 2px solid #d4b6e7; outline-offset: 3px; }
+
+.todo-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c2b1ce;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.todo-action-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+.todo-action-btn.delete:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+}
+.todo-edit-box {
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.todo-edit-box input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.todo-edit-box input[type="text"]:focus {
+  border-color: #E2B842;
+  box-shadow: 0 0 0 1px #E2B842;
+}
+.todo-edit-box input[type="datetime-local"] {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 11px;
+  outline: none;
+}
+.todo-edit-box input[type="datetime-local"]:focus {
+  border-color: #E2B842;
+}
+.todo-edit-btn-save {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #E2B842;
+  color: #1C0E28;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.todo-edit-btn-save:hover {
+  background: #ecc757;
+  transform: translateY(-1px);
+}
+.todo-edit-btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.todo-edit-btn-cancel {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #d4b6e7;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.todo-edit-btn-cancel:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+}
 
 /* Align the page content with the header's responsive outer gutters. */
 @media (min-width: 640px) { .dashboard-content { padding-left: 32px; padding-right: 32px; } }

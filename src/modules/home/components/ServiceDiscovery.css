@@ -104,14 +104,42 @@
   border: 1px solid #b2b2f8;
 }
 
-/* Service Discovery Cards (Lower section) */
-.tone-rose { background: linear-gradient(145deg,#fff9fb,#fbeaf0); --service-art: #d57593; }
-.tone-blue { background: linear-gradient(145deg,#f8fcff,#e7f0fc); --service-art: #6593cf; }
-.tone-orange { background: linear-gradient(145deg,#fffbf6,#fff0df); --service-art: #d4a068; }
-.tone-purple { background: linear-gradient(145deg,#fcf9ff,#eee5f8); --service-art: #a080c5; }
-.tone-teal { background: linear-gradient(145deg,#f7fffe,#e2f4f1); --service-art: #63a9a0; }
-.tone-gold { background: linear-gradient(145deg,#fffdf7,#fcf2d9); --service-art: #c5a45a; }
-.tone-indigo { background: linear-gradient(145deg,#fbfaff,#eeebfb); --service-art: #8f87c5; }
+/* Service Discovery Cards (Lower section) - refined, slightly richer pastel tones */
+.service-discovery-card.tone-rose {
+  background: linear-gradient(150deg, #ffeef3 0%, #ffdce6 100%);
+  border-color: #fca8be;
+  --service-art: #cc5b7d;
+}
+.service-discovery-card.tone-blue {
+  background: linear-gradient(150deg, #ecf4fd 0%, #d6e8fa 100%);
+  border-color: #aed1f7;
+  --service-art: #5282c0;
+}
+.service-discovery-card.tone-orange {
+  background: linear-gradient(150deg, #fff1e2 0%, #ffdfbf 100%);
+  border-color: #fbc695;
+  --service-art: #cf8d4c;
+}
+.service-discovery-card.tone-purple {
+  background: linear-gradient(150deg, #f5ecfc 0%, #e6d1f7 100%);
+  border-color: #d6b8f4;
+  --service-art: #8f6ab8;
+}
+.service-discovery-card.tone-teal {
+  background: linear-gradient(150deg, #ebfaf6 0%, #cefaee 100%);
+  border-color: #93e2d3;
+  --service-art: #489a8f;
+}
+.service-discovery-card.tone-gold {
+  background: linear-gradient(150deg, #fef9e6 0%, #fdeec0 100%);
+  border-color: #f7dd82;
+  --service-art: #b8933e;
+}
+.service-discovery-card.tone-indigo {
+  background: linear-gradient(150deg, #f0effd 0%, #dedbfb 100%);
+  border-color: #bfb9f8;
+  --service-art: #7c72ba;
+}
 
 /* White card container for entire More for your everyday section */
 .service-discovery {
@@ -183,8 +211,8 @@
   align-items: flex-start;
   border-radius: 18px;
   border: 1px solid rgba(226, 232, 240, 0.9);
-  padding: 20px 18px 20px;
-  min-height: 295px;
+  padding: 22px 18px 22px;
+  min-height: 315px;
   box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.03);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -201,39 +229,39 @@
 }
 
 .service-card-heading .service-glyph {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
 }
 
 .service-card-heading h3 {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 750;
   line-height: 1.35;
   color: #0f172a;
 }
 
 .service-discovery-card > p {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.55;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
   margin-top: 10px;
 }
 
 .service-discovery-card ul {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 9.5px;
   margin: 16px 0;
 }
 
 .service-discovery-card li {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 550;
-  color: #334155;
+  gap: 8.5px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .service-discovery-card li svg {
@@ -256,13 +284,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 9px 18px;
+  padding: 9.5px 20px;
   margin-top: auto;
   background: #ffffff;
   color: #0f172a;
   border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: 24px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 700;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
@@ -280,7 +308,8 @@
 }
 
 @media (max-width: 639px) {
-  .service-shortcuts { display: flex; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin !important; }
+  .service-shortcuts { display: flex; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none !important; -ms-overflow-style: none !important; }
+  .service-shortcuts::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
   .service-shortcut { flex: 0 0 104px; }
   .service-discovery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .service-discovery-card { padding: 16px 8px; }

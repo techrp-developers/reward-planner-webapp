@@ -3,15 +3,15 @@ import { Heart, ShieldCheck, ShoppingBag, Gift, Plane, GraduationCap, Wallet, Br
 import './ServiceDiscovery.css';
 
 const categories = [
-  { id: 'health', title: 'Health & Wellness', icon: Heart, to: '/wellness', tone: 'rose', description: 'Make time for your wellbeing.', features: ['Wellness programs', 'Fitness challenges', 'Nutrition sessions'] },
+  { id: 'health', title: 'Health & Wellness', icon: Heart, tone: 'rose' },
   { id: 'insurance', title: 'Insurance', icon: ShieldCheck, to: '/insurance', tone: 'blue', description: 'Protection for what matters.', features: ['Health insurance', 'Explore cover', 'Insurance services'] },
   { id: 'services', title: 'Services', icon: ShoppingBag, to: '/services', tone: 'orange', description: 'Everyday essentials, simplified.', features: ['Document services', 'Tax assistance', 'Vehicle services'] },
-  { id: 'rewards', title: 'Rewards Store', icon: Gift, to: '/rewards/explore', tone: 'purple', description: 'Find your next little reward.', features: ['Gift cards', 'Products', 'Experiences'] },
+  { id: 'rewards', title: 'Rewards Store', icon: Gift, to: '/store', tone: 'purple', description: 'Find your next favorite product.', features: ['Curated catalog', 'Corporate perks', 'Trending deals'] },
   { id: 'travel', title: 'Travel & Lifestyle', icon: Plane, tone: 'teal' },
-  { id: 'learning', title: 'Learning & Growth', icon: GraduationCap, to: '/benefits', tone: 'gold', description: 'Explore benefits that help you grow.', features: ['Learning vouchers', 'Employee benefits', 'Development benefits'] },
+  { id: 'learning', title: 'Learning & Growth', icon: GraduationCap, tone: 'gold' },
   { id: 'finance', title: 'Finance & Savings', icon: Wallet, to: '/services/mutual-funds', tone: 'blue', description: 'Plan for your next milestone.', features: ['Mutual funds', 'SIP calculator', 'Financial learning'] },
   { id: 'work', title: 'Work Essentials', icon: BriefcaseBusiness, to: '/store', tone: 'rose' },
-  { id: 'events', title: 'Events & Activities', icon: CalendarDays, to: '/events', tone: 'purple' },
+  { id: 'events', title: 'Events & Activities', icon: CalendarDays, tone: 'purple' },
   { id: 'games', title: 'Games & Challenges', icon: Gamepad2, tone: 'indigo' },
 ];
 
