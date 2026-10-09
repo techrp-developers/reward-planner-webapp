@@ -3,7 +3,7 @@ import { ArrowLeft, BadgeCheck, CircleAlert, LoaderCircle, ShieldCheck } from 'l
 import { getInsuranceError } from '../utils/insuranceValidation';
 import { selectPlan } from '../api/InsuranceCrmApi';
 import type { InsurancePageType, QuoteResponse } from '../types/insurance.types';
-import { buildSelectedPlanPayload, normalizeQuoteForDisplay } from '../utils/insuranceQuoteUtils';
+import { buildSelectedPlanPayload, getCompanyName, normalizeQuoteForDisplay } from '../utils/insuranceQuoteUtils';
 
 const PRODUCT_TITLES: Record<InsurancePageType, string> = {
   health: 'Health Insurance',
@@ -31,6 +31,9 @@ export default function InsuranceQuoteResults({ quotes, insuranceType, enquiryId
   const [selectionMessage, setSelectionMessage] = useState('');
   const [selectionError, setSelectionError] = useState('');
   const successfulQuotes = quotes.filter((quote) => quote.success);
+  const unavailableQuotes = quotes.filter((quote) => !quote.success && quote.unavailable);
+  const failedQuotes = quotes.filter((quote) => !quote.success && !quote.unavailable);
+  const excludedQuotes = quotes.filter((quote) => !quote.success);
 
   const choosePlan = async (quote: ReturnType<typeof normalizeQuoteForDisplay>) => {
     if (!enquiryId || selectionLock.current || !quote.premium) return;
@@ -67,7 +70,12 @@ export default function InsuranceQuoteResults({ quotes, insuranceType, enquiryId
       {selectionError && <div role="alert" className="mb-4 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800"><CircleAlert size={18} />{selectionError}</div>}
       {notice && <div role="status" className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{notice}</div>}
 
-      {quotes.some((quote) => !quote.success) && successfulQuotes.length > 0 && <p role="status" className="mb-4 text-sm text-amber-800">Some insurers could not provide quotes. The available plans are shown below.</p>}
+      {unavailableQuotes.length > 0 && <p role="status" className="mb-3 text-sm text-slate-600">{unavailableQuotes.length} {unavailableQuotes.length === 1 ? 'plan has' : 'plans have'} no matching premium for your selected details. Available quotes are shown below.</p>}
+      {failedQuotes.length > 0 && successfulQuotes.length > 0 && <p role="status" className="mb-3 text-sm text-amber-800">{failedQuotes.length} {failedQuotes.length === 1 ? 'plan could' : 'plans could'} not be checked because the provider returned an error.</p>}
+      {excludedQuotes.length > 0 && <details className="mb-5 rounded-lg border border-slate-200 bg-white p-3 text-sm">
+        <summary className="cursor-pointer font-semibold text-slate-700">View unavailable plan details ({excludedQuotes.length})</summary>
+        <ul className="mt-3 space-y-3">{excludedQuotes.map((quote, index) => <li key={quote.id || `${quote.url}-${index}`} className="break-words text-xs leading-5 text-slate-600"><span className="font-semibold text-slate-800">{getCompanyName(quote.data, quote.url)}</span>: {quote.error || 'No quote was returned for these details.'}</li>)}</ul>
+      </details>}
       {successfulQuotes.length ? (
         <section aria-label="Available insurance plans" className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {successfulQuotes.map((quote, index) => {

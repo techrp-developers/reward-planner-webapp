@@ -1,5 +1,5 @@
-// src/components/ui/Modal.jsx
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import CloseIcon from '@mui/icons-material/Close';
 
 export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg', showClose = true }) => {
@@ -16,8 +16,8 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg',
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-fade-in"
@@ -26,11 +26,11 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg',
 
       {/* Modal Container */}
       <div
-        className={`relative w-full ${maxWidth} bg-white rounded-2xl shadow-2xl z-10 overflow-hidden transform transition-all animate-scale-up`}
+        className={`relative w-full ${maxWidth} bg-white rounded-2xl shadow-2xl z-10 overflow-hidden transform transition-all animate-scale-up max-h-[85vh] flex flex-col my-auto`}
       >
         {/* Header */}
         {(title || showClose) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             {title && <h3 className="text-lg font-bold text-gray-900">{title}</h3>}
             {showClose && (
               <button
@@ -44,9 +44,10 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg',
         )}
 
         {/* Content */}
-        <div className="px-6 py-5 max-h-[80vh] overflow-y-auto">{children}</div>
+        <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

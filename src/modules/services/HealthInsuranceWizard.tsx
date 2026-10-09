@@ -1,6 +1,7 @@
 // src/modules/services/HealthInsuranceWizard.jsx
 // 3-Step Interactive Health Insurance Quote Flow matching the uploaded screenshots
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { submitServiceEnquiry } from '../../api/servicesApi';
@@ -745,9 +746,9 @@ export const HealthInsuranceWizard: React.FC<HealthInsuranceWizardProps> = ({ on
       )}
 
       {/* SUCCESS CONFIRMATION MODAL */}
-      {isSuccessModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl border border-gray-100">
+      {isSuccessModalOpen && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl border border-gray-100 max-h-[85vh] my-auto overflow-y-auto">
             <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
               <CheckCircleIcon sx={{ fontSize: 40 }} />
             </div>
@@ -782,7 +783,8 @@ export const HealthInsuranceWizard: React.FC<HealthInsuranceWizardProps> = ({ on
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </>

@@ -42,7 +42,7 @@ The Vite development proxy /api/policyplanner forwards to https://policyplanner.
 
 Production needs either PolicyPlanner origin allowlisting or a RewardPlanners backend proxy. Set VITE_POLICYPLANNER_BASE_URL to that proxy's base path/URL; it must preserve PolicyPlanner request paths and handle browser authentication/CORS as appropriate. The Vite proxy does not exist in a static production build. Production currently retains the public PolicyPlanner base when the variable is unset, with CRM quote fallback if direct requests fail. No production backend proxy endpoint was found in this frontend repository.
 
-Anonymous live premium checks (sample age and cover, no customer data/enquiries) returned usable Super Top-Up and PA response structures. The first Health catalog entry https://policyplanner.com/health-insurance/star/1003/218/premium returned 404. The external catalog or premium service needs correction for that entry; other insurer failures remain isolated.
+Anonymous live premium checks (sample age and cover, no customer data/enquiries) returned usable Super Top-Up and PA response structures. The Health endpoint https://policyplanner.com/health-insurance/star/1003/218/premium returned HTTP 404 with a JSON No premium found message for the sampled details. Follow-up checks confirmed POST is correct; this is a missing rate, not evidence of a stale route. HDFC and National Insurance returned valid premiums for a sample family. Rates depend on the submitted inputs; no ages, zones or cover amounts are changed to force a quote.
 
 ## Verification
 
@@ -66,3 +66,9 @@ Modified in src/modules/services/insurance: InsuranceQuotePageFlow.tsx, componen
 /insurance retains its existing redirect to /services/category/2. That exact category route now renders InsuranceProductsPage with Health Insurance, Super Top-Up and Personal Accident links to the existing quote flows. Other category routes retain ServiceCategoryPage. Services category clicks recognize Insurance before generic/content/direct category routing, and supported insurance service cards go to their product quote route. Legacy Health service detail buttons open the new quote page instead of the older HealthInsuranceWizard modal; other named supported insurance detail services use the same shared resolver. Unrelated services retain their detail and checkout behavior.
 
 Created InsuranceProductsPage.tsx and insuranceProducts.ts. Updated AppRouter.tsx, ServicesPage.tsx, ServiceDetailPage.tsx, InsuranceQuotePageFlow.tsx and the existing browser check script. Product names and quote paths are shared by the hub, quote tabs and service links. The browser regression check also exercises the redirect, all three product links, Services category entry, and legacy Health detail CTA.
+
+## Premium availability and terms diagnostics
+
+Provider error fields are now retained. No premium found responses are classified separately from technical failures, with counts and expandable per-plan reasons in quote results. Browser HTTP errors remain visible because the providers return real non-success statuses; the frontend does not rewrite those statuses or invent rates.
+
+The CRM terms/status and terms/accept routes returned CRM route not found on inspection. The existing terms-status compatibility fallback remains. Concurrent checks share one request; after a 404, the missing status route is not queried again within the loaded application. An explicit terms_accepted boolean from the user profile takes precedence, including false. The backend must supply working status/accept routes if central terms recording is required.

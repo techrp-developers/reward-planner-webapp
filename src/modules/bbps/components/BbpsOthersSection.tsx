@@ -1,6 +1,7 @@
-// src/modules/bbps/components/BbpsOthersSection.jsx
 import React from 'react';
-import { ReceiptText, Headphones, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import iconRechargeHistory from '../../../assets/payments/icon_recharge_history.png';
+import iconHelpSupport from '../../../assets/payments/icon_help_support.png';
 
 export const BbpsOthersSection = ({ onOpenHistory, onOpenSupport }) => {
   return (
@@ -19,10 +20,14 @@ export const BbpsOthersSection = ({ onOpenHistory, onOpenSupport }) => {
         <button
           type="button"
           onClick={onOpenHistory}
-          className="w-full p-5 sm:p-6 lg:p-7 flex items-center gap-4 sm:gap-5 hover:bg-purple-50/40 transition-colors cursor-pointer text-left group"
+          className="w-full p-4 sm:p-5 lg:p-6 flex items-center gap-4 sm:gap-5 hover:bg-purple-50/40 transition-colors cursor-pointer text-left group"
         >
-          <div className="w-12 h-12 lg:w-13 lg:h-13 rounded-2xl bg-[#F4F0F8] border border-[#E5DDED] flex items-center justify-center text-[#704096] shrink-0 group-hover:bg-[#E8D8F4] transition-colors">
-            <ReceiptText size={22} className="drop-shadow-xs" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-108">
+            <img
+              src={iconRechargeHistory}
+              alt="Recharges & bill payment history"
+              className="w-full h-full object-contain select-none pointer-events-none drop-shadow-sm"
+            />
           </div>
 
           <span className="flex-1 text-base sm:text-lg font-bold text-[#17131D] group-hover:text-[#704096] transition-colors">
@@ -36,10 +41,14 @@ export const BbpsOthersSection = ({ onOpenHistory, onOpenSupport }) => {
         <button
           type="button"
           onClick={onOpenSupport}
-          className="w-full p-5 sm:p-6 lg:p-7 flex items-center gap-4 sm:gap-5 hover:bg-purple-50/40 transition-colors cursor-pointer text-left group"
+          className="w-full p-4 sm:p-5 lg:p-6 flex items-center gap-4 sm:gap-5 hover:bg-purple-50/40 transition-colors cursor-pointer text-left group"
         >
-          <div className="w-12 h-12 lg:w-13 lg:h-13 rounded-2xl bg-[#F4F0F8] border border-[#E5DDED] flex items-center justify-center text-[#704096] shrink-0 group-hover:bg-[#E8D8F4] transition-colors">
-            <Headphones size={22} className="drop-shadow-xs" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-108">
+            <img
+              src={iconHelpSupport}
+              alt="Help and support"
+              className="w-full h-full object-contain select-none pointer-events-none drop-shadow-sm"
+            />
           </div>
 
           <span className="flex-1 text-base sm:text-lg font-bold text-[#17131D] group-hover:text-[#704096] transition-colors">

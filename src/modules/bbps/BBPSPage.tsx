@@ -55,6 +55,8 @@ export const BBPSPage = () => {
   const [showPlansModal, setShowPlansModal] = useState(false);
   const [plansData, setPlansData] = useState(null);
   const [loadingPlans, setLoadingPlans] = useState(false);
+  const [plansMobile, setPlansMobile] = useState('');
+  const [plansError, setPlansError] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   // Bill Fetch & Review
@@ -69,6 +71,7 @@ export const BBPSPage = () => {
   const [toastMessage, setToastMessage] = useState('');
 
   const activePollingRef = useRef(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -89,6 +92,12 @@ export const BBPSPage = () => {
       .then((locs) => {
         if (Array.isArray(locs) && locs.length > 0) {
           setLocations(locs);
+          const maharashtra = locs.find((loc) =>
+            /^maharashtra\b/i.test(String(loc.operator_location_name || '').trim())
+          );
+          if (maharashtra?.operator_location_id != null) {
+            setSelectedCircle((current) => current || String(maharashtra.operator_location_id));
+          }
         }
       })
       .catch((err) => console.error('Error fetching locations:', err));
@@ -96,16 +105,18 @@ export const BBPSPage = () => {
 
   // 2. Fetch Operators when category changes
   useEffect(() => {
+    let active = true;
     setLoadingOperators(true);
     fetchBbpsOperators(selectedCategory)
       .then((ops) => {
-        setOperators(Array.isArray(ops) ? ops : []);
+        if (active) setOperators(Array.isArray(ops) ? ops : []);
       })
       .catch((err) => {
         console.error('Error loading operators:', err);
-        setOperators([]);
+        if (active) setOperators([]);
       })
-      .finally(() => setLoadingOperators(false));
+      .finally(() => { if (active) setLoadingOperators(false); });
+    return () => { active = false; };
   }, [selectedCategory]);
 
   // 3. Category Selection -> opens Biller Selection view (matching mobile flow)
@@ -117,6 +128,7 @@ export const BBPSPage = () => {
   // 4. Handle Operator Click
   const handleSelectOperator = async (op) => {
     setSelectedOperator(op);
+    setOperatorDetails(null);
     setSelectedPlan(null);
     setPlansData(null);
     setFetchedBillData(null);
@@ -146,20 +158,24 @@ export const BBPSPage = () => {
   };
 
   // 5. Open Recharge Plans Modal
-  const handleOpenPlans = async () => {
+  const handleOpenPlans = async ({ mobile, circleId }) => {
+    setPlansMobile(mobile);
+    setPlansData(null);
+    setPlansError('');
     setShowPlansModal(true);
     setLoadingPlans(true);
 
     try {
       const res = await fetchBbpsRechargePlans({
-        mobile: user?.phone || '9999999999',
+        mobile,
         operatorId: selectedOperator?.operator_id,
-        circleId: selectedCircle || '',
+        circleId,
       });
+      if (!res.success) throw new Error(res.message || 'Could not load recharge plans. Please enter amount manually.');
       setPlansData(res.data);
     } catch (error) {
       console.error('Failed to load plans:', error);
-      showToast('Could not load recharge plans. Please enter amount manually.');
+      setPlansError(error?.response?.data?.message || error?.message || 'Could not load recharge plans. Please enter amount manually.');
     } finally {
       setLoadingPlans(false);
     }
@@ -396,6 +412,12 @@ export const BBPSPage = () => {
     if (tab === 'pay') {
       setViewMode('home');
     }
+    requestAnimationFrame(() => {
+      contentRef.current?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+        block: 'start',
+      });
+    });
   };
 
   return (
@@ -423,6 +445,7 @@ export const BBPSPage = () => {
         />
 
         {/* 2. Main Body */}
+        <div ref={contentRef} className="scroll-mt-28">
         {activeTab === 'pay' ? (
           viewMode === 'home' ? (
             /* EXACT 1:1 MOBILE APP HOME SCREEN VIEW */
@@ -445,7 +468,7 @@ export const BBPSPage = () => {
 
               {/* Section 4: | Others (History & Support) */}
               <BbpsOthersSection
-                onOpenHistory={() => setActiveTab('history')}
+                onOpenHistory={() => handleTabChange('history')}
                 onOpenSupport={() => navigate('/support')}
               />
             </div>
@@ -488,6 +511,7 @@ export const BBPSPage = () => {
             />
           </div>
         )}
+        </div>
       </div>
 
       {/* 3. Dynamic Biller Input Form Modal */}
@@ -515,9 +539,10 @@ export const BBPSPage = () => {
         <BbpsRechargePlansModal
           plansData={plansData}
           loadingPlans={loadingPlans}
+          plansError={plansError}
           onSelectPlan={handleSelectPlan}
           onClose={() => setShowPlansModal(false)}
-          mobile={user?.phone || ''}
+          mobile={plansMobile}
           operatorName={selectedOperator?.name || ''}
         />
       )}

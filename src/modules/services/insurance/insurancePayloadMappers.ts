@@ -131,6 +131,7 @@ export function mapPaDetails(
 // ─── Quote Normalizer ──────────────────────────────────────────────────────
 
 import type { QuoteResponse } from './types/insurance.types';
+import { isUnavailableQuoteMessage } from './utils/insuranceQuoteUtils';
 
 const record = (value: unknown): Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -156,12 +157,15 @@ export function normalizeQuotesForUi(quotesResponse: unknown): QuoteResponse[] {
     const inner = record(item.data);
     const payload = record(inner.data);
     const quoteData = Object.keys(payload).length ? payload : Object.keys(inner).length ? inner : item;
+    const error = item.error || inner.error ? String(item.error || inner.error) : undefined;
     return {
       id: String(item.id ?? item.quote_id ?? `${item.url || item.api_type || 'crm'}_${index}`),
       url: String(item.url || item.api_type || `crm_quote_${index}`),
       success: item.success !== false && inner.success !== false && !item.error && !inner.error,
       data: quoteData,
-      error: item.error || inner.error ? String(item.error || inner.error) : undefined,
+      error,
+      unavailable: item.unavailable === true || Boolean(error && isUnavailableQuoteMessage(error)),
+      status: typeof item.status === 'number' ? item.status : undefined,
     };
   });
 }

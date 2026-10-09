@@ -1,35 +1,63 @@
-// src/modules/bbps/components/BbpsQuickPay.jsx
+// src/modules/bbps/components/BbpsQuickPay.tsx
 import React from 'react';
-import { CreditCard, Smartphone, PhoneCall } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import iconCreditCard from '../../../assets/payments/icon_credit_card.png';
+import iconMobilePostpaid from '../../../assets/payments/icon_mobile_postpaid.png';
+import iconMobilePrepaid from '../../../assets/payments/icon_mobile_prepaid.png';
 
-const QUICK_PAY_ITEMS = [
+interface QuickPayItem {
+  id: number;
+  title: string;
+  image: string;
+  cardBg: string;
+  borderColor: string;
+  accentColor: string;
+  arrowColor: string;
+  arrowBg: string;
+}
+
+const QUICK_PAY_ITEMS: QuickPayItem[] = [
   {
     id: 7,
     title: 'Credit Card',
-    icon: CreditCard,
-    cardBg: 'from-[#FFFFFF] to-[#F5F0FC]',
-    iconGradient: 'from-[#8D5ED1] to-[#704096]',
-    accentColor: '#704096',
-  },
-  {
-    id: 5,
-    title: 'Mobile Prepaid',
-    icon: Smartphone,
-    cardBg: 'from-[#FFFFFF] to-[#F7F3FC]',
-    iconGradient: 'from-[#A884E1] to-[#7950B6]',
+    image: iconCreditCard,
+    cardBg: 'from-[#FFFFFF] via-[#FAF7FE] to-[#F3EBFC]',
+    borderColor: 'border-[#E9DEF7]',
     accentColor: '#8D5ED1',
+    arrowColor: 'text-[#8D5ED1]',
+    arrowBg: 'bg-[#F2E7FC]',
   },
   {
     id: 10,
     title: 'Mobile Postpaid',
-    icon: PhoneCall,
-    cardBg: 'from-[#FFFFFF] to-[#F5F0FC]',
-    iconGradient: 'from-[#DB83B2] to-[#AA477D]',
-    accentColor: '#C05A91',
+    image: iconMobilePostpaid,
+    cardBg: 'from-[#FFFFFF] via-[#FEF8FA] to-[#FBECF3]',
+    borderColor: 'border-[#F8DFEB]',
+    accentColor: '#E65D88',
+    arrowColor: 'text-[#E65D88]',
+    arrowBg: 'bg-[#FCE7F0]',
+  },
+  {
+    id: 5,
+    title: 'Mobile Prepaid',
+    image: iconMobilePrepaid,
+    cardBg: 'from-[#FFFFFF] via-[#F8F7FE] to-[#EFEAFA]',
+    borderColor: 'border-[#E5DDF7]',
+    accentColor: '#7C4DBF',
+    arrowColor: 'text-[#7C4DBF]',
+    arrowBg: 'bg-[#EFE8FC]',
   },
 ];
 
-export const BbpsQuickPay = ({ selectedCategory, onSelectCategory }) => {
+interface BbpsQuickPayProps {
+  selectedCategory: number | string;
+  onSelectCategory: (id: number) => void;
+}
+
+export const BbpsQuickPay: React.FC<BbpsQuickPayProps> = ({
+  selectedCategory,
+  onSelectCategory,
+}) => {
   return (
     <div className="w-full space-y-3.5">
       {/* Section Header with Purple Accent Bar */}
@@ -40,10 +68,9 @@ export const BbpsQuickPay = ({ selectedCategory, onSelectCategory }) => {
         </h2>
       </div>
 
-      {/* 3 Quick Pay Cards - Full width responsive grid */}
+      {/* 3 Quick Pay Cards with exact 3D illustrated assets from mobile mockup */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         {QUICK_PAY_ITEMS.map((item) => {
-          const Icon = item.icon;
           const isSelected = Number(selectedCategory) === Number(item.id);
 
           return (
@@ -51,29 +78,41 @@ export const BbpsQuickPay = ({ selectedCategory, onSelectCategory }) => {
               key={item.id}
               type="button"
               onClick={() => onSelectCategory(item.id)}
-              className={`relative overflow-hidden rounded-3xl border transition-all duration-200 p-5 sm:p-6 lg:p-7 text-left cursor-pointer flex flex-col justify-between min-h-[140px] ${
+              className={`relative overflow-hidden rounded-3xl border transition-all duration-300 p-4 sm:p-5 text-left cursor-pointer flex flex-col justify-between items-center min-h-[215px] sm:min-h-[230px] group bg-gradient-to-b ${item.cardBg} ${item.borderColor} ${
                 isSelected
-                  ? 'border-[#704096] shadow-md ring-2 ring-[#704096]/20 bg-gradient-to-b ' + item.cardBg
-                  : 'border-[#E7E1F0] hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-b ' + item.cardBg
+                  ? 'border-[#704096] shadow-lg ring-2 ring-[#704096]/25 scale-[1.01]'
+                  : 'hover:shadow-lg hover:scale-[1.015] hover:border-purple-300'
               }`}
             >
-              <div>
-                {/* Purple Squircle Icon */}
-                <div
-                  className={`w-12 h-12 lg:w-13 lg:h-13 rounded-2xl bg-gradient-to-br ${item.iconGradient} flex items-center justify-center text-white shadow-sm mb-4`}
-                >
-                  <Icon size={24} className="drop-shadow-xs" />
-                </div>
-
-                {/* Card Title */}
-                <h3 className="text-base sm:text-lg font-bold text-[#17131D] leading-snug">
-                  {item.title}
-                </h3>
+              {/* 3D Illustration in center - large and prominent */}
+              <div className="w-36 h-36 sm:w-40 sm:h-40 lg:w-44 lg:h-44 max-h-[135px] sm:max-h-[145px] flex-1 flex items-center justify-center my-auto transition-transform duration-300 group-hover:scale-105">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-contain select-none pointer-events-none drop-shadow-md"
+                  style={{
+                    imageRendering: '-webkit-optimize-contrast',
+                  }}
+                />
               </div>
 
-              {/* Bottom Color Accent Line (Matching mobile app) */}
+              {/* Bottom Pill matching mobile app: [Title >] - fully visible and unclipped */}
+              <div className="w-full flex items-center justify-start pt-2 pb-0.5 z-10">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-gray-100 shadow-2xs group-hover:shadow-xs transition-shadow">
+                  <span className="text-xs sm:text-sm font-bold text-[#17131D]">
+                    {item.title}
+                  </span>
+                  <div
+                    className={`w-4 h-4 rounded-full flex items-center justify-center ${item.arrowBg} ${item.arrowColor}`}
+                  >
+                    <ChevronRight size={11} strokeWidth={3} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Color Accent Line matching mobile app */}
               <div
-                className="w-full h-[4px] rounded-t-sm mt-4"
+                className="absolute bottom-0 left-0 right-0 h-[4px] rounded-t-sm"
                 style={{ backgroundColor: item.accentColor }}
               />
             </button>

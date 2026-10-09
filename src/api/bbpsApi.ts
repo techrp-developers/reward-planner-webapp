@@ -1,6 +1,7 @@
 // src/api/bbpsApi.js
 import api from './client';
 import { ENDPOINTS } from './endpoints';
+import { normalizeBbpsOperatorDetails } from './bbpsOperatorDetails';
 
 // 1. Fetch Categories
 export const fetchBbpsCategories = async () => {
@@ -53,14 +54,7 @@ export const searchBbpsOperators = async (query) => {
 export const fetchBbpsOperatorDetails = async (operatorId) => {
   try {
     const res = await api.get(ENDPOINTS.bbps.operatorDetails(operatorId));
-    const data = res.data?.data || res.data;
-    return {
-      operator_name: data?.operator_name || '',
-      operator_id: data?.operator_id || operatorId,
-      fetchBill: data?.fetchBill ?? 1,
-      BBPS: data?.BBPS ?? 1,
-      data: Array.isArray(data?.data) ? data.data : [],
-    };
+    return normalizeBbpsOperatorDetails(res.data, operatorId);
   } catch (error) {
     console.error(`Failed to fetch details for operator ${operatorId}:`, error);
     throw error;
@@ -77,14 +71,15 @@ export const fetchBbpsRechargePlans = async ({ mobile, operatorId, circleId }) =
         circle_id: circleId || '',
       },
     });
+    const plansData = res.data?.data ?? res.data;
     return {
       success: res.data?.success ?? true,
       message: res.data?.message || '',
       data: {
-        status: res.data?.data?.status ?? 0,
-        count: res.data?.data?.count ?? 0,
-        groups: Array.isArray(res.data?.data?.groups) ? res.data.data.groups : [],
-        plans: Array.isArray(res.data?.data?.plans) ? res.data.data.plans : [],
+        status: plansData?.status ?? 0,
+        count: plansData?.count ?? 0,
+        groups: Array.isArray(plansData?.groups) ? plansData.groups : [],
+        plans: Array.isArray(plansData) ? plansData : Array.isArray(plansData?.plans) ? plansData.plans : [],
       },
     };
   } catch (error) {

@@ -1,6 +1,7 @@
 // src/modules/bbps/components/BbpsBillerDirectory.jsx
 import React, { useState, useMemo } from 'react';
 import { Search, MapPin, ChevronRight, Building2, ArrowLeft } from 'lucide-react';
+import BbpsOperatorLogo from './BbpsOperatorLogo';
 
 const CATEGORY_NAMES = {
   5: 'Mobile Prepaid',
@@ -8,25 +9,6 @@ const CATEGORY_NAMES = {
   8: 'Electricity',
   10: 'Mobile Postpaid',
   22: 'FASTag',
-};
-
-const getInitials = (name) => {
-  if (!name) return 'BP';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-};
-
-const getAvatarGradient = (id) => {
-  const gradients = [
-    'from-violet-500 to-purple-700',
-    'from-blue-500 to-indigo-700',
-    'from-amber-500 to-orange-600',
-    'from-emerald-500 to-teal-700',
-    'from-rose-500 to-pink-700',
-    'from-cyan-500 to-blue-700',
-  ];
-  return gradients[Number(id || 0) % gradients.length];
 };
 
 export const BbpsBillerDirectory = ({
@@ -220,8 +202,6 @@ export const BbpsBillerDirectory = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredOperators.map((op) => {
-            const initials = getInitials(op.name);
-            const gradient = getAvatarGradient(op.operator_id);
             const categoryName = CATEGORY_NAMES[op.operator_category] || 'Utility';
             const isRecharge = Number(op.operator_category) === 5;
 
@@ -233,11 +213,7 @@ export const BbpsBillerDirectory = ({
               >
                 <div className="flex items-start gap-3.5">
                   {/* Operator Avatar */}
-                  <div
-                    className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform`}
-                  >
-                    {initials}
-                  </div>
+                  <BbpsOperatorLogo operator={op} />
 
                   <div className="min-w-0 flex-1">
                     <h4 className="text-xs sm:text-sm font-bold text-[#17131D] leading-snug line-clamp-2 group-hover:text-[#704096] transition-colors">

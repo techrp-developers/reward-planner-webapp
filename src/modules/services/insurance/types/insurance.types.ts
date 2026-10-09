@@ -30,6 +30,8 @@ export type QuoteResponse = {
   success: boolean;
   data?: unknown;
   error?: string;
+  unavailable?: boolean;
+  status?: number;
 };
 
 export type NormalizedQuote = QuoteResponse & {

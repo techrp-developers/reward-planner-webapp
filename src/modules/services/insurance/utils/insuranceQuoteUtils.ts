@@ -7,6 +7,9 @@ const asRecord = (value: unknown): RecordValue =>
 
 const asText = (value: unknown): string => typeof value === 'string' ? value.trim() : '';
 
+export const isUnavailableQuoteMessage = (message: string): boolean =>
+  /no premium (found|available)|no matching premium|premium not found|not eligible/i.test(message);
+
 export const getCompanyName = (value: unknown, url: string): string => {
   const data = asRecord(value);
   const company = asRecord(data.company);

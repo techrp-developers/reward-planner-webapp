@@ -98,13 +98,24 @@ export const resetPassword = async ({ email, newPassword }) => {
   return res.data;
 };
 
-export const checkTermsStatus = async () => {
-  try {
-    const res = await api.get(ENDPOINTS.terms.status);
-    return res.data;
-  } catch {
-    return { terms_accepted: true };
+let termsStatusUnavailable = false;
+let pendingTermsStatus: Promise<unknown> | null = null;
+
+export const checkTermsStatus = async (profile?: { terms_accepted?: unknown }) => {
+  if (typeof profile?.terms_accepted === 'boolean') return { terms_accepted: profile.terms_accepted };
+  // Retain the existing compatibility fallback for backends without this route.
+  // Share concurrent checks (including StrictMode hydration) and stop rechecking a missing route.
+  if (termsStatusUnavailable) return { terms_accepted: true };
+  if (!pendingTermsStatus) {
+    pendingTermsStatus = api.get(ENDPOINTS.terms.status)
+      .then((res) => res.data)
+      .catch((error: unknown) => {
+        if (axios.isAxiosError(error) && error.response?.status === 404) termsStatusUnavailable = true;
+        return { terms_accepted: true };
+      })
+      .finally(() => { pendingTermsStatus = null; });
   }
+  return pendingTermsStatus as Promise<{ terms_accepted?: boolean }>;
 };
 
 export const acceptTerms = async () => {

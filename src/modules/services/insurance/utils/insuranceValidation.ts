@@ -84,6 +84,7 @@ export function getInsuranceError(error: unknown, fallback = 'Unable to save you
     if (error.response?.status === 401 || error.response?.status === 403) return 'Your session expired or access was denied. Please sign in again.';
     const data = error.response?.data;
     if (data && typeof data.message === 'string') return data.message;
+    if (data && typeof data.error === 'string') return data.error;
     if (!error.response) return 'The insurance service could not be reached. Check your connection and try again.';
   }
   return error instanceof Error ? error.message : fallback;

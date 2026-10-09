@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
 
         // Check terms
         try {
-          const termsRes = await checkTermsStatus();
+          const termsRes = await checkTermsStatus(userData);
           if (termsRes && termsRes.terms_accepted === false) {
             setTermsAccepted(false);
             setAuthModalView('terms');

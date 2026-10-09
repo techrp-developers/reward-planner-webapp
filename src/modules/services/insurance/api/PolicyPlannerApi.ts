@@ -1,6 +1,7 @@
 ﻿import axios, { type RawAxiosRequestHeaders } from 'axios';
 import type { FamilyPremiumPayload, QuoteResponse } from '../types/insurance.types';
 import { getInsuranceError } from '../utils/insuranceValidation';
+import { isUnavailableQuoteMessage } from '../utils/insuranceQuoteUtils';
 
 // Public insurer endpoints must not receive RewardPlanners bearer tokens.
 const api = axios.create({ timeout: 10000 });
@@ -71,12 +72,17 @@ export const getPAPremium = (url: string, payload: PAPremiumPayload, headers?: H
 
 async function collectPremiums(plans: Plan[], premium: (url: string) => Promise<unknown>): Promise<QuoteResponse[]> {
   const responses = await Promise.allSettled(plans.map((plan) => premium(plan.api_type)));
-  return responses.map((res, index) => ({
-    id: `${plans[index].api_type}_${index}`, url: plans[index].api_type,
-    success: res.status === 'fulfilled',
-    data: res.status === 'fulfilled' ? res.value : undefined,
-    error: res.status === 'rejected' ? getInsuranceError(res.reason, 'This insurer could not provide a quote.') : undefined,
-  }));
+  return responses.map((res, index) => {
+    const error = res.status === 'rejected' ? getInsuranceError(res.reason, 'This insurer could not provide a quote.') : undefined;
+    return {
+      id: `${plans[index].api_type}_${index}`, url: plans[index].api_type,
+      success: res.status === 'fulfilled',
+      data: res.status === 'fulfilled' ? res.value : undefined,
+      error,
+      unavailable: Boolean(error && isUnavailableQuoteMessage(error)),
+      status: res.status === 'rejected' && axios.isAxiosError(res.reason) ? res.reason.response?.status : undefined,
+    };
+  });
 }
 
 export const getAllPremiums = async (payload: FamilyPremiumPayload) => collectPremiums(await fetchPlans(), (url) => getPremium(url, payload));

@@ -1,10 +1,11 @@
-// src/modules/bbps/components/BbpsRechargePlansModal.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Search, Check, Zap, Sparkles, Filter } from 'lucide-react';
 
 export const BbpsRechargePlansModal = ({
   plansData,
   loadingPlans,
+  plansError = '',
   onSelectPlan,
   onClose,
   mobile,
@@ -12,6 +13,15 @@ export const BbpsRechargePlansModal = ({
 }) => {
   const [activeGroupIndex, setActiveGroupIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   // Groups of plans returned by backend Eko
   const groups = useMemo(() => {
@@ -46,9 +56,9 @@ export const BbpsRechargePlansModal = ({
     return plans;
   }, [groups, activeGroupIndex, searchQuery]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] my-auto">
         {/* Header */}
         <div className="px-6 py-5 bg-gradient-to-r from-[#1C0E28] to-[#3B1953] text-white flex items-center justify-between">
           <div>
@@ -127,6 +137,11 @@ export const BbpsRechargePlansModal = ({
               <div className="w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-xs text-gray-500 font-medium">Fetching available recharge packs...</p>
             </div>
+          ) : plansError ? (
+            <div role="alert" className="py-16 text-center space-y-2">
+              <p className="text-sm font-bold text-gray-800">Could not load recharge plans</p>
+              <p className="text-xs text-gray-500">{plansError}</p>
+            </div>
           ) : currentPlans.length === 0 ? (
             <div className="py-16 text-center space-y-2">
               <p className="text-sm font-bold text-gray-800">No plans found</p>
@@ -173,7 +188,8 @@ export const BbpsRechargePlansModal = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

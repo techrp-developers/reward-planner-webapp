@@ -41,6 +41,7 @@ try {
     sessionStorage.setItem('rp_user_profile', JSON.stringify({first_name:'Test',last_name:'Customer',phone:'9876543210',city:'Mumbai',pincode:'400001'}));
   });
   let enquiry = 100;
+  let termsStatusCalls = 0;
   let rejectStep = false;
   const savedMembers = new Map();
   let premiumMode = 'success';
@@ -72,6 +73,7 @@ try {
       if (url.pathname.endsWith('/category/all-categories')) return route.fulfill({json:{success:true,data:[{id:2,name:'Insurance',display_type:'list'}]}});
       if (url.pathname.endsWith('/service/all-services')) return route.fulfill({json:{success:true,data:[{id:12,name:'Health Insurance',description:'Health cover'},{id:501,name:'Personal Accident',description:'Accident cover'},{id:502,name:'Super Top-Up',description:'Additional cover'}]}});
       if (url.pathname.endsWith('/user-info')) return route.fulfill({json:{success:true,data:{first_name:'Test',last_name:'Customer',phone:'9876543210',city:'Mumbai',pincode:'400001'}}});
+      if (url.pathname.endsWith('/terms/status')) { termsStatusCalls += 1; return route.fulfill({status:404,json:{success:false,message:'CRM route not found'}}); }
       if (url.pathname.includes('/terms/')) return route.fulfill({json:{success:true,terms_accepted:true}});
       return route.fulfill({json:{success:true,data:[]}});
     }
@@ -86,7 +88,7 @@ try {
       }
       report.calls.push({path:url.pathname,body:req.postDataJSON(),authorization:req.headers().authorization});
       if (premiumMode === 'failure') return route.fulfill({headers,status:503,json:{message:'Insurer unavailable'}});
-      if (url.pathname.includes('/nic/')) return route.fulfill({headers,json:{success:false,error:'Not eligible'}});
+      if (url.pathname.includes('/nic/')) return route.fulfill({headers,status:404,json:{error:'No premium found for eldest lookup age 30, zone 1, adults 2, children 2'}});
       return route.fulfill({headers,json:{success:true,data:quote}});
     }
     return route.fulfill({status:204,body:''});
@@ -125,6 +127,13 @@ try {
   };
   await page.goto(`${origin}/insurance`, {waitUntil:'domcontentloaded',timeout:60000});
   await page.getByRole('heading',{name:'Insurance',exact:true}).waitFor();
+  const termsCallsBefore = termsStatusCalls;
+  const terms = await page.evaluate(async () => { const {checkTermsStatus} = await import('/src/api/authApi.ts'); return {explicitFalse:await checkTermsStatus({terms_accepted:false}), concurrent:await Promise.all([checkTermsStatus(),checkTermsStatus()])}; });
+  assert.equal(terms.explicitFalse.terms_accepted,false);
+  assert.ok(terms.concurrent.every(status=>status.terms_accepted===true));
+  assert.equal(termsStatusCalls,termsCallsBefore);
+  assert.equal(termsStatusCalls,1);
+  report.passed.push('Terms status: missing route compatibility fallback, one initial request, no repeat checks and explicit profile non-acceptance retained');
   assert.equal(new URL(page.url()).pathname,'/services/category/2');
   for (const [label,path] of [['Health Insurance','health-insurance'],['Super Top-Up','super-top-up'],['Personal Accident','personal-accident']]) {
     await page.getByRole('link',{name:`Compare ${label} quotes`,exact:true}).click();
@@ -204,6 +213,9 @@ try {
   await checkWidths();
   savedMembers.delete(101);
   await completeFamily();
+  await page.getByRole('status').filter({hasText:'no matching premium'}).waitFor();
+  await page.getByText('View unavailable plan details (1)',{exact:true}).click();
+  await page.getByText(/No premium found for eldest lookup age 30/).waitFor();
   await checkWidths();
   const healthPremium = report.calls.find(call=>call.path.endsWith('/hdfc/Health-premium'));
   assert.deepEqual(healthPremium.body,{coverAmount:1000000,zone:'1',age:30,sage:28,c1age:6,c2age:3,c3age:null,c4age:null});

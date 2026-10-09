@@ -1,6 +1,6 @@
 // src/components/services/ServiceBannerCarousel.tsx
 // Senior UI/UX Designer Service Promotional Banner Carousel
-// Preserves exact previous banner card UI, same background images, same content with razor-sharp HD clarity
+// High-Resolution Local HD Banner Assets matching exact service offerings
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,14 +10,14 @@ import { getImageUrl } from '../../api/client';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-// High-Resolution Local HD Banner Assets (Exact same graphics & content, 3x sharp resolution)
-import bannerCarHD from '../../assets/servicescards/car-hd.png';
-import bannerTaxHD from '../../assets/servicescards/tax-hd.png';
-import bannerBikeHD from '../../assets/servicescards/bike-hd.png';
-import bannerPanHD from '../../assets/servicescards/pan-hd.png';
-import bannerRentHD from '../../assets/servicescards/rent-hd.png';
-import bannerHealthHD from '../../assets/servicescards/health-hd.png';
-import bannerTwoWheelerHD from '../../assets/servicescards/two_wheeler-hd.png';
+// High-Resolution Local HD Banner Assets (Exact 7 banner graphics provided by user)
+import bannerItrNew from '../../assets/servicescards/banner-itr-new.png';
+import bannerPanUpdate from '../../assets/servicescards/banner-pan-update.png';
+import bannerCarNew from '../../assets/servicescards/banner-car-new.png';
+import bannerPanService from '../../assets/servicescards/banner-pan-service.png';
+import bannerBikeNew from '../../assets/servicescards/banner-bike-new.png';
+import bannerHealthNew from '../../assets/servicescards/banner-health-new.png';
+import bannerCarOffer from '../../assets/servicescards/banner-car-offer.png';
 
 export interface ServiceBannerRedirect {
   type?: string;
@@ -44,80 +44,71 @@ export const getServiceBanner = (serviceId: string | number | undefined, service
   const sName = String(serviceName || '').toLowerCase();
   const sId = Number(serviceId);
 
-  if (sId === 10 || sName.includes('car')) return bannerCarHD;
-  if (sId === 7 || sId === 13 || sName.includes('tax') || sName.includes('itr') || sName.includes('income')) return bannerTaxHD;
-  if (sId === 6 || sId === 11 || sName.includes('bike')) return bannerBikeHD;
-  if (sId === 1 || sId === 9 || sName.includes('pan')) return bannerPanHD;
-  if (sId === 8 || sName.includes('rent') || sName.includes('agreement')) return bannerRentHD;
-  if (sId === 3 || sId === 12 || sName.includes('health') || sName.includes('mediclaim')) return bannerHealthHD;
-  if (sId === 4 || sId === 16 || sName.includes('two') || sName.includes('mseb') || sName.includes('license')) return bannerTwoWheelerHD;
+  if (sId === 10 || sName.includes('car')) return bannerCarNew;
+  if (sId === 7 || sId === 13 || sName.includes('tax') || sName.includes('itr') || sName.includes('income')) return bannerItrNew;
+  if (sId === 6 || sId === 11 || sName.includes('bike') || sName.includes('two')) return bannerBikeNew;
+  if (sId === 1 || sId === 9 || sName.includes('pan')) return bannerPanUpdate;
+  if (sId === 3 || sId === 12 || sName.includes('health') || sName.includes('mediclaim')) return bannerHealthNew;
 
-  return bannerCarHD;
+  return bannerCarNew;
 };
 
 export const DUMMY_SERVICE_BANNERS: ServiceBannerItem[] = [
   {
-    id: 10,
-    title: 'Car Insurance',
-    subtitle: 'Car',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780257163812-w92w2y-car insurance.png?v=2026-06-01%2001%3A22%3A44',
-    hd_image: bannerCarHD,
-    fallback_image: bannerCarHD,
-    redirect: { type: 'service', id: 10, url: null },
-  },
-  {
-    id: 7,
-    title: 'ITR Filing',
-    subtitle: 'Income Tax',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256921789-ygcnql-Income Tax.png?v=2026-06-01%2001%3A18%3A42',
-    hd_image: bannerTaxHD,
-    fallback_image: bannerTaxHD,
+    id: 13,
+    title: 'Income Tax Return Filing',
+    subtitle: 'File Your ITR Without Stress',
+    hd_image: bannerItrNew,
+    fallback_image: bannerItrNew,
     redirect: { type: 'service', id: 13, url: null },
   },
   {
-    id: 6,
-    title: 'Bike Insurance',
-    subtitle: 'Bike',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256860323-2dl4o4-Bike insurance.png?v=2026-06-01%2001%3A17%3A41',
-    hd_image: bannerBikeHD,
-    fallback_image: bannerBikeHD,
-    redirect: { type: 'service', id: 11, url: null },
-  },
-  {
-    id: 9,
-    title: 'Pan Card Service',
-    subtitle: 'Pan Card',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780257049156-2m1dig-Pan card.png?v=2026-06-01%2001%3A21%3A56',
-    hd_image: bannerPanHD,
-    fallback_image: bannerPanHD,
+    id: 1,
+    title: 'PAN Card Update',
+    subtitle: 'PAN Card Update Made Simple',
+    hd_image: bannerPanUpdate,
+    fallback_image: bannerPanUpdate,
     redirect: { type: 'service', id: 1, url: null },
   },
   {
-    id: 8,
-    title: 'Rent Agreement',
-    subtitle: 'Rent',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256972078-mya2g9-Rent agreement.png?v=2026-06-01%2001%3A19%3A32',
-    hd_image: bannerRentHD,
-    fallback_image: bannerRentHD,
-    redirect: { type: 'service', id: 9, url: null },
+    id: 10,
+    title: 'Car Insurance',
+    subtitle: 'Save up to ₹600 on new or renewal',
+    hd_image: bannerCarNew,
+    fallback_image: bannerCarNew,
+    redirect: { type: 'service', id: 10, url: null },
   },
   {
-    id: 3,
+    id: 9,
+    title: 'PAN Card Services',
+    subtitle: 'PAN Card Services Made Easy',
+    hd_image: bannerPanService,
+    fallback_image: bannerPanService,
+    redirect: { type: 'service', id: 1, url: null },
+  },
+  {
+    id: 11,
+    title: 'Two-Wheeler Insurance',
+    subtitle: 'Flat ₹200 OFF on renewals',
+    hd_image: bannerBikeNew,
+    fallback_image: bannerBikeNew,
+    redirect: { type: 'service', id: 11, url: null },
+  },
+  {
+    id: 12,
     title: 'Health Insurance',
-    subtitle: 'Health',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/3/1780253035033-byjzb6.png?v=2026-06-01%2000%3A13%3A55',
-    hd_image: bannerHealthHD,
-    fallback_image: bannerHealthHD,
+    subtitle: 'Extra 5% OFF on first purchase',
+    hd_image: bannerHealthNew,
+    fallback_image: bannerHealthNew,
     redirect: { type: 'service', id: 12, url: null },
   },
   {
-    id: 4,
-    title: 'Two wheeler Insurance',
-    subtitle: 'Two wheeler',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/4/1780253044733-ll0xwy.png?v=2026-06-01%2000%3A14%3A05',
-    hd_image: bannerTwoWheelerHD,
-    fallback_image: bannerTwoWheelerHD,
-    redirect: { type: 'service', id: 11, url: null },
+    id: 101,
+    title: 'Car Insurance Offer',
+    subtitle: 'Get up to ₹600 off On Car Insurance!',
+    hd_image: bannerCarOffer,
+    fallback_image: bannerCarOffer,
+    redirect: { type: 'service', id: 10, url: null },
   },
 ];
 
@@ -127,7 +118,8 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const timerRef = useRef<any>(null);
 
-  const displayBanners = Array.isArray(propBanners) && propBanners.length > 0
+  // If propBanners is empty or contains items without hd_image, use high quality local banners
+  const displayBanners = Array.isArray(propBanners) && propBanners.length > 0 && propBanners.some((b) => b.hd_image)
     ? propBanners
     : DUMMY_SERVICE_BANNERS;
 
@@ -168,34 +160,33 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
 
   return (
     <div
-      className="w-full relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-76 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-gray-200/80 bg-gradient-to-r from-[#F8F9FD] via-[#F4F5FA] to-[#EEF0F8] group select-none"
+      className="w-full relative rounded-2xl sm:rounded-3xl overflow-hidden select-none group shadow-sm"
+      style={{ aspectRatio: '1024 / 395' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Uniform Sliding Track - Every Banner Slide Has Exactly Identical Dimensions */}
+      {/* Sliding Track - Direct full-width image slides */}
       <div
         className="flex w-full h-full transition-transform duration-500 ease-in-out cursor-pointer"
         style={{ transform: `translateX(-${activeIdx * 100}%)` }}
       >
         {displayBanners.map((banner, i) => {
           // Prefer high-definition local asset for crispness; fallback to API or default
-          const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarHD);
+          const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarNew);
 
           return (
             <div
               key={banner.id || i}
               onClick={() => handleBannerClick(banner)}
-              className="w-full h-full shrink-0 flex items-center justify-center p-2 sm:p-4 overflow-hidden select-none bg-gradient-to-r from-[#F8F9FD] via-[#F4F5FA] to-[#EEF0F8]"
+              className="w-full h-full shrink-0 relative select-none"
               title={banner.title || 'Service Banner'}
             >
               <img
                 src={imgSrc}
                 alt={banner.title || 'Service Banner'}
-                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.01] drop-shadow-xs"
+                className="w-full h-full object-cover select-none pointer-events-none"
                 style={{
                   imageRendering: '-webkit-optimize-contrast',
-                  transform: 'translateZ(0)',
-                  backfaceVisibility: 'hidden',
                 }}
                 onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                   if (banner.fallback_image && (e.target as HTMLImageElement).src !== banner.fallback_image) {

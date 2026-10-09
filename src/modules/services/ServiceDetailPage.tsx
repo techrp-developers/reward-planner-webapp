@@ -1,8 +1,9 @@
-﻿// src/modules/services/ServiceDetailPage.jsx
+// src/modules/services/ServiceDetailPage.jsx
 // Web-Based & Mobile-Responsive Service Detail Module
 // Faithfully implements all 5 service designs (Four-Wheeler License, Two-Wheeler License, Domicile, Rent Agreement, PAN Card)
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchServiceDetails, submitServiceEnquiry } from '../../api/servicesApi';
 import { getImageUrl } from '../../api/client';
@@ -1073,9 +1074,9 @@ export const ServiceDetailPage: React.FC = () => {
       </div>
 
       {/* ENQUIRY SUBMISSION SUCCESS MODAL */}
-      {isSuccessModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl border border-gray-100">
+      {isSuccessModalOpen && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl border border-gray-100 max-h-[85vh] my-auto overflow-y-auto">
             <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
               <CheckCircleIcon sx={{ fontSize: 40 }} />
             </div>
@@ -1110,7 +1111,8 @@ export const ServiceDetailPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
 
