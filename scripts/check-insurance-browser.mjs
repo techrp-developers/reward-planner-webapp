@@ -30,7 +30,7 @@ const server = await createServer({
   }],
 });
 let browser;
-const report = { mode: 'Production App and insurance modules; intercepted APIs and Firebase test adapter', passed: [], calls: [], pageErrors: [] };
+const report = { mode: 'Production App and insurance modules; intercepted APIs and Firebase test adapter', passed: [], calls: [], masters: [], pageErrors: [] };
 try {
   await server.listen();
   const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
@@ -84,6 +84,7 @@ try {
       const headers = {'Access-Control-Allow-Origin':'*'};
       if (url.pathname.endsWith('/companies/plans')) {
         const policy = url.searchParams.get('policy');
+        report.masters.push(policy);
         return route.fulfill({headers,json:{success:true,data:[{api_type:`https://policyplanner.com/health-insurance/hdfc/${policy}-premium`},{api_type:`https://policyplanner.com/health-insurance/nic/${policy}-premium`}]}});
       }
       report.calls.push({path:url.pathname,body:req.postDataJSON(),authorization:req.headers().authorization});
@@ -286,6 +287,20 @@ try {
   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
   await page.getByRole('heading',{name:'Who will be insured?',exact:true}).waitFor();
   report.passed.push('Refresh loads safely; form and results fit 320, 375, 768, 1280 and 1440px; PolicyPlanner never receives CRM bearer token');
+  const beforeMasters = report.masters.filter(policy => policy === 'Health').length;
+  const cacheCheck = await page.evaluate(async () => {
+    const api = await import('/src/modules/services/insurance/api/PolicyPlannerApi.ts');
+    const [first, second] = await Promise.all([api.fetchPlans(), api.fetchPlans()]);
+    await api.fetchPlans();
+    const controller = new AbortController();
+    const request = api.getAllPremiums({coverAmount:1000000,zone:'1',age:30}, controller.signal);
+    controller.abort();
+    const cancelled = await request.then(() => false, error => error.name === 'AbortError');
+    return {samePlans:first.length === second.length, cancelled};
+  });
+  assert.equal(report.masters.filter(policy => policy === 'Health').length, beforeMasters + 1);
+  assert.deepEqual(cacheCheck, {samePlans:true,cancelled:true});
+  report.passed.push('Public insurer master GETs deduplicate and stay cached; aborted premium request cannot return stale quotes');
   assert.ok(report.calls.filter(call=>call.path.endsWith('/save-step') && call.body.step===2).every(call=>call.body.section==='members'));
   assert.deepEqual(report.pageErrors,[]);
   for (const call of report.calls.filter(call=>call.path.includes('/insurance/'))) assert.equal(call.authorization,'Bearer insurance-test-token');

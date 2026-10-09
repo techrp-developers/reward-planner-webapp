@@ -1,5 +1,6 @@
 // src/router/AppRouter.jsx
-import React from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { preloadServicesHome } from '../modules/services/servicesPreload';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ScrollToTop from '../components/common/ScrollToTop';
@@ -12,22 +13,18 @@ import rpLogo from '../assets/rp_logo_crisp.png';
 import MobileBottomBar from '../components/layout/MobileBottomBar';
 
 import LoginPage from '../modules/auth/LoginPage';
-import HomePage from '../modules/home/HomePage';
 import CinematicModuleStage from '../modules/stage/CinematicModuleStage';
-import ProductListingPage from '../modules/ecommerce/ProductListingPage';
 import ProductDetailPage from '../modules/ecommerce/ProductDetailPage';
 import CartPage from '../modules/ecommerce/CartPage';
 import CheckoutPage from '../modules/ecommerce/CheckoutPage';
-import BBPSPage from '../modules/bbps/BBPSPage';
-import ServicesPage from '../modules/services/ServicesPage';
-import ServiceCategoryPage from '../modules/services/ServiceCategoryPage';
-import ServiceDetailPage from '../modules/services/ServiceDetailPage';
-import ServiceCartPage from '../modules/services/ServiceCartPage';
-import ServiceCheckoutPage from '../modules/services/ServiceCheckoutPage';
-import MutualFundPage from '../modules/services/MutualFundPage';
-import ServiceBundlePage from '../modules/services/ServiceBundlePage';
-import InsuranceQuotePage from '../modules/services/insurance/InsuranceQuotePageFlow';
-import InsuranceProductsPage from '../modules/services/insurance/InsuranceProductsPage';
+const ServiceCategoryPage = lazy(() => import('../modules/services/ServiceCategoryPage'));
+const ServiceDetailPage = lazy(() => import('../modules/services/ServiceDetailPage'));
+const ServiceCartPage = lazy(() => import('../modules/services/ServiceCartPage'));
+const ServiceCheckoutPage = lazy(() => import('../modules/services/ServiceCheckoutPage'));
+const MutualFundPage = lazy(() => import('../modules/services/MutualFundPage'));
+const ServiceBundlePage = lazy(() => import('../modules/services/ServiceBundlePage'));
+const InsuranceQuotePage = lazy(() => import('../modules/services/insurance/InsuranceQuotePageFlow'));
+const InsuranceProductsPage = lazy(() => import('../modules/services/insurance/InsuranceProductsPage'));
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 import MyEventsPage from '../modules/events/MyEventsPage';
@@ -42,6 +39,9 @@ import ExploreRewardsPage from '../modules/rewards/ExploreRewardsPage';
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === '/services') preloadServicesHome();
+  }, [isAuthenticated, location.pathname]);
 
   const isPolicyPage = [
     '/terms',
@@ -128,6 +128,7 @@ export const AppRouter = () => {
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
       <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
+        <Suspense fallback={<div role="status" className="p-8 text-center text-sm text-gray-500">Loading page...</div>}>
         {isStageRoute ? (
           <CinematicModuleStage />
         ) : (
@@ -191,6 +192,7 @@ export const AppRouter = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
+        </Suspense>
       </main>
 
       {/* SLIDE-OVER RIGHT CART DRAWER */}

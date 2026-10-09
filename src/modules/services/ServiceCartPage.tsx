@@ -1,3 +1,4 @@
+import ServiceImage from '../../components/services/ServiceImage';
 // src/modules/services/ServiceCartPage.jsx
 import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -20,7 +21,7 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
 export const ServiceCartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { serviceCartItems, removeFromCart, cartRewards, loading } = useServiceCart();
+  const { serviceCartItems, removeFromCart, cartRewards, loading, error, refreshServiceCart } = useServiceCart();
   const [openDocsMap, setOpenDocsMap] = useState<Record<string | number, boolean>>({});
   const [useRewardCoins, setUseRewardCoins] = useState<boolean>(true);
   const [busyItemId, setBusyItemId] = useState<string | number | null>(null);
@@ -72,6 +73,8 @@ export const ServiceCartPage: React.FC = () => {
   const onProceedToCheckout = () => {
     navigate(`/services/checkout?mode=cart&redeemCoins=${totals.redeemCoins}`);
   };
+
+  if (error) return <div role="alert" className="p-8 text-center text-sm"><p>Could not load your services cart.</p><button type="button" className="mt-3 font-bold text-purple-700" onClick={() => void refreshServiceCart()}>Retry cart</button></div>;
 
   if (!loading && serviceCartItems.length === 0) {
     return (
@@ -149,13 +152,10 @@ export const ServiceCartPage: React.FC = () => {
                 <div className="flex gap-4 items-start">
                   {/* Thumbnail */}
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#F8F9FD] border border-gray-100 p-2 flex items-center justify-center shrink-0 overflow-hidden">
-                    <img
+                    <ServiceImage
                       src={imageSrc}
                       alt={item.service_name}
                       className="w-full h-full object-contain"
-                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                        (e.target as HTMLImageElement).src = fallbackImg;
-                      }}
                     />
                   </div>
 

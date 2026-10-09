@@ -5,31 +5,30 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchServiceDetails, submitServiceEnquiry } from '../../api/servicesApi';
+import { submitServiceEnquiry } from '../../api/servicesApi';
 import { getImageUrl } from '../../api/client';
+import { useServiceQuery } from './serviceQueries';
+import ServiceSectionState from './components/ServiceSectionState';
+import { ServiceVariants, ServiceDocuments, ServiceFaq, ServicePricing, ServiceCartActions, ServiceEnquiryForm } from './components/ServiceDetailSections';
+import ServiceImage from '../../components/services/ServiceImage';
 import { useAuth } from '../../context/AuthContext';
 import { useServiceCart } from '../../context/ServiceCartContext';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
 import RichText from '../../components/common/RichText';
 import { resolveServiceId, STATIC_SERVICES_DATA } from '../../data/serviceStaticData';
+import type { StaticServiceItem } from '../../data/serviceStaticData';
 import { getInsuranceQuotePath } from './insurance/insuranceProducts';
+import './ServiceDetailPage.css';
 
 // Material UI Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
-import CheckIcon from '@mui/icons-material/Check';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import BoltIcon from '@mui/icons-material/Bolt';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -71,12 +70,16 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Resolve numerical ID (supports both /services/detail/4 and /services/four-wheeler-license)
   const resolvedId = useMemo(() => resolveServiceId(serviceId), [serviceId]);
-  const staticData = useMemo(() => STATIC_SERVICES_DATA[resolvedId] || STATIC_SERVICES_DATA[1], [resolvedId]);
+  const staticData = useMemo<StaticServiceItem>(() => STATIC_SERVICES_DATA[resolvedId] || {
+    service: { id: Number(resolvedId), name: 'Service', description: '', price: '0', original_price: '0' },
+    variants: [], overview: [], journey: [], trust_stats: [], documents: [], enquiry_fields: [], faqs: [],
+  }, [resolvedId]);
 
-  const [serviceData, setServiceData] = useState<any>(null);
+  const detailQuery = useServiceQuery('detail', resolvedId);
+  const serviceData = detailQuery.data;
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState<boolean>(true);
+  const loading = detailQuery.isPending;
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
@@ -86,36 +89,34 @@ export const ServiceDetailPage: React.FC = () => {
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
 
 
+  const enquiryLock = useRef(false);
+  const cartLock = useRef(false);
   const enquiryFormRef = useRef<HTMLDivElement | null>(null);
+  const mobileEnquiryFormRef = useRef<HTMLDivElement | null>(null);
+  const detailRootRef = useRef<HTMLDivElement | null>(null);
+  const sidebarRef = useRef<HTMLElement | null>(null);
+
+  // Match the real header height, including tablet navigation and font reflow.
+  useEffect(() => {
+    const root = detailRootRef.current;
+    const header = document.querySelector('header');
+    if (!root || !header) return;
+    const sidebar = sidebarRef.current;
+    const updateOffset = () => {
+      root.style.setProperty('--service-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+      if (sidebar) root.style.setProperty('--service-sidebar-height', `${Math.ceil(sidebar.getBoundingClientRect().height)}px`);
+    };
+    updateOffset();
+    const observer = new ResizeObserver(updateOffset);
+    observer.observe(header);
+    if (sidebar) observer.observe(sidebar);
+    return () => observer.disconnect();
+  }, [loading, detailQuery.isError]);
 
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    fetchServiceDetails(resolvedId)
-      .then((data) => {
-        if (!isMounted) return;
-        setServiceData(data);
-        if (data?.variants?.length) {
-          setSelectedVariant(data.variants[0]);
-        } else if (staticData?.variants?.length) {
-          setSelectedVariant(staticData.variants[0]);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setServiceData(null);
-        if (staticData?.variants?.length) {
-          setSelectedVariant(staticData.variants[0]);
-        }
-        setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [resolvedId, staticData]);
+    setSelectedVariant(current => serviceData?.variants?.find(variant => variant.id === current?.id) || serviceData?.variants?.[0] || staticData?.variants?.[0] || null);
+    setFormError('');
+  }, [serviceData, staticData]);
 
   // Pre-fill user details into form
   useEffect(() => {
@@ -134,6 +135,8 @@ export const ServiceDetailPage: React.FC = () => {
   const insuranceQuotePath = getInsuranceQuotePath(resolvedId, service?.name);
   const isInsuranceService = Boolean(insuranceQuotePath);
   const primaryCtaLabel = isInsuranceService ? 'Compare quotes' : 'Buy Now';
+  const formTitle = service.form_title || staticData.service.form_title || `Apply for ${service.name}`;
+  const formSubtitle = service.form_subtitle || staticData.service.form_subtitle || 'Share your details and our team will help you with the next steps.';
   const variants = (serviceData?.variants && serviceData.variants.length > 0)
     ? serviceData.variants
     : staticData.variants;
@@ -146,25 +149,23 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Overview checklist (5 points from static or variant details)
   const overviewList = useMemo(() => {
-    if (staticData?.overview?.length) return staticData.overview;
     const feats = Array.isArray(activeVariant?.details) && activeVariant.details.length
       ? activeVariant.details
       : (activeVariant?.features || []);
     if (feats.length) {
       return feats.map((f, i) => ({ id: i, text: String(f), iconType: ['guide', 'eligibility', 'schedule', 'tracking', 'delivery'][i % 5] }));
     }
+    if (staticData?.overview?.length) return staticData.overview;
     return [
       { id: 1, text: 'Step-by-step guidance flow', iconType: 'guide' },
-      { id: 2, text: 'Smart eligibility check (age & docs)', iconType: 'eligibility' },
-      { id: 3, text: 'Online slot & RTO scheduling', iconType: 'schedule' },
+      { id: 2, text: 'Document review and application assistance', iconType: 'eligibility' },
+      { id: 3, text: 'Support with the next steps', iconType: 'schedule' },
       { id: 4, text: 'Status tracking at every stage', iconType: 'tracking' },
-      { id: 5, text: 'Physical DL license delivery', iconType: 'delivery' },
     ];
   }, [staticData, activeVariant]);
 
   // Journey timeline (From start to finish, here's what happens)
   const journeySteps = useMemo(() => {
-    if (staticData?.journey?.length) return staticData.journey;
     const apiJourney = activeVariant?.journey?.[0]?.content;
     if (Array.isArray(apiJourney) && apiJourney.length) {
       const colors = ['purple', 'blue', 'teal', 'orange'];
@@ -182,7 +183,6 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Trust stats (3 cards)
   const trustStats = useMemo(() => {
-    if (staticData?.trust_stats?.length) return staticData.trust_stats;
     if (activeVariant?.trust_stats?.length) {
       const colors = ['purple', 'blue', 'teal'];
       const icons = ['badge', 'percent', 'clock'];
@@ -202,7 +202,6 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Required documents
   const documentList = useMemo(() => {
-    if (staticData?.documents?.length) return staticData.documents;
     const docs = serviceData?.documents || [];
     if (docs.length) {
       return docs.map((d, i) => ({
@@ -218,14 +217,16 @@ export const ServiceDetailPage: React.FC = () => {
 
   // Enquiry Fields
   const enquiryFields = useMemo(() => {
-    return staticData?.enquiry_fields || [
+    const apiFields = serviceData?.enquiry_fields || service?.enquiry_fields;
+    if (Array.isArray(apiFields) && apiFields.length && apiFields.every(field => field.field_name && field.label)) return apiFields;
+    return staticData?.enquiry_fields?.length ? staticData.enquiry_fields : [
       { field_name: 'name', label: 'Name', field_type: 'text', placeholder: 'Enter your name', is_required: true },
       { field_name: 'city', label: 'City', field_type: 'text', placeholder: 'Enter city', is_required: true },
       { field_name: 'mobile_number', label: 'Mobile Number', field_type: 'tel', placeholder: 'Enter your mobile No', is_required: true },
       { field_name: 'email_id', label: 'Email ID', field_type: 'email', placeholder: 'Enter your Email ID', is_required: true },
       { field_name: 'additional_notes', label: 'Additional Notes (optional)', field_type: 'textarea', placeholder: 'Enter additional notes', is_required: false },
     ];
-  }, [staticData]);
+  }, [staticData, serviceData, service]);
 
   // FAQs
   const faqList = useMemo(() => {
@@ -243,9 +244,8 @@ export const ServiceDetailPage: React.FC = () => {
   }, [service, activeVariant, resolvedId]);
 
   const scrollToEnquiry = () => {
-    if (enquiryFormRef.current) {
-      enquiryFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const target = window.matchMedia('(min-width: 1024px)').matches ? enquiryFormRef.current : mobileEnquiryFormRef.current;
+    target?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
   };
 
   const handleFieldChange = (fieldName: string, value: string) => {
@@ -282,6 +282,8 @@ export const ServiceDetailPage: React.FC = () => {
     }
     const sId = Number(resolvedId);
     const vId = Number(activeVariant?.id || 0);
+    if (cartLock.current) return;
+    cartLock.current = true;
     setAddingToCart(true);
     try {
       await addToCart({
@@ -292,6 +294,7 @@ export const ServiceDetailPage: React.FC = () => {
     } catch {
       // Toast notification handled in ServiceCartContext
     } finally {
+      cartLock.current = false;
       setAddingToCart(false);
     }
   };
@@ -326,6 +329,8 @@ export const ServiceDetailPage: React.FC = () => {
     }
 
     setFormError('');
+    if (enquiryLock.current) return;
+    enquiryLock.current = true;
     setSubmitting(true);
 
     try {
@@ -339,15 +344,16 @@ export const ServiceDetailPage: React.FC = () => {
         enquiry_data: formValues,
       };
       const res = await submitServiceEnquiry(payload);
+      if (res?.success === false) throw new Error(res.message || 'Enquiry was rejected.');
       const generatedRef =
         res?.data?.enquiry_ref ||
-        (res?.data?.id ? `#RP-ENQ-${res.data.id}` : `#RP-ENQ-${Math.floor(10000 + Math.random() * 90000)}`);
+        (res?.data?.id ? `#RP-ENQ-${res.data.id}` : 'Submitted');
       setEnquiryRefId(generatedRef);
       setIsSuccessModalOpen(true);
-    } catch {
-      setEnquiryRefId(`#RP-ENQ-${Math.floor(10000 + Math.random() * 90000)}`);
-      setIsSuccessModalOpen(true);
+    } catch (error) {
+      setFormError(error?.response?.data?.message || error?.message || 'Could not submit your enquiry. Please try again.');
     } finally {
+      enquiryLock.current = false;
       setSubmitting(false);
     }
   };
@@ -391,6 +397,8 @@ export const ServiceDetailPage: React.FC = () => {
 
   const hideAddToCart = shouldHideAddToCartForService(resolvedId, service?.name);
 
+  if (detailQuery.isError) return <ServiceSectionState query={detailQuery} label="service details" />;
+
   if (loading) {
     return (
       <div className="w-full max-w-[1400px] mx-auto px-4 py-8 space-y-6 animate-pulse">
@@ -403,10 +411,11 @@ export const ServiceDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#FDFBF9] pb-24 md:pb-16 font-['Poppins',sans-serif] text-gray-900 selection:bg-purple-100 selection:text-purple-900">
+    <div ref={detailRootRef} className="service-detail w-full min-h-screen bg-[#FDFBF9] pb-24 md:pb-16 font-['Poppins',sans-serif] text-gray-900 selection:bg-purple-100 selection:text-purple-900">
       
+      <ServiceSectionState query={detailQuery} label="service details" />
       {/* MOBILE TOP SEARCH / NAVIGATION BAR (App Header Style) */}
-      <div className="md:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 shadow-2xs">
+      <div className="service-detail__mobile-nav md:hidden sticky z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 shadow-2xs">
         <button
           onClick={() => navigate('/services')}
           className="w-9 h-9 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center shrink-0"
@@ -472,25 +481,22 @@ export const ServiceDetailPage: React.FC = () => {
         </div>
 
         {/* MAIN RESPONSIVE CONTAINER (Desktop: 2-Column Grid | Mobile: 1-Column Flow) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="service-detail__grid grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
           {/* LEFT COLUMN: HERO, VARIANTS, OVERVIEW, TIMELINE, STATS, SAFETY, DOCS, FAQS */}
-          <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+          <div className="service-detail__content min-w-0 lg:col-span-7 xl:col-span-8 space-y-6">
 
             {/* 1. HERO IMAGE BANNER (Aspect Ratio clean photo with subtle curve & border) */}
             <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 border border-gray-200/90 shadow-xs group">
               <div className="w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[2/1] max-h-[420px] flex items-center justify-center overflow-hidden bg-white">
-                <img
+                <ServiceImage
                   src={heroImageSrc}
+                  fallbackSrc={getServiceBanner(resolvedId, service.name)}
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes="(min-width: 1024px) 65vw, 100vw"
                   alt={service.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                  onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                    const fallback = getServiceBanner(resolvedId, service.name);
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== fallback) {
-                      target.src = fallback;
-                    }
-                  }}
                 />
               </div>
 
@@ -502,43 +508,7 @@ export const ServiceDetailPage: React.FC = () => {
             </div>
 
             {/* 2. PLAN / VARIANT SELECTOR PILLS (Image 5 Style - When Multiple Variants Available) */}
-            {variants.length > 1 && (
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-gray-200/90 shadow-2xs space-y-2.5">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block">
-                  Select Package / Variant:
-                </span>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {variants.map((v) => {
-                    const isSelected = selectedVariant?.id === v.id;
-                    const vPrice = Number(v.price || 0);
-                    const vOld = Number(v.original_price || (vPrice * 1.3));
-
-                    return (
-                      <button
-                        key={v.id}
-                        type="button"
-                        onClick={() => setSelectedVariant(v)}
-                        className={`p-3 rounded-2xl text-left transition-all cursor-pointer flex flex-col justify-between border-2 ${
-                          isSelected
-                            ? 'bg-[#FCF7FF] border-[#A855F7] shadow-sm shadow-purple-100 ring-2 ring-purple-100'
-                            : 'bg-white border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <span className={`text-xs font-bold truncate block ${isSelected ? 'text-[#7C3AED]' : 'text-gray-800'}`}>
-                          {v.title || v.variant_name}
-                        </span>
-                        <div className="mt-2 flex items-baseline gap-1.5">
-                          <span className="text-sm font-black text-gray-900">₹{vPrice.toLocaleString('en-IN')}</span>
-                          {vOld > vPrice && (
-                            <span className="text-[11px] text-gray-400 line-through">₹{vOld.toLocaleString('en-IN')}</span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <ServiceVariants variants={variants} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
 
             {/* 3. SERVICE TITLE, RATING & DESCRIPTION */}
             <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-gray-200/90 shadow-2xs space-y-3">
@@ -584,30 +554,7 @@ export const ServiceDetailPage: React.FC = () => {
               </div>
 
               {/* Primary Dual CTA Buttons (Matching Mobile App Reference) */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-3">
-                {/* Outlined Add to Cart Pill Button */}
-                {!hideAddToCart && (
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    disabled={addingToCart}
-                    className="w-full sm:flex-1 py-3 px-6 rounded-full border-2 border-[#1E1260] text-[#1E1260] hover:bg-[#1E1260]/5 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-                  >
-                    <ShoppingCartOutlinedIcon sx={{ fontSize: 18 }} />
-                    <span>{addingToCart ? 'Adding to Cart...' : 'Add to Cart'}</span>
-                  </button>
-                )}
-
-                {/* Solid Deep Navy/Purple Buy Now or Enquire Now Pill Button */}
-                <button
-                  type="button"
-                  onClick={insuranceQuotePath ? () => navigate(insuranceQuotePath) : handleBuyNow}
-                  className="w-full sm:flex-1 py-3.5 px-6 rounded-full bg-[#1E1260] hover:bg-[#150C48] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <BoltIcon sx={{ fontSize: 18 }} />
-                  <span>{primaryCtaLabel}</span>
-                </button>
-              </div>
+<ServiceCartActions hideAddToCart={hideAddToCart} handleAddToCart={handleAddToCart} addingToCart={addingToCart} insuranceQuotePath={insuranceQuotePath} navigate={navigate} handleBuyNow={handleBuyNow} primaryCtaLabel={primaryCtaLabel} />
             </div>
 
             {/* 4. SERVICE OVERVIEW CARD (5 Bullet Items with Violet/Blue Icon Badges) */}
@@ -722,158 +669,29 @@ export const ServiceDetailPage: React.FC = () => {
             </div>
 
             {/* 8. REQUIRED DOCUMENTS SECTION (With Stepper Indicator Track) */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-gray-200/90 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm sm:text-base font-black text-gray-900 tracking-tight">
-                  Required Documents
-                </h2>
-                <span className="text-[11px] text-gray-400 font-semibold">Digital Copies Only</span>
-              </div>
-
-              {/* Progress step track above cards */}
-              <div className="flex items-center justify-center gap-2 py-1">
-                {documentList.map((doc, idx) => (
-                  <React.Fragment key={doc.id || idx}>
-                    <div className="w-5 h-5 rounded-full bg-purple-100 text-[#7C3AED] text-[10px] font-black flex items-center justify-center">
-                      {idx + 1}
-                    </div>
-                    {idx < documentList.length - 1 && (
-                      <div className="w-12 sm:w-20 h-0.5 bg-purple-200" />
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-
-              {/* Document Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {documentList.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="p-3.5 rounded-2xl bg-white border border-purple-200/70 hover:border-purple-300 shadow-2xs flex flex-col items-center text-center justify-between min-h-[110px] transition-all"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-[#7C3AED] flex items-center justify-center mb-2">
-                      {renderIcon(doc.iconType, 'text-[#7C3AED]')}
-                    </div>
-                    <span className="text-xs font-bold text-gray-800 leading-snug block">
-                      {doc.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ServiceDocuments documentList={documentList} renderIcon={renderIcon} />
 
             {/* 9. ON MOBILE: RENDER ENQUIRY FORM HERE IN-LINE */}
             <div className="lg:hidden">
               <div
-                ref={enquiryFormRef}
+                ref={mobileEnquiryFormRef}
                 className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-gray-200/90 shadow-xs space-y-4"
               >
                 <div className="space-y-1 border-b border-gray-100 pb-3">
                   <h3 className="text-base font-black text-gray-900">
-                    {staticData.service.form_title || `Apply for ${service.name} Request`}
+                    {formTitle}
                   </h3>
                   <p className="text-xs text-gray-500">
-                    {staticData.service.form_subtitle || 'Please fill out this form below and our team will get in touch with you shortly.'}
+                    {formSubtitle}
                   </p>
                 </div>
 
-                <form onSubmit={handleFormSubmit} className="space-y-3.5 text-xs">
-                  {formError && (
-                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-                      {formError}
-                    </div>
-                  )}
-
-                  {enquiryFields.map((field, idx) => (
-                    <div key={idx} className="space-y-1">
-                      <label className="font-bold text-gray-700 block text-xs">
-                        {field.label} {field.is_required && <span className="text-rose-500">*</span>}
-                      </label>
-                      {field.field_type === 'select' ? (
-                        <select
-                          value={formValues[field.field_name] || ''}
-                          onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                        >
-                          <option value="">{field.placeholder || `Select ${field.label}`}</option>
-                          {field.options?.map((opt, oIdx) => (
-                            <option key={oIdx} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      ) : field.field_type === 'textarea' ? (
-                        <textarea
-                          rows={3}
-                          value={formValues[field.field_name] || ''}
-                          onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                          placeholder={field.placeholder || `Enter ${field.label}`}
-                          className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                        />
-                      ) : (
-                        <input
-                          type={field.field_type || 'text'}
-                          value={formValues[field.field_name] || ''}
-                          onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                          placeholder={field.placeholder || `Enter ${field.label}`}
-                          className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                        />
-                      )}
-                    </div>
-                  ))}
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3.5 rounded-full font-bold text-xs sm:text-sm text-white bg-[#1E1260] hover:bg-[#150C48] shadow-md transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
-                  >
-                    {submitting ? 'Submitting...' : 'Submit'}
-                  </button>
-                </form>
+                <ServiceEnquiryForm handleFormSubmit={handleFormSubmit} formError={formError} enquiryFields={enquiryFields} formValues={formValues} handleFieldChange={handleFieldChange} submitting={submitting} />
               </div>
             </div>
 
             {/* 10. FAQ ACCORDION SECTION (With Blue Circular '?' Badge) */}
-            {faqList.length > 0 && (
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-gray-200/90 shadow-2xs space-y-3">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                  <h3 className="text-base sm:text-lg font-black text-gray-900 tracking-tight">
-                    FAQ
-                  </h3>
-                  <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-xs font-bold text-sm">
-                    ?
-                  </div>
-                </div>
-
-                <div className="divide-y divide-gray-100">
-                  {faqList.map((faq, idx) => {
-                    const isOpen = openFaqIdx === idx;
-                    return (
-                      <div key={idx} className="py-3.5 first:pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
-                          className="w-full flex items-center justify-between text-left text-xs sm:text-sm font-bold text-gray-800 hover:text-[#7C3AED] transition-colors cursor-pointer gap-3"
-                        >
-                          <span>{faq.question}</span>
-                          <KeyboardArrowDownIcon
-                            sx={{ fontSize: 18 }}
-                            className={`text-gray-400 transition-transform duration-200 shrink-0 ${
-                              isOpen ? 'rotate-180 text-[#7C3AED]' : ''
-                            }`}
-                          />
-                        </button>
-                        {isOpen && (
-                          <p className="text-xs text-gray-600 mt-2 pl-0.5 leading-relaxed font-normal animate-fadeIn">
-                            {faq.answer}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <ServiceFaq faqList={faqList} openFaqIdx={openFaqIdx} setOpenFaqIdx={setOpenFaqIdx} />
 
             {/* 11. BOTTOM ASSISTANCE BANNER ("Need document help? Quick guidance from our team") */}
             <div className="bg-gradient-to-r from-[#F0F2FF] via-[#E8EDFF] to-[#F5F3FF] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-indigo-100 shadow-2xs space-y-4">
@@ -890,7 +708,7 @@ export const ServiceDetailPage: React.FC = () => {
                 {/* Team Face Avatars */}
                 <div className="flex items-center -space-x-2">
                   {[1, 2, 3, 4].map((i) => (
-                    <img
+                    <ServiceImage
                       key={i}
                       src={userAvatar1}
                       alt="Advisor"
@@ -938,52 +756,14 @@ export const ServiceDetailPage: React.FC = () => {
           </div>
 
           {/* RIGHT COLUMN (DESKTOP ONLY): STICKY BOOKING CARD & DYNAMIC APPLICATION FORM */}
-          <div className="hidden lg:block lg:col-span-5 xl:col-span-4 sticky top-28 space-y-6">
+          <aside ref={sidebarRef} aria-label="Service booking" className="service-detail__sidebar hidden lg:col-span-5 xl:col-span-4">
 
             {/* DESKTOP PRICING & BOOKING ACTION CARD */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-200/90 shadow-md space-y-5">
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
-                  Total Pricing:
-                </span>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl font-black text-gray-900">₹{price.toLocaleString('en-IN')}</span>
-                  {originalPrice > price && (
-                    <span className="text-sm text-gray-400 line-through">₹{originalPrice.toLocaleString('en-IN')}</span>
-                  )}
-                  {savings > 0 && (
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      Save ₹{savings.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[11px] text-gray-400 font-medium">All Government & Processing Fees Included</p>
-              </div>
-
-              {/* CTAs */}
-              <div className="space-y-2.5 pt-1">
-                <button
-                  type="button"
-                  onClick={insuranceQuotePath ? () => navigate(insuranceQuotePath) : handleBuyNow}
-                  className="w-full py-4 rounded-full bg-[#1E1260] hover:bg-[#150C48] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <BoltIcon sx={{ fontSize: 18 }} />
-                  <span>{primaryCtaLabel}</span>
-                </button>
-
-                {!hideAddToCart && (
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    disabled={addingToCart}
-                    className="w-full py-3.5 rounded-full border-2 border-[#1E1260] text-[#1E1260] hover:bg-[#1E1260]/5 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-                  >
-                    <ShoppingCartOutlinedIcon sx={{ fontSize: 18 }} />
-                    <span>{addingToCart ? 'Adding to Cart...' : 'Add to Cart'}</span>
-                  </button>
-                )}
-              </div>
+            <div className="service-detail__pricing">
+              <ServicePricing price={price} originalPrice={originalPrice} savings={savings} insuranceQuotePath={insuranceQuotePath} navigate={navigate} handleBuyNow={handleBuyNow} primaryCtaLabel={primaryCtaLabel} hideAddToCart={hideAddToCart} handleAddToCart={handleAddToCart} addingToCart={addingToCart} />
             </div>
+
+            <div className="service-detail__sidebar-content space-y-4">
 
             {/* DESKTOP APPLICATION FORM CARD */}
             <div
@@ -992,66 +772,14 @@ export const ServiceDetailPage: React.FC = () => {
             >
               <div className="space-y-1 border-b border-gray-100 pb-3">
                 <h3 className="text-base font-black text-gray-900">
-                  {staticData.service.form_title || `Apply for ${service.name} Request`}
+                  {formTitle}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {staticData.service.form_subtitle || 'Please fill out this form below and our team will get in touch with you shortly.'}
+                  {formSubtitle}
                 </p>
               </div>
 
-              <form onSubmit={handleFormSubmit} className="space-y-3.5 text-xs">
-                {formError && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-                    {formError}
-                  </div>
-                )}
-
-                {enquiryFields.map((field, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <label className="font-bold text-gray-700 block text-xs">
-                      {field.label} {field.is_required && <span className="text-rose-500">*</span>}
-                    </label>
-                    {field.field_type === 'select' ? (
-                      <select
-                        value={formValues[field.field_name] || ''}
-                        onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                      >
-                        <option value="">{field.placeholder || `Select ${field.label}`}</option>
-                        {field.options?.map((opt, oIdx) => (
-                          <option key={oIdx} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    ) : field.field_type === 'textarea' ? (
-                      <textarea
-                        rows={3}
-                        value={formValues[field.field_name] || ''}
-                        onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                        placeholder={field.placeholder || `Enter ${field.label}`}
-                        className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                      />
-                    ) : (
-                      <input
-                        type={field.field_type || 'text'}
-                        value={formValues[field.field_name] || ''}
-                        onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                        placeholder={field.placeholder || `Enter ${field.label}`}
-                        className="w-full p-3 border border-gray-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#7C3AED] bg-white shadow-2xs"
-                      />
-                    )}
-                  </div>
-                ))}
-
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-4 rounded-full font-bold text-sm text-white bg-[#1E1260] hover:bg-[#150C48] shadow-md transition-all cursor-pointer flex items-center justify-center disabled:opacity-50"
-                >
-                  {submitting ? 'Submitting Application...' : 'Submit'}
-                </button>
-              </form>
+              <ServiceEnquiryForm handleFormSubmit={handleFormSubmit} formError={formError} enquiryFields={enquiryFields} formValues={formValues} handleFieldChange={handleFieldChange} submitting={submitting} />
             </div>
 
             {/* DEDICATED ASSISTANCE HELPLINE WIDGET */}
@@ -1067,7 +795,8 @@ export const ServiceDetailPage: React.FC = () => {
               </div>
             </div>
 
-          </div>
+            </div>
+          </aside>
 
         </div>
 

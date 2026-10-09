@@ -1,3 +1,4 @@
+import { queryClient } from '../../../../queryClient';
 ﻿import axios, { type RawAxiosRequestHeaders } from 'axios';
 import type { FamilyPremiumPayload, QuoteResponse } from '../types/insurance.types';
 import { getInsuranceError } from '../utils/insuranceValidation';
@@ -19,24 +20,30 @@ type Headers = RawAxiosRequestHeaders;
 export type PAPremiumPayload = { coverAmount: number; category: number; age: number };
 export type SuperTopupPremiumPayload = FamilyPremiumPayload & { deductible: number };
 
-async function fetchPlanList(policy: string, headers?: Headers, healthFallback = false): Promise<Plan[]> {
+async function fetchPlanList(policy: string, headers?: Headers, healthFallback = false, signal?: AbortSignal): Promise<Plan[]> {
   let lastError: unknown;
   const paths = healthFallback ? ['companies/plans', '/companies/plans'] : ['companies/plans'];
   for (const path of paths) {
     try {
-      const res = await api.get(requestUrl(`/health-insurance/${path}?policy=${policy}`), { headers });
+      const res = await api.get(requestUrl(`/health-insurance/${path}?policy=${policy}`), { headers, signal });
       if (res.data?.success === false) throw new Error(res.data.message || 'The insurer plan service rejected this request.');
       if (!Array.isArray(res.data?.data)) throw new Error('The insurer plan service returned an unexpected response.');
       return res.data.data.filter((value: unknown): value is Plan =>
         Boolean(value && typeof value === 'object' && typeof (value as Plan).api_type === 'string'));
-    } catch (error) { lastError = error; }
+    } catch (error) { if (signal?.aborted) throw error; lastError = error; }
   }
   throw lastError;
 }
 
-export const fetchPlans = (headers?: Headers) => fetchPlanList('Health', headers, true);
-export const fetchSuperTopUpPlans = (headers?: Headers) => fetchPlanList('super_top_up', headers);
-export const fetchPAPlans = (headers?: Headers) => fetchPlanList('pa', headers);
+// Cache public plan/master data only. Premium results remain per-enquiry and uncached.
+const masterPlans = (policy: string, headers?: Headers, signal?: AbortSignal) => headers
+  ? fetchPlanList(policy, headers, policy === 'Health', signal)
+  : queryClient.fetchQuery({ queryKey: ['insurance-master', policy], staleTime: 15 * 60_000,
+      gcTime: 30 * 60_000, retry: false,
+      queryFn: ({ signal: requestSignal }) => fetchPlanList(policy, undefined, policy === 'Health', requestSignal) });
+export const fetchPlans = (headers?: Headers, signal?: AbortSignal) => masterPlans('Health', headers, signal);
+export const fetchSuperTopUpPlans = (headers?: Headers, signal?: AbortSignal) => masterPlans('super_top_up', headers, signal);
+export const fetchPAPlans = (headers?: Headers, signal?: AbortSignal) => masterPlans('pa', headers, signal);
 
 const getCompanyFromUrl = (url: string) => new URL(url, POLICY_ORIGIN).pathname.split('/').filter(Boolean)[1] || 'general';
 
@@ -50,24 +57,24 @@ const buildHealthPayload = (company: string, payload: FamilyPremiumPayload) => {
   }
 };
 
-async function postPremium(url: string, payload: unknown, headers?: Headers): Promise<unknown> {
+async function postPremium(url: string, payload: unknown, headers?: Headers, signal?: AbortSignal): Promise<unknown> {
   if (!url) throw new Error('The insurer premium API URL is missing.');
-  const res = await api.post(requestUrl(url), payload, { headers: { 'Content-Type': 'application/json', ...headers } });
+  const res = await api.post(requestUrl(url), payload, { signal, headers: { 'Content-Type': 'application/json', ...headers } });
   return res.data;
 }
 
-export const getPremium = (url: string, payload: FamilyPremiumPayload, headers?: Headers) =>
-  postPremium(url, buildHealthPayload(getCompanyFromUrl(url), payload), headers);
+export const getPremium = (url: string, payload: FamilyPremiumPayload, headers?: Headers, signal?: AbortSignal) =>
+  postPremium(url, buildHealthPayload(getCompanyFromUrl(url), payload), headers, signal);
 
-export const getSuperTopUpPremium = (url: string, payload: SuperTopupPremiumPayload, headers?: Headers) =>
+export const getSuperTopUpPremium = (url: string, payload: SuperTopupPremiumPayload, headers?: Headers, signal?: AbortSignal) =>
   postPremium(url, {
     coverAmount: payload.coverAmount, deductible: payload.deductible || 500000, age: payload.age,
     sage: payload.sage ?? null, c1age: payload.c1age ?? null, c2age: payload.c2age ?? null, c3age: payload.c3age ?? null, c4age: payload.c4age ?? null,
-  }, headers);
+  }, headers, signal);
 
-export const getPAPremium = (url: string, payload: PAPremiumPayload, headers?: Headers) => {
+export const getPAPremium = (url: string, payload: PAPremiumPayload, headers?: Headers, signal?: AbortSignal) => {
   if (!payload.coverAmount || !payload.category || !payload.age) throw new Error('coverAmount, category, and age are required');
-  return postPremium(url, payload, headers);
+  return postPremium(url, payload, headers, signal);
 };
 
 async function collectPremiums(plans: Plan[], premium: (url: string) => Promise<unknown>): Promise<QuoteResponse[]> {
@@ -85,6 +92,24 @@ async function collectPremiums(plans: Plan[], premium: (url: string) => Promise<
   });
 }
 
-export const getAllPremiums = async (payload: FamilyPremiumPayload) => collectPremiums(await fetchPlans(), (url) => getPremium(url, payload));
-export const getAllSuperTopUpPremiums = async (payload: SuperTopupPremiumPayload) => collectPremiums(await fetchSuperTopUpPlans(), (url) => getSuperTopUpPremium(url, payload));
-export const getAllPAPremiums = async (payload: PAPremiumPayload) => collectPremiums(await fetchPAPlans(), (url) => getPAPremium(url, payload));
+export const getAllPremiums = async (payload: FamilyPremiumPayload, signal?: AbortSignal) => {
+  const plans = await fetchPlans(undefined, signal);
+  signal?.throwIfAborted();
+  const result = await collectPremiums(plans, url => getPremium(url, payload, undefined, signal));
+  signal?.throwIfAborted();
+  return result;
+};
+export const getAllSuperTopUpPremiums = async (payload: SuperTopupPremiumPayload, signal?: AbortSignal) => {
+  const plans = await fetchSuperTopUpPlans(undefined, signal);
+  signal?.throwIfAborted();
+  const result = await collectPremiums(plans, url => getSuperTopUpPremium(url, payload, undefined, signal));
+  signal?.throwIfAborted();
+  return result;
+};
+export const getAllPAPremiums = async (payload: PAPremiumPayload, signal?: AbortSignal) => {
+  const plans = await fetchPAPlans(undefined, signal);
+  signal?.throwIfAborted();
+  const result = await collectPremiums(plans, url => getPAPremium(url, payload, undefined, signal));
+  signal?.throwIfAborted();
+  return result;
+};

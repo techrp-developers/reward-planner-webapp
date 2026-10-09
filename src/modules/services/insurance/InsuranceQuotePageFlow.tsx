@@ -43,6 +43,14 @@ function InsuranceFlow({ insuranceType }: { insuranceType: InsurancePageType }) 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const stepLock = useRef(false);
   const submitLock = useRef(false);
+  const quoteRequest = useRef<AbortController | null>(null);
+  const formVersion = useRef(0);
+  useEffect(() => {
+    formVersion.current += 1;
+    quoteRequest.current?.abort();
+    setQuotes(null);
+  }, [form]);
+  useEffect(() => () => quoteRequest.current?.abort(), []);
   const ageMembers = useMemo(() => getAgeMembers(form), [form.members, form.memberCounts]);
 
   useEffect(() => {
@@ -184,14 +192,19 @@ function InsuranceFlow({ insuranceType }: { insuranceType: InsurancePageType }) 
     if (!coverAmount) { setError('Select a valid cover amount.'); return; }
 
     submitLock.current = true;
+    const controller = new AbortController();
+    quoteRequest.current?.abort();
+    quoteRequest.current = controller;
+    const version = formVersion.current;
     setError('');
     setNotice('');
     try {
-      const result = await submitInsuranceQuote(form, insuranceType, coverAmount, setBusy);
+      const result = await submitInsuranceQuote(form, insuranceType, coverAmount, message => { if (!controller.signal.aborted) setBusy(message); }, controller.signal);
+      if (controller.signal.aborted || formVersion.current !== version) return;
       setNotice(result.notice);
       setQuotes(result.quotes);
     } catch (submitError: unknown) {
-      setError(getInsuranceError(submitError));
+      if (!controller.signal.aborted) setError(getInsuranceError(submitError));
     } finally {
       submitLock.current = false;
       setBusy('');

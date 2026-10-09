@@ -5,19 +5,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '../../api/client';
+import ServiceImage from './ServiceImage';
 
 // Material UI Icons
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 // High-Resolution Local HD Banner Assets (Exact 7 banner graphics provided by user)
-import bannerItrNew from '../../assets/servicescards/banner-itr-new.png';
-import bannerPanUpdate from '../../assets/servicescards/banner-pan-update.png';
-import bannerCarNew from '../../assets/servicescards/banner-car-new.png';
-import bannerPanService from '../../assets/servicescards/banner-pan-service.png';
-import bannerBikeNew from '../../assets/servicescards/banner-bike-new.png';
-import bannerHealthNew from '../../assets/servicescards/banner-health-new.png';
-import bannerCarOffer from '../../assets/servicescards/banner-car-offer.png';
+import bannerItrNew from '../../assets/servicescards/optimized/banner-itr-new-1280.webp';
+import bannerPanUpdate from '../../assets/servicescards/optimized/banner-pan-update-1280.webp';
+import bannerCarNew from '../../assets/servicescards/optimized/banner-car-new-1280.webp';
+import bannerPanService from '../../assets/servicescards/optimized/banner-pan-service-1280.webp';
+import bannerBikeNew from '../../assets/servicescards/optimized/banner-bike-new-1280.webp';
+import bannerHealthNew from '../../assets/servicescards/optimized/banner-health-new-1280.webp';
+import bannerCarOffer from '../../assets/servicescards/optimized/banner-car-offer-1280.webp';
 
 export interface ServiceBannerRedirect {
   type?: string;
@@ -175,26 +176,28 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
           const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarNew);
 
           return (
-            <div
+            <button
+              type="button"
               key={banner.id || i}
+              tabIndex={i === activeIdx ? 0 : -1}
+              aria-hidden={i !== activeIdx}
               onClick={() => handleBannerClick(banner)}
               className="w-full h-full shrink-0 relative select-none"
               title={banner.title || 'Service Banner'}
             >
-              <img
+              <ServiceImage
                 src={imgSrc}
+                fallbackSrc={banner.fallback_image}
+                sizes="(min-width: 1600px) 1500px, 100vw"
+                loading={i === activeIdx ? 'eager' : 'lazy'}
+                fetchPriority={i === 0 ? 'high' : 'auto'}
                 alt={banner.title || 'Service Banner'}
                 className="w-full h-full object-cover select-none pointer-events-none"
                 style={{
                   imageRendering: '-webkit-optimize-contrast',
                 }}
-                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                  if (banner.fallback_image && (e.target as HTMLImageElement).src !== banner.fallback_image) {
-                    (e.target as HTMLImageElement).src = banner.fallback_image;
-                  }
-                }}
               />
-            </div>
+            </button>
           );
         })}
       </div>
@@ -241,4 +244,4 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
   );
 };
 
-export default ServiceBannerCarousel;
+export default React.memo(ServiceBannerCarousel);

@@ -1,8 +1,10 @@
+import ServiceImage from '../../components/services/ServiceImage';
 // src/modules/services/ServiceCheckoutPage.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { QueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { createSubmissionGate } from './submissionGate';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useLocation } from '../../context/LocationContext';
 import { useServiceCart } from '../../context/ServiceCartContext';
 import {
   fetchServiceBuyNowPreview,
@@ -35,10 +37,14 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 
 export const ServiceCheckoutPage: React.FC = () => {
+  const [params] = useSearchParams();
+  return <ServiceCheckoutFlow key={params.toString()} />;
+};
+
+const ServiceCheckoutFlow: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, isAuthenticated, openAuth } = useAuth();
-  const { cityName, pincode: locationPincode } = useLocation();
+  const { user, token, isAuthenticated, openAuth } = useAuth();
   const { refreshServiceCart } = useServiceCart();
 
   const mode = searchParams.get('mode') === 'buy_now' ? 'buy_now' : 'cart';
@@ -52,114 +58,60 @@ export const ServiceCheckoutPage: React.FC = () => {
     ? Number(searchParams.get('bundleId') || searchParams.get('bundle_id'))
     : null;
 
+  const privateClient = useMemo(() => new QueryClient(), [token]);
+  useEffect(() => () => privateClient.clear(), [privateClient]);
+  const addressQuery = useQuery({ queryKey: ['addresses'], enabled: isAuthenticated,
+    queryFn: ({ signal }) => fetchAllAddresses(signal, true), staleTime: 0, gcTime: 0, retry: false }, privateClient);
+  const previewQuery = useQuery({ queryKey: ['checkout-preview', mode, serviceId, variantId, bundleId], enabled: isAuthenticated,
+    queryFn: ({ signal }) => {
+      if (mode === 'cart') return fetchServiceCheckoutPreview(0, signal);
+      if (bundleId) return fetchBuyNowBundlePreview({ bundle_id: bundleId, redeem_coins: 0 }, signal);
+      if (serviceId && variantId) return fetchServiceBuyNowPreview({ service_id: serviceId, variant_id: variantId, redeem_coins: 0 }, signal);
+      throw new Error('Missing service or bundle identifiers for Buy Now');
+    }, staleTime: 0, gcTime: 0, retry: false }, privateClient);
+
   // Address state
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | string | null>(null);
   const [showAddressForm, setShowAddressForm] = useState<boolean>(false);
-  const [addressLoading, setAddressLoading] = useState<boolean>(false);
+  const addressLoading = addressQuery.isPending;
 
   // Checkout calculation state
-  const [previewData, setPreviewData] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const previewData = previewQuery.data;
+  const loading = previewQuery.isPending;
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [useRewardCoins, setUseRewardCoins] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
+  const orderGate = useRef(createSubmissionGate());
+  const savedOrder = useRef<{ key: string; result: any } | null>(null);
+  const uncertainOrder = useRef(false);
+  const verifyingPayment = useRef(false);
+  const paymentReview = useRef<any>(null);
+  const orderMutation = useMutation({
+    mutationFn: async ({ kind, payload }: { kind: string; payload: any }) => {
+      const result = kind === 'bundle' ? await placeBuyNowBundleOrder(payload) : kind === 'buy_now' ? await placeServiceBuyNowOrder(payload) : await placeServiceCartOrder(payload);
+      if (result?.success === false) throw new Error(result.message || 'The order was rejected.');
+      return result;
+    },
+    retry: false,
+    gcTime: 0,
+  }, privateClient);
+
   // Order Confirmed State
   const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
 
-  // 1. Fetch User Addresses
+  // Private queries cancel obsolete previews and never persist across sessions.
   useEffect(() => {
-    if (!isAuthenticated) return;
-    setAddressLoading(true);
-
-    fetchAllAddresses()
-      .then((list) => {
-        if (Array.isArray(list) && list.length > 0) {
-          setAddresses(list);
-          const defaultAddr = list.find((a) => Number(a.is_default) === 1) || list[0];
-          setSelectedAddressId(defaultAddr.id || defaultAddr.address_id);
-        } else {
-          // Fallback corporate address
-          const fallback = {
-            id: 1,
-            address_id: 1,
-            contact_name: user?.name || user?.first_name || 'Corporate Employee',
-            contact_phone: user?.phone || user?.mobile || '9876543210',
-            address1: 'Main Corporate Office, Business Bay',
-            locality: 'Hadapsar',
-            city: cityName || 'Pune',
-            state: 'Maharashtra',
-            zipcode: locationPincode || '411013',
-            address_type: 'work',
-          };
-          setAddresses([fallback]);
-          setSelectedAddressId(1);
-        }
-      })
-      .catch(() => {
-        const fallback = {
-          id: 1,
-          address_id: 1,
-          contact_name: user?.name || user?.first_name || 'Corporate Employee',
-          contact_phone: user?.phone || user?.mobile || '9876543210',
-          address1: 'Corporate Campus',
-          locality: 'Tech Zone',
-          city: cityName || 'Pune',
-          state: 'Maharashtra',
-          zipcode: locationPincode || '411013',
-          address_type: 'work',
-        };
-        setAddresses([fallback]);
-        setSelectedAddressId(1);
-      })
-      .finally(() => setAddressLoading(false));
-  }, [isAuthenticated, user, cityName, locationPincode]);
-
-  // 2. Fetch Checkout Preview
+    if (addressQuery.data) {
+      const list = Array.isArray(addressQuery.data) ? addressQuery.data : [];
+      setAddresses(list);
+      setSelectedAddressId(current => list.some(address => (address.id || address.address_id) === current) ? current : (list.find(address => Number(address.is_default) === 1) || list[0])?.id || list[0]?.address_id || null);
+    }
+  }, [addressQuery.data]);
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-    setErrorMsg('');
-
-    const loadPreview = async () => {
-      try {
-        let res;
-        if (mode === 'buy_now') {
-          if (bundleId) {
-            res = await fetchBuyNowBundlePreview({ bundle_id: bundleId, redeem_coins: 0 });
-          } else if (serviceId && variantId) {
-            res = await fetchServiceBuyNowPreview({
-              service_id: serviceId,
-              variant_id: variantId,
-              redeem_coins: 0,
-            });
-          } else {
-            throw new Error('Missing service or bundle identifiers for Buy Now');
-          }
-        } else {
-          res = await fetchServiceCheckoutPreview(0);
-        }
-
-        if (isMounted) {
-          setPreviewData(res);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error('Failed to load checkout preview:', err);
-        if (isMounted) {
-          setErrorMsg(err.response?.data?.message || err.message || 'Failed to load checkout preview.');
-          setLoading(false);
-        }
-      }
-    };
-
-    loadPreview();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [mode, serviceId, variantId, bundleId]);
+    if (previewQuery.isError || addressQuery.isError) setErrorMsg('Could not load checkout details. Please try again.');
+  }, [previewQuery.isError, addressQuery.isError]);
 
   // Normalize preview items
   const items = useMemo(() => {
@@ -225,17 +177,15 @@ export const ServiceCheckoutPage: React.FC = () => {
   const handleAddNewAddress = async (formData) => {
     try {
       const added = await addAddress(formData);
-      const newId = added?.id || added?.address_id || Date.now();
+      const newId = added?.data?.id || added?.data?.address_id || added?.id || added?.address_id;
+      if (!newId) throw new Error('Address ID missing from response.');
       const newAddrObj = { ...formData, id: newId, address_id: newId };
       setAddresses((prev) => [newAddrObj, ...prev]);
       setSelectedAddressId(newId);
       setShowAddressForm(false);
-    } catch {
-      const fallbackId = Date.now();
-      const fallbackObj = { ...formData, id: fallbackId, address_id: fallbackId };
-      setAddresses((prev) => [fallbackObj, ...prev]);
-      setSelectedAddressId(fallbackId);
-      setShowAddressForm(false);
+      void privateClient.invalidateQueries({ queryKey: ['addresses'] });
+    } catch (error) {
+      setErrorMsg(error?.response?.data?.message || 'Could not save your address. Please try again.');
     }
   };
 
@@ -246,45 +196,48 @@ export const ServiceCheckoutPage: React.FC = () => {
       return;
     }
 
+    if (loading || previewQuery.isError || addressQuery.isError || confirmedOrder || verifyingPayment.current) return;
+
     if (!selectedAddressId) {
       setErrorMsg('Please select or add a communication/delivery address.');
       return;
     }
 
+    if (uncertainOrder.current) {
+      setErrorMsg('The previous order could not be confirmed. Check your orders before trying again.');
+      return;
+    }
+    if (!orderGate.current.acquire()) return;
     setSubmitting(true);
     setErrorMsg('');
 
     try {
-      let orderResult;
       const coinsToRedeem = summary.coinsRedeemed;
-
-      if (mode === 'buy_now') {
-        if (bundleId) {
-          orderResult = await placeBuyNowBundleOrder({
-            bundle_id: bundleId,
-            address_id: selectedAddressId,
-            redeem_coins: coinsToRedeem,
-          });
-        } else {
-          orderResult = await placeServiceBuyNowOrder({
-            service_id: serviceId,
-            variant_id: variantId,
-            address_id: selectedAddressId,
-            redeem_coins: coinsToRedeem,
-          });
+      const kind = mode === 'buy_now' ? bundleId ? 'bundle' : 'buy_now' : 'cart';
+      const payload = mode === 'buy_now' ? bundleId
+        ? { bundle_id: bundleId, address_id: selectedAddressId, redeem_coins: coinsToRedeem }
+        : { service_id: serviceId, variant_id: variantId, address_id: selectedAddressId, redeem_coins: coinsToRedeem }
+        : { address_id: selectedAddressId, redeem_coins: coinsToRedeem };
+      const key = JSON.stringify({ kind, payload });
+      let orderResult = savedOrder.current?.key === key ? savedOrder.current.result : null;
+      if (!orderResult) {
+        try {
+          orderResult = await orderMutation.mutateAsync({ kind, payload });
+          savedOrder.current = { key, result: orderResult };
+        } catch (error) {
+          // A dropped response may hide a successful creation: do not create another order.
+          if (!error?.response && error?.isAxiosError) uncertainOrder.current = true;
+          throw error;
         }
-      } else {
-        orderResult = await placeServiceCartOrder({
-          address_id: selectedAddressId,
-          redeem_coins: coinsToRedeem,
-        });
       }
 
       const parentOrderId =
         orderResult?.parent_order_id ||
         orderResult?.order?.parent_order_id ||
         orderResult?.order_id ||
-        `RP-SRV-${Date.now()}`;
+        null;
+      if (!parentOrderId) throw new Error('The service did not return an order reference. Check your orders before retrying.');
+      paymentReview.current = { parentOrderId, amountPaid: summary.grandTotal, coinsRedeemed: coinsToRedeem, items };
 
       // Case A: Free service or covered 100% by coins (grandTotal <= 0)
       if (summary.grandTotal <= 0) {
@@ -295,6 +248,7 @@ export const ServiceCheckoutPage: React.FC = () => {
           coinsRedeemed: coinsToRedeem,
           items,
         });
+        orderGate.current.release();
         setSubmitting(false);
         return;
       }
@@ -303,10 +257,11 @@ export const ServiceCheckoutPage: React.FC = () => {
       const paymentOrder = await createServicePaymentOrder(parentOrderId);
       const razorpayData = paymentOrder?.data || paymentOrder;
 
+      if (!razorpayData.key || !(razorpayData.orderId || razorpayData.order_id)) throw new Error('Payment details are missing. Please try again.');
       const Razorpay = await loadRazorpay();
 
       const options = {
-        key: razorpayData.key || 'rzp_test_placeholder',
+        key: razorpayData.key,
         amount: razorpayData.amount || summary.grandTotal * 100,
         currency: razorpayData.currency || 'INR',
         name: 'Reward Planners',
@@ -321,12 +276,15 @@ export const ServiceCheckoutPage: React.FC = () => {
           color: '#8b3ab5',
         },
         handler: async (response) => {
+          if (verifyingPayment.current) return;
+          verifyingPayment.current = true;
           try {
-            await verifyServicePayment({
+            const verification = await verifyServicePayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
+            if (!isServicePaymentVerified(verification)) throw new Error('Payment verification is pending.');
 
             if (mode === 'cart') await refreshServiceCart();
 
@@ -353,19 +311,18 @@ export const ServiceCheckoutPage: React.FC = () => {
               }
             } catch {}
 
-            // Still show confirmation if payment completed on client side
-            if (mode === 'cart') await refreshServiceCart();
-            setConfirmedOrder({
-              parentOrderId,
-              paymentId: response.razorpay_payment_id,
-              amountPaid: summary.grandTotal,
-              coinsRedeemed: coinsToRedeem,
-              items,
-            });
+            uncertainOrder.current = true;
+            setErrorMsg('Payment could not be verified. Check your order status before paying again.');
+          } finally {
+            verifyingPayment.current = false;
+            orderGate.current.release();
+            setSubmitting(false);
           }
         },
         modal: {
           ondismiss: () => {
+            if (verifyingPayment.current) return;
+            orderGate.current.release();
             setSubmitting(false);
             setErrorMsg('Payment was not completed. You can retry placing your order.');
           },
@@ -374,17 +331,42 @@ export const ServiceCheckoutPage: React.FC = () => {
 
       const rzp = new Razorpay(options);
       rzp.on('payment.failed', (resp) => {
+        if (verifyingPayment.current) return;
+        orderGate.current.release();
         console.error('Payment failed:', resp.error);
         setErrorMsg(resp.error?.description || 'Payment transaction failed. Please try again.');
         setSubmitting(false);
       });
       rzp.open();
     } catch (err) {
+      orderGate.current.release();
       console.error('Order placement error:', err);
       setErrorMsg(err.response?.data?.message || err.message || 'Unable to place service order.');
       setSubmitting(false);
     }
   };
+
+  const handleCheckPaymentStatus = async () => {
+    const review = paymentReview.current;
+    if (!review || !orderGate.current.acquire()) return;
+    setSubmitting(true);
+    try {
+      const status = await checkServicePaymentStatus(review.parentOrderId);
+      if (isServicePaymentVerified(status)) {
+        if (mode === 'cart') await refreshServiceCart();
+        setConfirmedOrder(review);
+      } else {
+        setErrorMsg('Payment is not yet verified. You can check its status again.');
+      }
+    } catch {
+      setErrorMsg('Could not check payment status. Please try again.');
+    } finally {
+      orderGate.current.release();
+      setSubmitting(false);
+    }
+  };
+
+  if (previewQuery.isError || addressQuery.isError) return <div role="alert" className="p-8 text-center text-sm"><p>{errorMsg || 'Could not load checkout details.'}</p><button type="button" className="mt-3 font-bold text-purple-700" onClick={() => { void previewQuery.refetch(); void addressQuery.refetch(); }}>Retry checkout</button></div>;
 
   // 3. SUCCESS / CONFIRMATION SCREEN
   if (confirmedOrder) {
@@ -539,10 +521,12 @@ export const ServiceCheckoutPage: React.FC = () => {
                   const isSelected = selectedAddressId === aId;
 
                   return (
-                    <div
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
                       key={aId}
                       onClick={() => setSelectedAddressId(aId)}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                      className={`text-left p-4 rounded-2xl border transition-all cursor-pointer ${
                         isSelected
                           ? 'border-[#8b3ab5] bg-purple-50/40 ring-2 ring-[#8b3ab5]/30'
                           : 'border-gray-200 hover:border-gray-300 bg-white'
@@ -563,7 +547,7 @@ export const ServiceCheckoutPage: React.FC = () => {
                       <span className="text-[11px] font-semibold text-gray-500 block mt-1">
                         📞 {addr.contact_phone || addr.phone || user?.phone}
                       </span>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -683,9 +667,10 @@ export const ServiceCheckoutPage: React.FC = () => {
             </div>
 
             {/* Place Order CTA */}
+            {uncertainOrder.current && paymentReview.current && <button type="button" disabled={submitting} onClick={handleCheckPaymentStatus} className="w-full rounded-xl border border-purple-200 px-4 py-3 text-sm font-bold text-purple-700 disabled:opacity-50">Check payment status</button>}
             <button
               onClick={handlePlaceOrder}
-              disabled={submitting}
+              disabled={submitting || orderMutation.isPending || !selectedAddressId || uncertainOrder.current}
               className="w-full py-4 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               {submitting ? (

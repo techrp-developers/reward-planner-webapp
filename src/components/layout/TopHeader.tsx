@@ -7,7 +7,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation as useRouterLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from '../../context/LocationContext';
-import { useCart } from '../../context/CartContext';
 import { useServiceCart } from '../../context/ServiceCartContext';
 import { fetchGlobalSearchSuggestions } from '../../api/productApi';
 import LocationModal from './LocationModal';
@@ -43,7 +42,6 @@ import iconProfile from '../../assets/icon6.png';
 export const TopHeader = () => {
   const { user, isAuthenticated, openAuth } = useAuth();
   const { pincode, cityName, selectedAddress, openLocationModal } = useLocation();
-  const { totalQuantity, openCartDrawer } = useCart();
   const { serviceCartCount } = useServiceCart();
   const navigate = useNavigate();
   const routerLocation = useRouterLocation();
@@ -52,13 +50,6 @@ export const TopHeader = () => {
 
   const displayName = user?.name || user?.full_name || 'Shrinivas Karur';
   const avatarSrc = user?.avatar || user?.userImage || userAvatar || iconProfile;
-
-  const isServicePath =
-    routerLocation.pathname.startsWith('/services') ||
-    routerLocation.pathname === '/insurance' ||
-    routerLocation.pathname === '/tax';
-
-  const cartBadgeCount = isServicePath ? serviceCartCount : (totalQuantity > 0 ? totalQuantity : serviceCartCount);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,7 +153,7 @@ export const TopHeader = () => {
 
 
       <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-4 px-4 sm:px-8 lg:px-12 antialiased">
-        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-4">
+        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Left Group: [ + / Logo Squircle ] and [ ::: Name Pill ] */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -249,7 +240,22 @@ export const TopHeader = () => {
           </div>
 
           {/* Right Group: Notification with pip & Menu button */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+            {isServicesPath && (
+              <Link
+                to="/services/cart"
+                aria-label={`Services cart, ${serviceCartCount} ${serviceCartCount === 1 ? 'item' : 'items'}`}
+                title="View Services Cart"
+                className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E4DCE9] bg-white text-[#1C0E28] hover:bg-[#ECE7FF] focus-visible:outline-2 focus-visible:outline-[#78538F]"
+              >
+                <ShoppingCartOutlinedIcon aria-hidden="true" sx={{ fontSize: 22 }} />
+                {serviceCartCount > 0 && (
+                  <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#7C3AED] px-1 text-[10px] font-bold text-white">
+                    {serviceCartCount > 99 ? '99+' : serviceCartCount}
+                  </span>
+                )}
+              </Link>
+            )}
             <Link to="/rewards" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-2 pr-2 sm:pr-4 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
               <img src={pointsCoin} alt="" className="hidden sm:block w-8 h-8 object-contain" />
               <span><strong className="block text-xs sm:text-sm font-semibold leading-tight max-w-[96px] truncate">{coinBalance}</strong><span className="block text-[9px] sm:text-[10px] text-[#776B80] mt-1 whitespace-nowrap">RP Points</span></span>

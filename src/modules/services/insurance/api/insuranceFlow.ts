@@ -1,4 +1,3 @@
-﻿import { createFirebaseEnquiry } from './FirebaseService';
 import { buildHealthEnquiryData, buildPersonalAccidentEnquiryData, buildSuperTopupEnquiryData } from './enquiryPayloadBuilders';
 import { completeInsurance, getQuotes, saveStep } from './InsuranceCrmApi';
 import { getAllPAPremiums, getAllPremiums, getAllSuperTopUpPremiums } from './PolicyPlannerApi';
@@ -9,7 +8,7 @@ import { buildFamilyPremiumPayload, getInsuranceError } from '../utils/insurance
 import { SUPER_TOPUP_DEDUCTIBLE } from '../constant/InsuranceConstants';
 
 // Keep sequencing and persistence outside the presentation component.
-export async function submitInsuranceQuote(form: InsuranceFormData, type: InsurancePageType, coverAmount: number, onProgress: (message: string) => void) {
+export async function submitInsuranceQuote(form: InsuranceFormData, type: InsurancePageType, coverAmount: number, onProgress: (message: string) => void, signal?: AbortSignal) {
   const enquiryId = Number(form.details.enquiryId);
   if (!Number.isInteger(enquiryId) || enquiryId <= 0) throw new Error('Your enquiry has expired. Start again from the first step.');
   const members = mapMembersAges(form);
@@ -32,12 +31,12 @@ export async function submitInsuranceQuote(form: InsuranceFormData, type: Insura
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     await Promise.race([
-      createFirebaseEnquiry({
+      import('./FirebaseService').then(({ createFirebaseEnquiry }) => createFirebaseEnquiry({
         service_id: type === 'health' ? 1 : type === 'supertopup' ? 2 : 3, variant_id: 1,
         name: `${form.details.firstName || ''} ${form.details.lastName || ''}`.trim(),
         city: form.details.city, mobile: form.details.mobileNumber || '', email: '',
         enquiry_data: type === 'health' ? buildHealthEnquiryData(form, coverAmount) : type === 'supertopup' ? buildSuperTopupEnquiryData(form, coverAmount) : buildPersonalAccidentEnquiryData(form, coverAmount),
-      }, String(enquiryId)),
+      }, String(enquiryId))),
       new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('Enquiry storage timed out.')), 12000); }),
     ]);
   } catch (error) {
@@ -46,19 +45,21 @@ export async function submitInsuranceQuote(form: InsuranceFormData, type: Insura
 
   onProgress('Completing your insurance application...');
   await completeInsurance(enquiryId);
+  signal?.throwIfAborted();
   onProgress('Finding available plans...');
   let quotes: QuoteResponse[] = [];
   let premiumError: unknown;
   try {
-    const results = type === 'health' ? await getAllPremiums(buildFamilyPremiumPayload(form, coverAmount))
-      : type === 'supertopup' ? await getAllSuperTopUpPremiums({ ...buildFamilyPremiumPayload(form, coverAmount), deductible: Number(form.details.deductible) || SUPER_TOPUP_DEDUCTIBLE })
-      : await getAllPAPremiums({ coverAmount, category: getCategoryFromNatureOfWork(form.details.natureOfWork)!, age: getAgeFromDateOfBirth(form.details.dob || '')! });
+    const results = type === 'health' ? await getAllPremiums(buildFamilyPremiumPayload(form, coverAmount), signal)
+      : type === 'supertopup' ? await getAllSuperTopUpPremiums({ ...buildFamilyPremiumPayload(form, coverAmount), deductible: Number(form.details.deductible) || SUPER_TOPUP_DEDUCTIBLE }, signal)
+      : await getAllPAPremiums({ coverAmount, category: getCategoryFromNatureOfWork(form.details.natureOfWork)!, age: getAgeFromDateOfBirth(form.details.dob || '')! }, signal);
     quotes = normalizeQuotesForUi(results);
   } catch (error) { premiumError = error; }
+  signal?.throwIfAborted();
   if (!quotes.some((quote) => quote.success)) {
     onProgress('Checking CRM quote availability...');
     try {
-      const crmQuotes = normalizeQuotesForUi(await getQuotes(enquiryId));
+      const crmQuotes = normalizeQuotesForUi(await getQuotes(enquiryId, 8, signal));
       if (crmQuotes.length) quotes = crmQuotes;
       if (premiumError) notice = [notice, 'Direct insurer quotes could not be reached; CRM quote availability was checked.'].filter(Boolean).join(' ');
     } catch (error) {

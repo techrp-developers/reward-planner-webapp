@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import { QueryClient } from '@tanstack/react-query';
+import { filterServices, getCategoryLayout } from '../src/modules/services/serviceCatalog.ts';
+import { createSubmissionGate } from '../src/modules/services/submissionGate.ts';
+import { isServicePaymentVerified } from '../src/api/servicePaymentStatus.ts';
+
+assert.equal(getCategoryLayout({ id: 4 }), 'wide');
+assert.equal(getCategoryLayout({ id: 2 }), 'standard');
+assert.equal(getCategoryLayout({ id: 99, layout: 'wide' }), 'wide');
+const items = [{ id: 1, name: 'PAN Card', description: 'Document help' }, { id: 2, name: 'ITR Filing', category_name: 'Tax', description: 'Income support' }];
+assert.deepEqual(filterServices(items, 'pAn').map(item => item.id), [1]);
+assert.deepEqual(filterServices(items, 'TAX').map(item => item.id), [2]);
+assert.deepEqual(filterServices(items, 'TAX', false), []);
+assert.deepEqual(filterServices(items, 'income').map(item => item.id), [2]);
+assert.deepEqual(filterServices(items, ''), items);
+assert.deepEqual(filterServices(items, 'missing'), []);
+const gate = createSubmissionGate();
+assert.equal(gate.acquire(), true);
+assert.equal(gate.acquire(), false);
+gate.release(); assert.equal(gate.acquire(), true);
+assert.equal(isServicePaymentVerified({ success: false, status: 'paid' }), false);
+assert.equal(isServicePaymentVerified({ success: true, data: { payment_status: 'pending' } }), false);
+assert.equal(isServicePaymentVerified({ success: true, data: { payment_status: 'paid' } }), true);
+assert.equal(isServicePaymentVerified({ status: 'captured' }), true);
+assert.equal(isServicePaymentVerified({}), false);
+
+// Test deduplication, fresh reuse, manual invalidation and cancellation in the installed Query implementation.
+const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+let calls = 0;
+const options = { queryKey: ['test-catalog'], staleTime: 60_000, queryFn: async () => { calls++; return items; } };
+await Promise.all([client.fetchQuery(options), client.fetchQuery(options)]);
+assert.equal(calls, 1);
+await client.fetchQuery(options); assert.equal(calls, 1);
+await client.invalidateQueries({ queryKey: options.queryKey });
+await client.fetchQuery(options); assert.equal(calls, 2);
+let aborted = false;
+const pending = client.fetchQuery({ queryKey: ['test-cancel'], queryFn: ({ signal }) => new Promise((_, reject) => signal.addEventListener('abort', () => { aborted = true; reject(new Error('aborted')); })) }).catch(() => {});
+await client.cancelQueries({ queryKey: ['test-cancel'] }); await pending;
+assert.equal(aborted, true); client.clear();
+console.log('Passed: category IDs/layout metadata, search semantics, synchronous duplicate guard, query deduplication/cache/invalidation/cancellation.');

@@ -1,6 +1,5 @@
 // src/components/layout/MobileBottomBar.jsx
 // Mobile-Responsive Bottom Navigation Bar matching the reference designs
-import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HomeIcon from '@mui/icons-material/Home';

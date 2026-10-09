@@ -11,6 +11,9 @@
     "typecheck:services": "tsc -p tsconfig.services.json",
     "typecheck:mutualfund": "tsc -p tsconfig.mutualfund.json",
     "check:mutualfund": "node --experimental-strip-types scripts/check-mutualfund.mjs",
+    "check:services": "node --experimental-strip-types scripts/check-services.mjs",
+    "check:services:browser": "node --experimental-strip-types scripts/check-services-browser.mjs",
+    "optimize:service-images": "node scripts/optimize-service-images.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -39,6 +42,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.4",
     "globals": "^17.11.0",
+    "lighthouse": "^12.8.2",
     "playwright-core": "^1.63.0",
     "sharp": "^0.35.4",
     "typescript": "^7.0.2",
