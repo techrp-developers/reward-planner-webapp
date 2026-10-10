@@ -1,1 +1,0 @@
-import{r as e,t}from"./client-BYyHSosv.js";var n=async n=>(await t.post(e.services.enquiry,n)).data;export{n as t};

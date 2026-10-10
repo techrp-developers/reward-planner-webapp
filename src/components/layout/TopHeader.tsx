@@ -46,6 +46,7 @@ export const TopHeader = () => {
   const { serviceCartCount } = useServiceCart();
   const navigate = useNavigate();
   const routerLocation = useRouterLocation();
+  const isServicesPath = routerLocation.pathname.startsWith('/services');
 
   // Mobile Navigation Drawer (Hamburger) State
 
@@ -122,8 +123,6 @@ export const TopHeader = () => {
       <LocationModal />
 
 
-      <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-4 px-4 sm:px-8 lg:px-12 antialiased">
-        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2 sm:gap-4">
       <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-3 sm:py-3.5 lg:py-4 px-4 sm:px-8 lg:px-12 antialiased">
         <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-3 sm:gap-4">
           
@@ -157,7 +156,7 @@ export const TopHeader = () => {
           </div>
 
           {/* Right Group: Notification with pip & Menu button */}
-          <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {isServicesPath && (
               <Link
                 to="/services/cart"
@@ -173,16 +172,13 @@ export const TopHeader = () => {
                 )}
               </Link>
             )}
-            <Link to="/rewards" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-2 pr-2 sm:pr-4 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
-              <img src={pointsCoin} alt="" className="hidden sm:block w-8 h-8 object-contain" />
-              <span><strong className="block text-xs sm:text-sm font-semibold leading-tight max-w-[96px] truncate">{coinBalance}</strong><span className="block text-[9px] sm:text-[10px] text-[#776B80] mt-1 whitespace-nowrap">RP Points</span></span>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+
             <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3.5 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
               <img src={coinsIcon} alt="RP Coins" className="hidden sm:block w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0" />
               <span><strong className="block text-xs sm:text-sm font-semibold leading-tight max-w-[96px] truncate">{coinBalance}</strong><span className="block text-[9px] sm:text-[10px] text-[#776B80] mt-0.5 whitespace-nowrap">RP Points</span></span>
             </Link>
-            <NotificationsPanel />
 
+            <NotificationsPanel />
 
             <AccountMenu />
           </div>

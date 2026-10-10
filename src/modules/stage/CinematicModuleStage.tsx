@@ -81,7 +81,7 @@ export default function CinematicModuleStage() {
           aria-hidden={activeIndex !== 1}
           inert={activeIndex !== 1}
         >
-          {visited.has(1) && <Suspense fallback={<div role="status" className="p-8">Loading store...</div>}><ProductListingPage /></Suspense>}
+          {visited.has(1) && <Suspense fallback={<div role="status" className="p-8">Loading services...</div>}><ServicesPage /></Suspense>}
         </div>
 
         {/* Screen 2: Products */}
@@ -90,7 +90,7 @@ export default function CinematicModuleStage() {
           aria-hidden={activeIndex !== 2}
           inert={activeIndex !== 2}
         >
-          {visited.has(2) && <Suspense fallback={<div role="status" className="p-8">Loading services...</div>}><ServicesPage /></Suspense>}
+          {visited.has(2) && <Suspense fallback={<div role="status" className="p-8">Loading store...</div>}><ProductListingPage /></Suspense>}
         </div>
 
         {/* Screen 3: Payments */}
