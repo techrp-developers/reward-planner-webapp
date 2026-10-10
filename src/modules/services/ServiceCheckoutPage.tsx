@@ -475,10 +475,13 @@ export const ServiceCheckoutPage = () => {
       {/* 1. Header */}
       <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
         <button
-          onClick={() => navigate(-1)}
-          className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
+          type="button"
+          onClick={() => (mode === 'buy_now' ? navigate(-1) : navigate('/services/cart'))}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+          title="Back"
         >
-          <ArrowBackIcon sx={{ fontSize: 18 }} />
+          <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+          <span>Back</span>
         </button>
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">

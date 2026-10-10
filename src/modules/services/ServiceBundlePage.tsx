@@ -154,17 +154,24 @@ export const ServiceBundlePage = () => {
       {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (like above) */}
       <ServiceBannerCarousel />
 
-      {/* 2. Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+      {/* 2. Breadcrumbs & Back Navigation */}
+      <div className="flex items-center gap-3">
         <button
+          type="button"
           onClick={() => navigate('/services')}
-          className="flex items-center gap-1 hover:text-[#7C3AED] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+          title="Back to Services"
         >
-          <ArrowBackIcon sx={{ fontSize: 15 }} />
-          <span>Services</span>
+          <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+          <span>Back to Services</span>
         </button>
-        <span>/</span>
-        <span className="text-gray-900 font-bold">{bundle.name}</span>
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 truncate">
+          <Link to="/" className="hover:text-gray-800 transition-colors shrink-0">Home</Link>
+          <span className="shrink-0">/</span>
+          <Link to="/services" className="hover:text-gray-800 transition-colors shrink-0">Services</Link>
+          <span className="shrink-0">/</span>
+          <span className="text-gray-900 font-bold truncate">{bundle.name}</span>
+        </div>
       </div>
 
       {/* Main Two-Column Layout */}

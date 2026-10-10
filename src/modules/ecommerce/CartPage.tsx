@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { GradientButton } from '../../components/ui/GradientButton';
 
 // Material UI Icons
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AddIcon from '@mui/icons-material/Add';
@@ -88,24 +89,49 @@ export const CartPage = () => {
   // If cart is empty and no saved for later items
   if (items.length === 0 && savedForLater.length === 0) {
     return (
-      <div className="w-full max-w-[1400px] mx-auto px-4 py-16 text-center space-y-5">
-        <div className="w-24 h-24 mx-auto rounded-3xl bg-purple-50 text-[#8b3ab5] flex items-center justify-center border border-purple-100 shadow-xs">
-          <ShoppingCartOutlinedIcon sx={{ fontSize: 44 }} />
+      <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-8 font-['Poppins',sans-serif]">
+        {/* TOP NAVIGATION & BREADCRUMB STRIP */}
+        <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/store')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+              title="Back to Store Catalog"
+            >
+              <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+              <span>Back to Store</span>
+            </button>
+
+            <nav className="text-xs text-gray-500 flex items-center gap-1.5">
+              <button onClick={() => navigate('/dashboard')} className="hover:text-gray-800 transition-colors cursor-pointer">Home</button>
+              <span>/</span>
+              <button onClick={() => navigate('/store')} className="hover:text-gray-800 transition-colors cursor-pointer">Store</button>
+              <span>/</span>
+              <span className="text-gray-900 font-semibold">Cart</span>
+            </nav>
+          </div>
         </div>
-        <div className="space-y-1">
-          <h2 className="text-2xl font-black text-gray-900">Your Cart is Empty!</h2>
-          <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-            Explore our corporate store with 880+ verified products, exclusive employee discounts, and instant RP Coins redemption.
-          </p>
-        </div>
-        <div className="pt-2">
-          <button
-            onClick={() => navigate('/store')}
-            className="px-8 py-3.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-all shadow-md cursor-pointer inline-flex items-center gap-2"
-          >
-            <span>Explore Store Catalog</span>
-            <ArrowForwardIcon sx={{ fontSize: 16 }} />
-          </button>
+
+        <div className="w-full max-w-[1400px] mx-auto py-12 text-center space-y-5">
+          <div className="w-24 h-24 mx-auto rounded-3xl bg-purple-50 text-[#8b3ab5] flex items-center justify-center border border-purple-100 shadow-xs">
+            <ShoppingCartOutlinedIcon sx={{ fontSize: 44 }} />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black text-gray-900">Your Cart is Empty!</h2>
+            <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+              Explore our corporate store with 880+ verified products, exclusive employee discounts, and instant RP Coins redemption.
+            </p>
+          </div>
+          <div className="pt-2">
+            <button
+              onClick={() => navigate('/store')}
+              className="px-8 py-3.5 bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white text-xs font-bold rounded-xl hover:opacity-95 transition-all shadow-md cursor-pointer inline-flex items-center gap-2"
+            >
+              <span>Explore Store Catalog</span>
+              <ArrowForwardIcon sx={{ fontSize: 16 }} />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -113,18 +139,32 @@ export const CartPage = () => {
 
   return (
     <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6">
-      {/* BREADCRUMB STRIP */}
-      <nav className="text-xs text-gray-500 flex items-center gap-1.5">
-        <Link to="/" className="hover:text-[#7C3AED] transition-colors">
-          Home
-        </Link>
-        <span>/</span>
-        <Link to="/store" className="hover:text-[#7C3AED] transition-colors">
-          Store
-        </Link>
-        <span>/</span>
-        <span className="font-bold text-gray-900">Shopping Cart</span>
-      </nav>
+      {/* TOP NAVIGATION & BREADCRUMB STRIP */}
+      <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/store')}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+            title="Continue Shopping"
+          >
+            <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <span>Continue Shopping</span>
+          </button>
+
+          <nav className="text-xs text-gray-500 flex items-center gap-1.5">
+            <Link to="/" className="hover:text-[#7C3AED] transition-colors">
+              Home
+            </Link>
+            <span>/</span>
+            <Link to="/store" className="hover:text-[#7C3AED] transition-colors">
+              Store
+            </Link>
+            <span>/</span>
+            <span className="font-bold text-gray-900">Shopping Cart</span>
+          </nav>
+        </div>
+      </div>
 
       {/* FLIPKART & AMAZON 60/40 TWO-COLUMN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

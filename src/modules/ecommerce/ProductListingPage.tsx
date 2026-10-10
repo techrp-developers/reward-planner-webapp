@@ -21,7 +21,7 @@ import EcommerceHorizontalSection from './components/EcommerceHorizontalSection'
 import EcommerceFeaturedWeek from './components/EcommerceFeaturedWeek';
 import EcommerceCategoryTabGrid from './components/EcommerceCategoryTabGrid';
 import navratriBanner from '../../assets/home/Navratri_banner.png';
-import { Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import Pagination from '@mui/material/Pagination';
 
@@ -322,10 +322,19 @@ export const ProductListingPage = () => {
       {/* ========================================================================= */}
       {isLandingMode ? (
         <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-8">
-          {/* Top End-Corner: 'All Products' Link & Shopping Cart in One Row (Below Header, Above Categories) */}
-          <div className="flex justify-between items-center gap-2 sm:gap-3 mb-1 pt-1">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-800 border border-amber-300/60 shadow-2xs">
+          {/* Top End-Corner: Back Button, Festive Banner & Shopping Cart */}
+          <div className="flex justify-between items-center gap-2 sm:gap-3 mb-1 pt-1 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+                title="Back to Dashboard"
+              >
+                <ArrowLeft size={16} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+                <span>Back to Dashboard</span>
+              </button>
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-800 border border-amber-300/60 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                 Festive Season Offers
               </span>
@@ -451,14 +460,25 @@ export const ProductListingPage = () => {
         <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-6">
           {/* Breadcrumbs & Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-4">
-            <div>
-              <nav className="text-xs text-gray-500 mb-1 flex items-center gap-1.5 flex-wrap">
-                <span
-                  onClick={handleBackToStoreHome}
-                  className="hover:text-[#7C3AED] cursor-pointer"
-                >
-                  Home
-                </span>
+            <div className="flex items-start sm:items-center gap-3.5">
+              <button
+                type="button"
+                onClick={handleBackToStoreHome}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5 shrink-0 mt-0.5 sm:mt-0"
+                title="Back to Store Overview"
+              >
+                <ArrowLeft size={16} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+                <span>Back</span>
+              </button>
+
+              <div>
+                <nav className="text-xs text-gray-500 mb-1 flex items-center gap-1.5 flex-wrap">
+                  <span
+                    onClick={handleBackToStoreHome}
+                    className="hover:text-[#7C3AED] cursor-pointer"
+                  >
+                    Home
+                  </span>
                 <span>/</span>
                 <span
                   onClick={handleBackToStoreHome}
@@ -511,6 +531,7 @@ export const ProductListingPage = () => {
                   : 'All Products'}
               </h2>
             </div>
+          </div>
 
             {/* Top Controls: Mobile Filter Button & Sort By Dropdown */}
             <div className="flex items-center gap-3 self-end md:self-auto text-sm font-semibold">

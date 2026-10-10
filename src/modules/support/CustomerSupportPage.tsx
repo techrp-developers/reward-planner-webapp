@@ -12,6 +12,7 @@ import {
 
 // Lucide & Material Icons
 import {
+  ArrowLeft,
   HelpCircle,
   PhoneCall,
   Mail,
@@ -197,17 +198,29 @@ export const CustomerSupportPage = () => {
         {/* Header Title & Intro Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/80 pb-5">
           <div className="space-y-1">
-            <nav className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500 mb-0.5" aria-label="Breadcrumb">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="hover:text-[#6D28D9] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+                title="Back to Dashboard"
               >
-                Home
+                <ArrowLeft size={16} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+                <span>Back to Dashboard</span>
               </button>
-              <ChevronRight size={13} className="text-slate-400" />
-              <span className="text-[#111827] font-semibold">Help &amp; Support</span>
-            </nav>
+
+              <nav className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-500" aria-label="Breadcrumb">
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="hover:text-[#6D28D9] transition-colors cursor-pointer"
+                >
+                  Home
+                </button>
+                <ChevronRight size={13} className="text-slate-400" />
+                <span className="text-[#111827] font-semibold">Help &amp; Support</span>
+              </nav>
+            </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight">
               Help &amp; <span className="text-[#6D28D9]">Support</span>

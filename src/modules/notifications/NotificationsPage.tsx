@@ -412,22 +412,25 @@ export default function NotificationsPage() {
       {/* ─── Breadcrumb Bar ─── */}
       <div className="bg-white border-b border-[#E8E1EF] px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#776B80]">
-            <Link to="/" className="hover:text-[#1C0E28] transition-colors">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-[#1C0E28] font-bold">Notifications</span>
-          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-[#E8E1EF] text-[#1C0E28] hover:bg-[#F8F6FA] text-xs font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+              title="Back to Dashboard"
+            >
+              <ArrowBackRoundedIcon sx={{ fontSize: 16 }} className="text-[#78538F] group-hover:text-[#1C0E28] transition-colors" />
+              <span>Back to Dashboard</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#78538F] hover:text-[#1C0E28] cursor-pointer transition-colors"
-          >
-            <ArrowBackRoundedIcon sx={{ fontSize: 16 }} />
-            <span>Back</span>
-          </button>
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#776B80]">
+              <Link to="/" className="hover:text-[#1C0E28] transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-[#1C0E28] font-bold">Notifications</span>
+            </div>
+          </div>
         </div>
       </div>
 

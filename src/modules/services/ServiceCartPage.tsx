@@ -75,24 +75,38 @@ export const ServiceCartPage = () => {
 
   if (!loading && serviceCartItems.length === 0) {
     return (
-      <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-16 text-center font-['Poppins',sans-serif]">
-        <div className="max-w-md mx-auto bg-white rounded-3xl p-8 sm:p-10 border border-gray-200 shadow-xs space-y-5">
-          <div className="w-20 h-20 rounded-full bg-purple-50 text-[#8b3ab5] flex items-center justify-center mx-auto border border-purple-100">
-            <ShoppingBagOutlinedIcon sx={{ fontSize: 40 }} />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold text-gray-900">Your Services Cart is Empty</h2>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Explore government documentation, tax filing, insurance, and company registration services with doorstep pickup.
-            </p>
-          </div>
+      <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+        <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
           <button
+            type="button"
             onClick={() => navigate('/services')}
-            className="w-full py-3.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+            title="Back to Services"
           >
-            <span>Explore Services</span>
-            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+            <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <span>Back to Services</span>
           </button>
+        </div>
+
+        <div className="py-12 text-center">
+          <div className="max-w-md mx-auto bg-white rounded-3xl p-8 sm:p-10 border border-gray-200 shadow-xs space-y-5">
+            <div className="w-20 h-20 rounded-full bg-purple-50 text-[#8b3ab5] flex items-center justify-center mx-auto border border-purple-100">
+              <ShoppingBagOutlinedIcon sx={{ fontSize: 40 }} />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-gray-900">Your Services Cart is Empty</h2>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Explore government documentation, tax filing, insurance, and company registration services with doorstep pickup.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/services')}
+              className="w-full py-3.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] hover:opacity-95 shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Explore Services</span>
+              <ArrowForwardIcon sx={{ fontSize: 16 }} />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -104,11 +118,13 @@ export const ServiceCartPage = () => {
       <div className="flex items-center justify-between border-b border-gray-200 pb-4">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => navigate('/services')}
-            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
             title="Back to Services"
           >
-            <ArrowBackIcon sx={{ fontSize: 18 }} />
+            <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <span>Back to Services</span>
           </button>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">

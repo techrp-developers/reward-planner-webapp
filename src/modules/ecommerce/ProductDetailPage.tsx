@@ -11,6 +11,7 @@ import ProductCard from '../../components/product/ProductCard';
 import RichText from '../../components/common/RichText';
 import { GradientButton } from '../../components/ui/GradientButton';
 import {
+  ArrowLeft,
   MapPin,
   CheckCircle2,
   Truck,
@@ -177,40 +178,54 @@ export const ProductDetailPage = () => {
 
   return (
     <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6">
-      {/* BREADCRUMBS */}
-      <nav className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
-        <span onClick={() => navigate('/')} className="hover:text-[#8b3ab5] cursor-pointer">
-          Home
-        </span>
-        <span>/</span>
-        <span onClick={() => navigate('/store')} className="hover:text-[#8b3ab5] cursor-pointer">
-          Store
-        </span>
-        {product.category && (
-          <>
-            <span>/</span>
-            <span
-              onClick={() => navigate(`/store?category=${product.category_id || ''}`)}
-              className="hover:text-[#8b3ab5] cursor-pointer"
-            >
-              {product.category}
+      {/* TOP NAVIGATION & BREADCRUMBS */}
+      <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+            title="Go Back"
+          >
+            <ArrowLeft size={16} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <span>Back</span>
+          </button>
+
+          <nav className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap">
+            <span onClick={() => navigate('/')} className="hover:text-[#8b3ab5] cursor-pointer">
+              Home
             </span>
-          </>
-        )}
-        {product.subcategory && (
-          <>
             <span>/</span>
-            <span
-              onClick={() => navigate(`/store?category=${product.category_id || ''}&sub=${product.subcategory_id || ''}`)}
-              className="hover:text-[#8b3ab5] cursor-pointer"
-            >
-              {product.subcategory}
+            <span onClick={() => navigate('/store')} className="hover:text-[#8b3ab5] cursor-pointer">
+              Store
             </span>
-          </>
-        )}
-        <span>/</span>
-        <span className="text-gray-900 font-bold truncate max-w-sm">{product.title}</span>
-      </nav>
+            {product.category && (
+              <>
+                <span>/</span>
+                <span
+                  onClick={() => navigate(`/store?category=${product.category_id || ''}`)}
+                  className="hover:text-[#8b3ab5] cursor-pointer"
+                >
+                  {product.category}
+                </span>
+              </>
+            )}
+            {product.subcategory && (
+              <>
+                <span>/</span>
+                <span
+                  onClick={() => navigate(`/store?category=${product.category_id || ''}&sub=${product.subcategory_id || ''}`)}
+                  className="hover:text-[#8b3ab5] cursor-pointer"
+                >
+                  {product.subcategory}
+                </span>
+              </>
+            )}
+            <span>/</span>
+            <span className="text-gray-900 font-bold truncate max-w-xs sm:max-w-md">{product.title}</span>
+          </nav>
+        </div>
+      </div>
 
       {/* 2-COLUMN MAIN PRODUCT VIEW */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">

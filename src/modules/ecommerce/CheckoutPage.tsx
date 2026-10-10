@@ -28,6 +28,7 @@ import { loadRazorpay } from '../../utils/loadRazorpay';
 import { getImageUrl } from '../../api/client';
 
 // Material UI Icons
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import AddIcon from '@mui/icons-material/Add';
@@ -484,20 +485,34 @@ export const CheckoutPage = () => {
 
   return (
     <div className="w-full max-w-[1500px] mx-auto px-4 lg:px-8 py-8 space-y-8">
-      {/* Breadcrumbs */}
-      <nav className="text-xs text-gray-500 flex items-center gap-1.5">
-        <Link to="/" className="hover:text-gray-900">
-          Home
-        </Link>
-        <span>/</span>
-        <Link to="/store" className="hover:text-gray-900">
-          Store
-        </Link>
-        <span>/</span>
-        <span className="font-bold text-gray-900">
-          {mode === 'buy_now' ? 'Express Checkout' : 'Secure Checkout'}
-        </span>
-      </nav>
+      {/* Top Navigation & Breadcrumbs */}
+      <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => (mode === 'buy_now' ? navigate(-1) : navigate('/cart'))}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-xs sm:text-sm font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:-translate-x-0.5"
+            title={mode === 'buy_now' ? 'Back to Product' : 'Back to Cart'}
+          >
+            <ArrowBackIcon sx={{ fontSize: 16 }} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
+            <span>{mode === 'buy_now' ? 'Back' : 'Back to Cart'}</span>
+          </button>
+
+          <nav className="text-xs text-gray-500 flex items-center gap-1.5">
+            <Link to="/" className="hover:text-gray-900">
+              Home
+            </Link>
+            <span>/</span>
+            <Link to="/store" className="hover:text-gray-900">
+              Store
+            </Link>
+            <span>/</span>
+            <span className="font-bold text-gray-900">
+              {mode === 'buy_now' ? 'Express Checkout' : 'Secure Checkout'}
+            </span>
+          </nav>
+        </div>
+      </div>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
