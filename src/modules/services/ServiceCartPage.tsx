@@ -1,3 +1,5 @@
+import CelebrationOutlinedIcon from '@mui/icons-material/CelebrationOutlined';
+import ServiceImage from '../../components/services/ServiceImage';
 // src/modules/services/ServiceCartPage.jsx
 import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,6 +9,7 @@ import { getServiceBanner } from '../../components/services/ServiceBannerCarouse
 
 // Material UI Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import BoltIcon from '@mui/icons-material/Bolt';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -18,18 +21,18 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
-export const ServiceCartPage = () => {
+export const ServiceCartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { serviceCartItems, removeFromCart, cartRewards, loading } = useServiceCart();
-  const [openDocsMap, setOpenDocsMap] = useState({});
-  const [useRewardCoins, setUseRewardCoins] = useState(true);
-  const [busyItemId, setBusyItemId] = useState(null);
+  const { serviceCartItems, removeFromCart, cartRewards, loading, error, refreshServiceCart } = useServiceCart();
+  const [openDocsMap, setOpenDocsMap] = useState<Record<string | number, boolean>>({});
+  const [useRewardCoins, setUseRewardCoins] = useState<boolean>(true);
+  const [busyItemId, setBusyItemId] = useState<string | number | null>(null);
 
-  const toggleDocs = (id) => {
+  const toggleDocs = (id: string | number) => {
     setOpenDocsMap((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleRemove = async (item) => {
+  const handleRemove = async (item: any) => {
     setBusyItemId(item.id);
     try {
       await removeFromCart(item);
@@ -38,7 +41,7 @@ export const ServiceCartPage = () => {
     }
   };
 
-  const handleBuyNowSingle = (item) => {
+  const handleBuyNowSingle = (item: any) => {
     if (item.isBundle) {
       navigate(`/services/checkout?mode=buy_now&bundleId=${item.bundle_id}`);
     } else {
@@ -72,6 +75,8 @@ export const ServiceCartPage = () => {
   const onProceedToCheckout = () => {
     navigate(`/services/checkout?mode=cart&redeemCoins=${totals.redeemCoins}`);
   };
+
+  if (error) return <div role="alert" className="p-8 text-center text-sm"><p>Could not load your services cart.</p><button type="button" className="mt-3 font-bold text-purple-700" onClick={() => void refreshServiceCart()}>Retry cart</button></div>;
 
   if (!loading && serviceCartItems.length === 0) {
     return (
@@ -113,9 +118,9 @@ export const ServiceCartPage = () => {
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+    <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col font-['Poppins',sans-serif]">
       {/* 1. Header & Navigation */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+      <div className="flex shrink-0 items-center justify-between border-b border-gray-200 pb-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -139,16 +144,22 @@ export const ServiceCartPage = () => {
 
         <button
           onClick={() => navigate('/services')}
-          className="text-xs font-bold text-[#7C3AED] hover:underline cursor-pointer hidden sm:block"
+          className="text-xs font-bold text-[#7C3AED] hover:underline cursor-pointer hidden sm:flex items-center gap-1"
         >
-          + Add More Services
+          <AddIcon sx={{ fontSize: 16 }} />
+          <span>Add More Services</span>
         </button>
       </div>
 
       {/* 2. Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start lg:min-h-0 lg:flex-1">
         {/* Left Column: Cart Items List */}
-        <div className="lg:col-span-2 space-y-4">
+        <div
+          role="region"
+          aria-label="Services in your cart"
+          tabIndex={0}
+          className="lg:col-span-2 space-y-4 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pb-1 focus-visible:outline-2 focus-visible:outline-purple-500 focus-visible:outline-offset-2"
+        >
           {serviceCartItems.map((item) => {
             const hasDocs = Array.isArray(item.documents) && item.documents.length > 0;
             const isDocsOpen = !!openDocsMap[item.id];
@@ -165,13 +176,10 @@ export const ServiceCartPage = () => {
                 <div className="flex gap-4 items-start">
                   {/* Thumbnail */}
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#F8F9FD] border border-gray-100 p-2 flex items-center justify-center shrink-0 overflow-hidden">
-                    <img
+                    <ServiceImage
                       src={imageSrc}
                       alt={item.service_name}
                       className="w-full h-full object-contain"
-                      onError={(e) => {
-                        (e.target as any).src = fallbackImg;
-                      }}
                     />
                   </div>
 
@@ -274,8 +282,8 @@ export const ServiceCartPage = () => {
         </div>
 
         {/* Right Column: Order Bill Summary & Checkout */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-5 sticky top-24">
+        <div className="space-y-4 lg:sticky lg:top-0">
+          <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-5">
             <h2 className="text-base font-black text-gray-900 border-b border-gray-100 pb-3">
               Order Summary
             </h2>
@@ -334,7 +342,7 @@ export const ServiceCartPage = () => {
 
               {totals.earnCoins > 0 && (
                 <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 text-[11px] font-bold text-center border border-emerald-200">
-                  🎉 You will earn +{totals.earnCoins} RP Coins on this order!
+                  <CelebrationOutlinedIcon sx={{ fontSize: 16 }} /> You will earn +{totals.earnCoins} RP Coins on this order!
                 </div>
               )}
             </div>

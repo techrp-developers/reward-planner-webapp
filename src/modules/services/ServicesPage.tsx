@@ -1,15 +1,16 @@
 // src/modules/services/ServicesPage.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  fetchServiceCategories,
-  fetchAllServices,
-  fetchServiceBanners,
-  fetchServiceBundles,
-} from '../../api/servicesApi';
+import React, { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useServiceQuery } from './serviceQueries';
+import ServiceSectionState from './components/ServiceSectionState';
+import ServiceImage from '../../components/services/ServiceImage';
+import { filterServices, getCategoryLayout } from './serviceCatalog';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
+import { getInsuranceQuotePath } from './insurance/insuranceProducts';
 
 // Material UI Icons
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
@@ -17,53 +18,28 @@ import StarIcon from '@mui/icons-material/Star';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
-export const ServicesPage = () => {
+export const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [banners, setBanners] = useState([]);
-  const [bundles, setBundles] = useState([]);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const categoriesQuery = useServiceQuery('categories');
+  const bundlesQuery = useServiceQuery('bundles');
+  const servicesQuery = useServiceQuery('list');
+  const categories = categoriesQuery.data || [];
+  const bundles = bundlesQuery.data || [];
+  const services: any[] = servicesQuery.data || [];
   const [searchQuery, setSearchQuery] = useState('');
+  const search = useDebouncedValue(searchQuery);
 
-  useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    Promise.allSettled([
-      fetchServiceCategories(),
-      fetchServiceBanners(),
-      fetchServiceBundles(),
-      fetchAllServices(),
-    ]).then(([catRes, banRes, bunRes, srvRes]) => {
-      if (!isMounted) return;
-      if (catRes.status === 'fulfilled' && Array.isArray(catRes.value)) {
-        setCategories(catRes.value);
-      }
-      if (banRes.status === 'fulfilled' && Array.isArray(banRes.value)) {
-        setBanners(banRes.value);
-      }
-      if (bunRes.status === 'fulfilled' && Array.isArray(bunRes.value)) {
-        setBundles(bunRes.value);
-      }
-      if (srvRes.status === 'fulfilled' && Array.isArray(srvRes.value)) {
-        setServices(srvRes.value);
-      }
-      setLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleCategoryClick = (cat) => {
+  const handleCategoryClick = (cat: any) => {
     const displayType = String(cat.display_type || 'list').toLowerCase();
     const catName = String(cat.name || '').toLowerCase();
 
-    if (displayType === 'content' || catName.includes('mutual fund')) {
+    if (Number(cat.id) === 2 || catName.includes('insurance')) {
+      navigate('/insurance');
+    } else if (displayType === 'content' || catName.includes('mutual fund')) {
       navigate('/services/mutual-funds');
     } else if (displayType === 'direct' && cat.direct_service_id) {
       navigate(`/services/detail/${cat.direct_service_id}`);
@@ -72,20 +48,16 @@ export const ServicesPage = () => {
     }
   };
 
-  const filteredServices = services.filter((srv) =>
-    (srv.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (srv.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (srv.category_name || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredServices = useMemo(() => filterServices(services, search), [services, search]);
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-8">
-      {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (EXACT PREVIOUS BANNER UI, DUMMY FALLBACKS, SAME BG IMAGES & CONTENT) */}
-      <ServiceBannerCarousel banners={banners} />
+    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5">
+      {/* Promotional banners supplied for the Service page. */}
+      <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 
       {/* 2. SEARCH BAR & QUICK FILTERS */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm sm:text-base font-black text-gray-900">
             Explore Services
           </span>
@@ -94,11 +66,12 @@ export const ServicesPage = () => {
           </span>
         </div>
 
-        <div className="w-full sm:w-80">
+        <div className="w-full sm:w-96 sm:max-w-[45%]">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search services"
             placeholder="Search PAN, MSEB, Tax, Insurance, Driving License..."
             className="w-full px-4 py-2.5 text-xs bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7C3AED] font-medium shadow-2xs"
           />
@@ -106,8 +79,8 @@ export const ServicesPage = () => {
       </div>
 
       {/* 3. SERVICE CATEGORIES (App UI Layout: 3 equal cards on Row 1, Wide + Narrow card on Row 2) */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3 border-b border-gray-200 pb-2">
           <h2 className="text-sm sm:text-base font-black text-gray-900">
             Browse Services by Category
           </h2>
@@ -116,116 +89,29 @@ export const ServicesPage = () => {
           </span>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="h-32 rounded-2xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Row 1: First 3 Categories (Tax Filing, Insurance, Government Document) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {categories.slice(0, 3).map((cat) => (
-                <div
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat)}
-                  className="relative h-32 rounded-2xl p-5 overflow-hidden border border-[#ECE7FF] bg-gradient-to-br from-[#FAF8FF] to-[#EFEAFF] shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
-                >
-                  <h3 className="text-sm sm:text-base font-black text-[#1F2937] leading-snug max-w-[65%] group-hover:text-[#7C3AED] transition-colors">
-                    {cat.name}
-                  </h3>
-
-                  <div className="absolute right-3 bottom-2 w-20 h-20 flex items-center justify-center pointer-events-none group-hover:scale-108 transition-transform duration-300">
-                    {cat.icon ? (
-                      <img
-                        src={getImageUrl(cat.icon)}
-                        alt={cat.name}
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <BuildOutlinedIcon sx={{ fontSize: 40 }} className="text-[#A654CD]" />
-                    )}
-                  </div>
-
-                  <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">
-                    Explore Services →
-                  </span>
+        <ServiceSectionState query={categoriesQuery} label="service categories" empty={!categories.length} skeleton="categories" />
+        {!categoriesQuery.isPending && !categoriesQuery.isError && (
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+            {categories.map(cat => (
+              <button type="button" key={cat.id} onClick={() => handleCategoryClick(cat)}
+                className={`${getCategoryLayout(cat) === 'wide' ? 'sm:col-span-8' : 'sm:col-span-4'} text-left relative h-32 rounded-2xl p-5 overflow-hidden border border-[#ECE7FF] bg-gradient-to-br from-[#FAF8FF] to-[#EFEAFF] shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group`}>
+                <div className="max-w-[65%] space-y-1">
+                  <h3 className="text-sm sm:text-base font-black text-[#1F2937] leading-snug group-hover:text-[#7C3AED] transition-colors">{cat.name}</h3>
+                  {Number(cat.id) === 4 && <p className="text-[11px] text-gray-500 line-clamp-1">SIP calculators, goal planning, and verified educational guides</p>}
                 </div>
-              ))}
-            </div>
-
-            {/* Row 2: Next 2 Categories (Mutual Fund = Wide 2/3, MSEB Name Change = Narrow 1/3) */}
-            {categories.length > 3 && (
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                {/* 4th Category: Mutual Fund (Wide 8 columns) */}
-                {categories[3] && (
-                  <div
-                    onClick={() => handleCategoryClick(categories[3])}
-                    className="sm:col-span-8 relative h-32 rounded-2xl p-5 overflow-hidden border border-[#ECE7FF] bg-gradient-to-br from-[#FAF8FF] to-[#EFEAFF] shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
-                  >
-                    <div className="max-w-[65%] space-y-1">
-                      <h3 className="text-sm sm:text-base font-black text-[#1F2937] leading-snug group-hover:text-[#7C3AED] transition-colors">
-                        {categories[3].name}
-                      </h3>
-                      <p className="text-[11px] text-gray-500 line-clamp-1">
-                        SIP calculators, goal planning, and verified educational guides
-                      </p>
-                    </div>
-
-                    <div className="absolute right-4 bottom-2 w-28 h-24 flex items-center justify-center pointer-events-none group-hover:scale-108 transition-transform duration-300">
-                      {categories[3].icon ? (
-                        <img
-                          src={getImageUrl(categories[3].icon)}
-                          alt={categories[3].name}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <BuildOutlinedIcon sx={{ fontSize: 44 }} className="text-[#A654CD]" />
-                      )}
-                    </div>
-
-                    <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">
-                      Calculate & Learn →
-                    </span>
-                  </div>
-                )}
-
-                {/* 5th Category: MSEB Name Change (Narrow 4 columns) */}
-                {categories[4] && (
-                  <div
-                    onClick={() => handleCategoryClick(categories[4])}
-                    className="sm:col-span-4 relative h-32 rounded-2xl p-5 overflow-hidden border border-[#ECE7FF] bg-gradient-to-br from-[#FAF8FF] to-[#EFEAFF] shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
-                  >
-                    <h3 className="text-sm sm:text-base font-black text-[#1F2937] leading-snug max-w-[65%] group-hover:text-[#7C3AED] transition-colors">
-                      {categories[4].name}
-                    </h3>
-
-                    <div className="absolute right-3 bottom-2 w-20 h-20 flex items-center justify-center pointer-events-none group-hover:scale-108 transition-transform duration-300">
-                      {categories[4].icon ? (
-                        <img
-                          src={getImageUrl(categories[4].icon)}
-                          alt={categories[4].name}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <BuildOutlinedIcon sx={{ fontSize: 40 }} className="text-[#A654CD]" />
-                      )}
-                    </div>
-
-                    <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">
-                      Book Now →
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+                <div className={`absolute right-3 bottom-2 ${getCategoryLayout(cat) === 'wide' ? 'w-28 h-24' : 'w-20 h-20'} flex items-center justify-center pointer-events-none group-hover:scale-108 transition-transform duration-300`}>
+                  {cat.icon ? <ServiceImage src={getImageUrl(cat.icon)} alt="" sizes="80px" className="w-full h-full object-contain" /> : <BuildOutlinedIcon sx={{ fontSize: 40 }} className="text-[#A654CD]" />}
+                </div>
+                <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">{Number(cat.id) === 5 ? 'Book Now' : 'Explore Services'} <ArrowForwardIcon sx={{ fontSize: 13 }} /></span>
+              </button>
+            ))}
           </div>
         )}
       </section>
 
       {/* 4. VALUE SERVICE BUNDLES & PACKS (Clean 2:1 ratio, uncropped graphics) */}
-      {bundles.length > 0 && (
+      <ServiceSectionState query={bundlesQuery} label="service bundles" empty={!bundles.length} />
+      {!bundlesQuery.isError && bundles.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3">
             <div className="flex items-center gap-2">
@@ -245,21 +131,19 @@ export const ServicesPage = () => {
             {bundles.map((bundle) => {
               const savings = Math.max(0, Number(bundle.original_price || 0) - Number(bundle.bundle_price || 0));
               return (
-                <div
+                <Link
                   key={bundle.id}
-                  onClick={() => navigate(`/services/bundle/${bundle.id}`)}
+                  to={`/services/bundle/${bundle.id}`}
                   className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between group"
                 >
                   <div className="relative aspect-[2/1] w-full bg-gradient-to-br from-[#F8F9FD] to-[#EEF0F8] overflow-hidden flex items-center justify-center p-1.5">
-                    <img
+                    <ServiceImage
                       src={bundle.banner_image ? getImageUrl(bundle.banner_image) : getServiceBanner(bundle.id, bundle.name)}
+                      fallbackSrc={getServiceBanner(bundle.id, bundle.name)}
+                      sizes="(min-width: 768px) 50vw, 100vw"
                       alt={bundle.name}
                       className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500 drop-shadow-2xs"
                       style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      onError={(e) => {
-                        const fb = getServiceBanner(bundle.id, bundle.name);
-                        if ((e.target as any).src !== fb) (e.target as any).src = fb;
-                      }}
                     />
                     {savings > 0 && (
                       <span className="absolute top-3 right-3 bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-md">
@@ -291,13 +175,13 @@ export const ServicesPage = () => {
                         <span className="text-[10px] text-emerald-700 font-bold">Bundle Discount Applied</span>
                       </div>
 
-                      <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-sm group-hover:opacity-95 flex items-center gap-1.5 cursor-pointer">
+                      <span className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-sm group-hover:opacity-95 flex items-center gap-1.5 cursor-pointer">
                         <span>View Pack</span>
                         <ArrowForwardIcon sx={{ fontSize: 14 }} />
-                      </button>
+                      </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -320,7 +204,8 @@ export const ServicesPage = () => {
           </span>
         </div>
 
-        {filteredServices.length === 0 && !loading ? (
+        <ServiceSectionState query={servicesQuery} label="services" />
+        {!servicesQuery.isPending && !servicesQuery.isError && (filteredServices.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 p-8 space-y-3">
             <p className="text-sm font-bold text-gray-700">No services matched your query</p>
             <p className="text-xs text-gray-400">Try searching for PAN, Tax, Insurance, or License</p>
@@ -333,23 +218,21 @@ export const ServicesPage = () => {
               const rating = Number(srv.rating || 4.5);
 
               return (
-                <div
+                <Link
                   key={srv.id}
-                  onClick={() => navigate(`/services/detail/${srv.id}`)}
+                  to={getInsuranceQuotePath(srv.id, srv.name) || `/services/detail/${srv.id}`}
                   className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group space-y-4"
                 >
                   <div className="flex gap-3.5 items-start">
                     {/* Uncropped Service Image Thumbnail with padded canvas matching mobile Card.tsx */}
                     <div className="w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden bg-gradient-to-br from-[#F8F9FD] to-[#EEF0F8] border border-gray-100 flex items-center justify-center p-1.5 shrink-0 group-hover:scale-102 transition-transform">
-                      <img
+                      <ServiceImage
                         src={srv.service_image ? getImageUrl(srv.service_image) : getServiceBanner(srv.id, srv.name)}
+                        fallbackSrc={getServiceBanner(srv.id, srv.name)}
+                        sizes="128px"
                         alt={srv.name}
                         className="w-full h-full object-contain drop-shadow-2xs"
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
-                        onError={(e) => {
-                          const fb = getServiceBanner(srv.id, srv.name);
-                          if ((e.target as any).src !== fb) (e.target as any).src = fb;
-                        }}
                       />
                     </div>
 
@@ -387,16 +270,16 @@ export const ServicesPage = () => {
                       </div>
                     </div>
 
-                    <button className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#8b3ab5] bg-purple-50 hover:bg-purple-100 transition-colors cursor-pointer flex items-center gap-1">
+                    <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#8b3ab5] bg-purple-50 hover:bg-purple-100 transition-colors cursor-pointer flex items-center gap-1">
                       <span>Book Service</span>
                       <ArrowForwardIcon sx={{ fontSize: 13 }} />
-                    </button>
+                    </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
-        )}
+        ))}
       </section>
 
       {/* 6. TRUST & SAFETY BADGE */}
@@ -414,10 +297,10 @@ export const ServicesPage = () => {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-xs font-bold text-gray-700 bg-white/80 px-3 py-1.5 rounded-lg border border-gray-200">
-            🔒 256-bit Encrypted
+            <LockOutlinedIcon sx={{ fontSize: 14 }} /> 256-bit Encrypted
           </span>
           <span className="text-xs font-bold text-gray-700 bg-white/80 px-3 py-1.5 rounded-lg border border-gray-200">
-            🛡️ Authorized Govt Vendors
+            <ShieldOutlinedIcon sx={{ fontSize: 14 }} /> Authorized Govt Vendors
           </span>
         </div>
       </div>

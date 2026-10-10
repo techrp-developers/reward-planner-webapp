@@ -18,9 +18,12 @@ api.interceptors.request.use((config) => {
 
 // Response interceptor: handle 401 with automatic token refresh
 let isRefreshing = false;
-let failedQueue = [];
+let failedQueue: Array<{
+  resolve: (token: string | null) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
 
-const processQueue = (error, token = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -43,7 +46,7 @@ api.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<string | null>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
@@ -98,7 +101,7 @@ api.interceptors.response.use(
   }
 );
 
-export const getImageUrl = (imagePath) => {
+export const getImageUrl = (imagePath: unknown): string => {
   if (!imagePath || typeof imagePath !== 'string') return '/placeholder.svg';
   const trimmed = imagePath.trim();
   if (!trimmed) return '/placeholder.svg';

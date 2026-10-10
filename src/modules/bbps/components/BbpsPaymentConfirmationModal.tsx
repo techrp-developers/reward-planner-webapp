@@ -1,5 +1,5 @@
-// src/modules/bbps/components/BbpsPaymentConfirmationModal.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ShieldCheck, Zap, Calendar, User, Hash, Sparkles, ArrowRight, Lock } from 'lucide-react';
 
 const formatBillDate = (val) => {
@@ -33,9 +33,18 @@ export const BbpsPaymentConfirmationModal = ({
   // Reward points calculation (e.g. 1% cashback as RP coins)
   const bonusCoins = Math.max(Math.round(amount * 0.05), 5);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] my-auto">
         {/* Header */}
         <div className="px-6 py-5 bg-gradient-to-r from-[#1C0E28] via-[#2A1338] to-[#4A206A] text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -178,7 +187,8 @@ export const BbpsPaymentConfirmationModal = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

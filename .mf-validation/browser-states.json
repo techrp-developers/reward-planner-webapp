@@ -1,0 +1,11 @@
+{
+  "mode": "standalone component with deliberately injected failures",
+  "checks": [
+    "Category error and retry recovers with live data.",
+    "FAQ search retains successful results during partial failure and retries the failed search.",
+    "Section error and retry recovers with live articles.",
+    "Closing a loading dialog cancels its request without showing a later error.",
+    "Empty category payload shows the published-content empty state."
+  ],
+  "passed": true
+}

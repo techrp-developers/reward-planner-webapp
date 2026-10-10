@@ -1,5 +1,6 @@
 // src/router/AppRouter.jsx
-import React from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { preloadServicesHome } from '../modules/services/servicesPreload';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ScrollToTop from '../components/common/ScrollToTop';
@@ -8,23 +9,22 @@ import MegaMenuStrip from '../components/layout/MegaMenuStrip';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
 import rpLogo from '../assets/rp_logo_crisp.png';
+import MobileBottomBar from '../components/layout/MobileBottomBar';
 
 import LoginPage from '../modules/auth/LoginPage';
-import HomePage from '../modules/home/HomePage';
 import CinematicModuleStage from '../modules/stage/CinematicModuleStage';
-import ProductListingPage from '../modules/ecommerce/ProductListingPage';
 import ProductDetailPage from '../modules/ecommerce/ProductDetailPage';
 import NavratriProductsPage from '../modules/ecommerce/NavratriProductsPage';
 import CartPage from '../modules/ecommerce/CartPage';
 import CheckoutPage from '../modules/ecommerce/CheckoutPage';
-import BBPSPage from '../modules/bbps/BBPSPage';
-import ServicesPage from '../modules/services/ServicesPage';
-import ServiceCategoryPage from '../modules/services/ServiceCategoryPage';
-import ServiceDetailPage from '../modules/services/ServiceDetailPage';
-import ServiceCartPage from '../modules/services/ServiceCartPage';
-import ServiceCheckoutPage from '../modules/services/ServiceCheckoutPage';
-import MutualFundPage from '../modules/services/MutualFundPage';
-import ServiceBundlePage from '../modules/services/ServiceBundlePage';
+const ServiceCategoryPage = lazy(() => import('../modules/services/ServiceCategoryPage'));
+const ServiceDetailPage = lazy(() => import('../modules/services/ServiceDetailPage'));
+const ServiceCartPage = lazy(() => import('../modules/services/ServiceCartPage'));
+const ServiceCheckoutPage = lazy(() => import('../modules/services/ServiceCheckoutPage'));
+const MutualFundPage = lazy(() => import('../modules/services/MutualFundPage'));
+const ServiceBundlePage = lazy(() => import('../modules/services/ServiceBundlePage'));
+const InsuranceQuotePage = lazy(() => import('../modules/services/insurance/InsuranceQuotePageFlow'));
+const InsuranceProductsPage = lazy(() => import('../modules/services/insurance/InsuranceProductsPage'));
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
@@ -33,6 +33,9 @@ import NotificationsPage from '../modules/notifications/NotificationsPage';
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === '/services') preloadServicesHome();
+  }, [isAuthenticated, location.pathname]);
 
   const isPolicyPage = [
     '/terms',
@@ -50,6 +53,23 @@ export const AppRouter = () => {
     location.pathname === '/bbps';
 
   const isHomePage = location.pathname === '/';
+  const isEventsPage =
+    location.pathname.startsWith('/events') ||
+    location.pathname === '/my-events' ||
+    location.pathname === '/all-events';
+  const isWellnessPage =
+    location.pathname.startsWith('/wellness') ||
+    location.pathname === '/health-wellness';
+  const isBenefitsPage =
+    location.pathname.startsWith('/benefits') ||
+    location.pathname === '/my-benefits';
+  const isReportsPage =
+    location.pathname.startsWith('/reports');
+  const isRewardsPage =
+    location.pathname.startsWith('/rewards') ||
+    location.pathname === '/my-rewards';
+  const isFixedLayout = isStageRoute || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage || isRewardsPage;
+  const isServicePurchasePage = location.pathname === '/services/cart' || location.pathname === '/services/checkout';
   const isFixedLayout = isStageRoute;
 
   const isEcommercePage =
@@ -98,6 +118,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
+    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
     <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
@@ -107,6 +128,8 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
+      <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
+        <Suspense fallback={<div role="status" className="p-8 text-center text-sm text-gray-500">Loading page...</div>}>
       <main className={`flex-1 w-full overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
         {isStageRoute ? (
           <CinematicModuleStage />
@@ -130,9 +153,16 @@ export const AppRouter = () => {
             {/* SERVICES FULL SUITE */}
             <Route path="/services/cart" element={<ServiceCartPage />} />
             <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
+            <Route path="/services/category/2" element={<InsuranceProductsPage />} />
             <Route path="/services/category/:categoryId" element={<ServiceCategoryPage />} />
             <Route path="/services/detail/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+            <Route path="/services/health-insurance/quote" element={<InsuranceQuotePage key="health" insuranceType="health" />} />
+            <Route path="/insurance/quote" element={<InsuranceQuotePage key="health-alias" insuranceType="health" />} />
+            <Route path="/services/super-top-up/quote" element={<InsuranceQuotePage key="supertopup" insuranceType="supertopup" />} />
+            <Route path="/services/personal-accident/quote" element={<InsuranceQuotePage key="personal-accident" insuranceType="personal_accident" />} />
+            <Route path="/insurance/super-top-up/quote" element={<InsuranceQuotePage key="supertopup-alias" insuranceType="supertopup" />} />
+            <Route path="/insurance/personal-accident/quote" element={<InsuranceQuotePage key="personal-accident-alias" insuranceType="personal_accident" />} />
             <Route path="/services/mutual-funds" element={<MutualFundPage />} />
             <Route path="/services/bundle/:bundleId" element={<ServiceBundlePage />} />
             <Route path="/insurance" element={<Navigate to="/services/category/2" replace />} />
@@ -165,6 +195,7 @@ export const AppRouter = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
+        </Suspense>
       </main>
 
       {/* SLIDE-OVER RIGHT CART DRAWER */}
@@ -172,6 +203,12 @@ export const AppRouter = () => {
 
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
+
+      {/* FULL-WIDTH FOOTER (Hidden on fixed layout app pages, policy pages, and e-commerce per user specification) */}
+      {!isPolicyPage && !isEcommercePage && !isFixedLayout && (
+        isServicePurchasePage ? <div className="lg:hidden"><Footer /></div> : <Footer />
+      )}
+      <MobileBottomBar />
     </div>
   );
 };

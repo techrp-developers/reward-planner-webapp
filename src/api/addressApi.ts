@@ -2,11 +2,12 @@
 import api from './client';
 import { ENDPOINTS } from './endpoints';
 
-export const fetchAllAddresses = async () => {
+export const fetchAllAddresses = async (signal?: AbortSignal, strict = false) => {
   try {
-    const res = await api.get(ENDPOINTS.auth.addresses);
+    const res = await api.get(ENDPOINTS.auth.addresses, { signal });
     return res.data?.data || res.data || [];
-  } catch {
+  } catch (error) {
+    if (strict || signal?.aborted) throw error;
     return [];
   }
 };

@@ -516,3 +516,5 @@ export const MutualFundPage = () => {
 };
 
 export default MutualFundPage;
+// src/modules/services/MutualFundPage.tsx
+export { default, default as MutualFundPage } from './mutualfund/web/MFScreen';

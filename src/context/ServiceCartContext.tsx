@@ -1,3 +1,4 @@
+import { QueryClient, useQuery } from '@tanstack/react-query';
 // src/context/ServiceCartContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
@@ -12,14 +13,15 @@ import { useAuth } from './AuthContext';
 const ServiceCartContext = createContext(null);
 
 export const ServiceCartProvider = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  const [cartData, setCartData] = useState({
-    bundles: [],
-    individual_items: [],
-    total: 0,
-    rewards: { earn_coins: 0, max_redeem_coins: 0 },
-  });
-  const [loading, setLoading] = useState(false);
+  const { isAuthenticated, token } = useAuth();
+  // Private per-session cache; never persists addresses, orders, or cart data globally.
+  const privateClient = useMemo(() => new QueryClient(), [token]);
+  const cartQuery = useQuery({ queryKey: ['service-cart'], enabled: isAuthenticated,
+    queryFn: ({ signal }) => fetchServiceCartItems(signal), staleTime: 15_000,
+    gcTime: 0, retry: false, refetchOnWindowFocus: false }, privateClient);
+  useEffect(() => () => privateClient.clear(), [privateClient]);
+  const cartData = cartQuery.data || { bundles: [], individual_items: [], total: 0, rewards: { earn_coins: 0, max_redeem_coins: 0 } };
+  const loading = isAuthenticated && cartQuery.isPending;
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = useCallback((msg, type = 'success') => {
@@ -30,30 +32,9 @@ export const ServiceCartProvider = ({ children }) => {
   }, []);
 
   const refreshServiceCart = useCallback(async () => {
-    if (!isAuthenticated) {
-      setCartData({
-        bundles: [],
-        individual_items: [],
-        total: 0,
-        rewards: { earn_coins: 0, max_redeem_coins: 0 },
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const data = await fetchServiceCartItems();
-      setCartData(data);
-    } catch (err) {
-      console.warn('Failed to load service cart items:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    refreshServiceCart();
-  }, [refreshServiceCart]);
+    if (!isAuthenticated) return;
+    await privateClient.invalidateQueries({ queryKey: ['service-cart'] });
+  }, [isAuthenticated, privateClient]);
 
   // Normalized items combining bundles & individual items for UI display
   const serviceCartItems = useMemo(() => {
@@ -178,6 +159,7 @@ export const ServiceCartProvider = ({ children }) => {
 
   const value = {
     serviceCartData: cartData,
+    error: cartQuery.isError ? cartQuery.error : null,
     serviceCartItems,
     serviceCartCount,
     cartRewards: cartData.rewards || { earn_coins: 0, max_redeem_coins: 0 },

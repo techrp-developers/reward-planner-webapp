@@ -1,8 +1,11 @@
+import ServiceImage from '../../components/services/ServiceImage';
 // src/modules/services/ServiceBundlePage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchServiceBundleDetail, submitServiceEnquiry } from '../../api/servicesApi';
+import { submitServiceEnquiry } from '../../api/servicesApi';
 import { getImageUrl } from '../../api/client';
+import { useServiceQuery } from './serviceQueries';
+import ServiceSectionState from './components/ServiceSectionState';
 import { useAuth } from '../../context/AuthContext';
 import { GradientButton } from '../../components/ui/GradientButton';
 import { Modal } from '../../components/ui/Modal';
@@ -15,48 +18,31 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { useServiceCart } from '../../context/ServiceCartContext';
 
-export const ServiceBundlePage = () => {
-  const { bundleId } = useParams();
+export const ServiceBundlePage: React.FC = () => {
+  const { bundleId } = useParams<{ bundleId?: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated, openAuth } = useAuth();
   const { addBundle, serviceCartCount } = useServiceCart();
 
-  const [bundleData, setBundleData] = useState(null);
-  const [formValues, setFormValues] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [addingPack, setAddingPack] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [formError, setFormError] = useState('');
+  const bundleQuery = useServiceQuery('bundle', bundleId);
+  const bundleData = bundleQuery.data;
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const loading = bundleQuery.isPending;
+  const [addingPack, setAddingPack] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>('');
+  const enquiryLock = useRef(false);
+  const packLock = useRef(false);
 
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    fetchServiceBundleDetail(bundleId)
-      .then((data) => {
-        if (!isMounted) return;
-        setBundleData(data);
-        if (user) {
-          setFormValues({
-            full_name: user.name || user.first_name || '',
-            email_id: user.email || '',
-            mobile_number: user.phone || user.mobile || '',
-          });
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [bundleId, user]);
+    if (user) setFormValues(current => ({ ...current, full_name: current.full_name || user.name || user.first_name || '', email_id: current.email_id || user.email || '', mobile_number: current.mobile_number || user.phone || user.mobile || '' }));
+  }, [user]);
 
   const bundle = bundleData?.bundle;
   const items = bundleData?.items || [];
@@ -64,11 +50,11 @@ export const ServiceBundlePage = () => {
   const enquiryFields = bundleData?.enquiry_fields || [];
   const trustStats = bundleData?.sections?.trust_stats || [];
 
-  const handleFieldChange = (field, val) => {
+  const handleFieldChange = (field: string, val: string) => {
     setFormValues((prev) => ({ ...prev, [field]: val }));
   };
 
-  const handleEnquirySubmit = async (e) => {
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
       openAuth('login');
@@ -84,16 +70,20 @@ export const ServiceBundlePage = () => {
     }
 
     setFormError('');
+    if (enquiryLock.current) return;
+    enquiryLock.current = true;
     setSubmitting(true);
     try {
-      await submitServiceEnquiry({
+      const response = await submitServiceEnquiry({
         bundle_id: Number(bundle?.id || bundleId),
         form_data: formValues,
       });
+      if (response?.success === false) throw new Error(response.message || 'Enquiry was rejected.');
       setIsSuccessModalOpen(true);
-    } catch {
-      setIsSuccessModalOpen(true);
+    } catch (error) {
+      setFormError(error?.response?.data?.message || error?.message || 'Could not submit your enquiry. Please try again.');
     } finally {
+      enquiryLock.current = false;
       setSubmitting(false);
     }
   };
@@ -111,6 +101,8 @@ export const ServiceBundlePage = () => {
       openAuth('login');
       return;
     }
+    if (packLock.current) return;
+    packLock.current = true;
     setAddingPack(true);
     try {
       const selectedItemIds = (items || []).map((i) => Number(i.id || i.service_id)).filter(Boolean);
@@ -118,6 +110,7 @@ export const ServiceBundlePage = () => {
     } catch {
       // Toast handled by context
     } finally {
+      packLock.current = false;
       setAddingPack(false);
     }
   };
@@ -130,6 +123,8 @@ export const ServiceBundlePage = () => {
       </div>
     );
   }
+
+  if (bundleQuery.isError) return <ServiceSectionState query={bundleQuery} label="service bundle" />;
 
   if (!bundle) {
     return (
@@ -181,7 +176,7 @@ export const ServiceBundlePage = () => {
           {/* Hero Banner Card */}
           <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs">
             <div className="relative h-48 sm:h-60 md:h-68 bg-gradient-to-r from-[#F8F9FD] via-[#F4F5FA] to-[#EEF0F8] border-b border-gray-100 flex items-center justify-center p-2 sm:p-4">
-              <img
+              <ServiceImage
                 src={bundle.banner_image ? getImageUrl(bundle.banner_image) : getServiceBanner(bundle.id, bundle.name)}
                 alt={bundle.name}
                 className="w-full h-full object-contain drop-shadow-xs transition-transform duration-300"
@@ -189,12 +184,6 @@ export const ServiceBundlePage = () => {
                   imageRendering: '-webkit-optimize-contrast',
                   transform: 'translateZ(0)',
                   backfaceVisibility: 'hidden',
-                }}
-                onError={(e) => {
-                  const fallback = getServiceBanner(bundle.id, bundle.name);
-                  if ((e.target as any).src !== fallback) {
-                    (e.target as any).src = fallback;
-                  }
                 }}
               />
               {savings > 0 && (
@@ -224,15 +213,11 @@ export const ServiceBundlePage = () => {
               {items.map((item, idx) => (
                 <div key={item.id || idx} className="py-3.5 flex gap-4 items-center">
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#F8F9FD] to-[#EEF0F8] border border-gray-200 p-1 flex items-center justify-center shrink-0">
-                    <img
+                    <ServiceImage
                       src={item.image_url ? getImageUrl(item.image_url) : getServiceBanner(item.id, item.title || item.service_name)}
                       alt={item.title}
                       className="w-full h-full object-contain drop-shadow-2xs"
                       style={{ imageRendering: '-webkit-optimize-contrast' }}
-                      onError={(e) => {
-                        const fb = getServiceBanner(item.id, item.title || item.service_name);
-                        if ((e.target as any).src !== fb) (e.target as any).src = fb;
-                      }}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -316,7 +301,7 @@ export const ServiceBundlePage = () => {
                   onClick={() => navigate('/services/cart')}
                   className="w-full py-2 px-4 rounded-xl font-bold text-[11px] text-gray-600 hover:text-gray-900 transition-colors text-center cursor-pointer"
                 >
-                  View Services Cart ({serviceCartCount}) →
+                  View Services Cart ({serviceCartCount}) <ArrowForwardIcon sx={{ fontSize: 14 }} />
                 </button>
               )}
             </div>
@@ -343,11 +328,12 @@ export const ServiceBundlePage = () => {
                 const req = Boolean(f.is_required);
                 return (
                   <div key={f.field_name} className="space-y-1">
-                    <label className="font-bold text-gray-700 block">
+                    <label htmlFor={`bundle-field-${f.field_name}`} className="font-bold text-gray-700 block">
                       {f.label} {req && <span className="text-rose-500">*</span>}
                     </label>
                     {f.field_type === 'textarea' ? (
                       <textarea
+                        id={`bundle-field-${f.field_name}`}
                         rows={2}
                         value={formValues[f.field_name] || ''}
                         onChange={(e) => handleFieldChange(f.field_name, e.target.value)}
@@ -356,6 +342,7 @@ export const ServiceBundlePage = () => {
                       />
                     ) : (
                       <input
+                        id={`bundle-field-${f.field_name}`}
                         type={f.field_type === 'number' ? 'number' : 'text'}
                         value={formValues[f.field_name] || ''}
                         onChange={(e) => handleFieldChange(f.field_name, e.target.value)}
@@ -368,12 +355,12 @@ export const ServiceBundlePage = () => {
                 );
               })}
 
-              <GradientButton type="submit" loading={submitting} className="w-full py-3.5 text-xs font-bold mt-2 shadow-sm">
+              <GradientButton type="submit" onClick={() => {}} loading={submitting} className="w-full py-3.5 text-xs font-bold mt-2 shadow-sm">
                 <span>{isAuthenticated ? 'Book This Pack Now' : 'Sign In to Book'}</span>
               </GradientButton>
 
               <div className="pt-2 text-center text-[11px] text-gray-400">
-                🔒 Includes door-step document pickup and CA review.
+                <LockOutlinedIcon sx={{ fontSize: 13 }} /> Includes door-step document pickup and CA review.
               </div>
             </form>
           </div>

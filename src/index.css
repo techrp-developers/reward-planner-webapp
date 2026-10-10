@@ -114,6 +114,29 @@ header, footer, article, form, figcaption, figure, blockquote, small {
   height: 0 !important;
 }
 
+/* Visible Custom Scrollbar class for modal and scrollable dialogs */
+.has-visible-scrollbar {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #A78BFA #F3F4F6 !important;
+}
+.has-visible-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 6px !important;
+  height: 6px !important;
+}
+.has-visible-scrollbar::-webkit-scrollbar-track {
+  background: #F3F4F6 !important;
+  border-radius: 9999px !important;
+}
+.has-visible-scrollbar::-webkit-scrollbar-thumb {
+  background: #A78BFA !important;
+  border-radius: 9999px !important;
+}
+.has-visible-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #7C3AED !important;
+}
+
 /* Smooth infinite brand marquee animations */
 @keyframes marquee {
   0% {

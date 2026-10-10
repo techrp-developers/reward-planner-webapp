@@ -1,5 +1,5 @@
-// src/modules/bbps/components/BbpsReceiptModal.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckCircle2, Clock, AlertCircle, Printer, X, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 
 export const BbpsReceiptModal = ({
@@ -41,9 +41,18 @@ export const BbpsReceiptModal = ({
     window.print();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200 print:p-0 print:bg-white">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh] print:shadow-none print:border-none print:max-w-full">
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200 print:p-0 print:bg-white">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] my-auto print:shadow-none print:border-none print:max-w-full">
         {/* Header Ribbon */}
         <div
           className={`p-6 text-center text-white relative ${
@@ -183,7 +192,8 @@ export const BbpsReceiptModal = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

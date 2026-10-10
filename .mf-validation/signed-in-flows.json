@@ -1,0 +1,15 @@
+{
+  "mode": "signed-in application",
+  "origin": "http://localhost:5173",
+  "flows": [],
+  "responses": [
+    {
+      "url": "http://localhost:5173/services/mutual-funds",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "expectedFailures": [],
+  "passed": false,
+  "failure": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.mf-page') to be visible\u001b[22m\n"
+}

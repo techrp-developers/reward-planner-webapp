@@ -1,113 +1,127 @@
-// src/components/services/ServiceBannerCarousel.jsx
+// src/components/services/ServiceBannerCarousel.tsx
 // Senior UI/UX Designer Service Promotional Banner Carousel
-// Preserves exact previous banner card UI, same background images, same content with razor-sharp HD clarity
+// High-Resolution Local HD Banner Assets matching exact service offerings
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '../../api/client';
+import ServiceImage from './ServiceImage';
 
 // Material UI Icons
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-// High-Resolution Local HD Banner Assets (Exact same graphics & content, 3x sharp resolution)
-import bannerCarHD from '../../assets/servicescards/car-hd.png';
-import bannerTaxHD from '../../assets/servicescards/tax-hd.png';
-import bannerBikeHD from '../../assets/servicescards/bike-hd.png';
-import bannerPanHD from '../../assets/servicescards/pan-hd.png';
-import bannerRentHD from '../../assets/servicescards/rent-hd.png';
-import bannerHealthHD from '../../assets/servicescards/health-hd.png';
-import bannerTwoWheelerHD from '../../assets/servicescards/two_wheeler-hd.png';
+// High-Resolution Local HD Banner Assets (Exact 7 banner graphics provided by user)
+import bannerItrNew from '../../assets/servicescards/optimized/banner-itr-new-1280.webp';
+import bannerPanUpdate from '../../assets/servicescards/optimized/banner-pan-update-1280.webp';
+import bannerCarNew from '../../assets/servicescards/optimized/banner-car-new-1280.webp';
+import bannerPanService from '../../assets/servicescards/optimized/banner-pan-service-1280.webp';
+import bannerBikeNew from '../../assets/servicescards/optimized/banner-bike-new-1280.webp';
+import bannerHealthNew from '../../assets/servicescards/optimized/banner-health-new-1280.webp';
+import bannerCarOffer from '../../assets/servicescards/optimized/banner-car-offer-1280.webp';
+
+export interface ServiceBannerRedirect {
+  type?: string;
+  id?: number | string | null;
+  url?: string | null;
+}
+
+export interface ServiceBannerItem {
+  id: number | string;
+  title: string;
+  subtitle?: string;
+  image_url?: string;
+  hd_image?: string;
+  fallback_image?: string;
+  redirect?: ServiceBannerRedirect;
+}
+
+export interface ServiceBannerCarouselProps {
+  banners?: ServiceBannerItem[];
+  fullWidthArtwork?: boolean;
+}
 
 // Helper to resolve the matching crystal-clear banner for any service
-export const getServiceBanner = (serviceId, serviceName = '') => {
+export const getServiceBanner = (serviceId: string | number | undefined, serviceName = ''): string => {
   const sName = String(serviceName || '').toLowerCase();
   const sId = Number(serviceId);
 
-  if (sId === 10 || sName.includes('car')) return bannerCarHD;
-  if (sId === 7 || sId === 13 || sName.includes('tax') || sName.includes('itr') || sName.includes('income')) return bannerTaxHD;
-  if (sId === 6 || sId === 11 || sName.includes('bike')) return bannerBikeHD;
-  if (sId === 1 || sId === 9 || sName.includes('pan')) return bannerPanHD;
-  if (sId === 8 || sName.includes('rent') || sName.includes('agreement')) return bannerRentHD;
-  if (sId === 3 || sId === 12 || sName.includes('health') || sName.includes('mediclaim')) return bannerHealthHD;
-  if (sId === 4 || sId === 16 || sName.includes('two') || sName.includes('mseb') || sName.includes('license')) return bannerTwoWheelerHD;
+  if (sId === 10 || sName.includes('car')) return bannerCarNew;
+  if (sId === 7 || sId === 13 || sName.includes('tax') || sName.includes('itr') || sName.includes('income')) return bannerItrNew;
+  if (sId === 6 || sId === 11 || sName.includes('bike') || sName.includes('two')) return bannerBikeNew;
+  if (sId === 1 || sId === 9 || sName.includes('pan')) return bannerPanUpdate;
+  if (sId === 3 || sId === 12 || sName.includes('health') || sName.includes('mediclaim')) return bannerHealthNew;
 
-  return bannerCarHD;
+  return bannerCarNew;
 };
 
-export const DUMMY_SERVICE_BANNERS = [
+export const DUMMY_SERVICE_BANNERS: ServiceBannerItem[] = [
   {
-    id: 10,
-    title: 'Car Insurance',
-    subtitle: 'Car',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780257163812-w92w2y-car insurance.png?v=2026-06-01%2001%3A22%3A44',
-    hd_image: bannerCarHD,
-    fallback_image: bannerCarHD,
-    redirect: { type: 'service', id: 10, url: null },
-  },
-  {
-    id: 7,
-    title: 'ITR Filing',
-    subtitle: 'Income Tax',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256921789-ygcnql-Income Tax.png?v=2026-06-01%2001%3A18%3A42',
-    hd_image: bannerTaxHD,
-    fallback_image: bannerTaxHD,
+    id: 13,
+    title: 'Income Tax Return Filing',
+    subtitle: 'File Your ITR Without Stress',
+    hd_image: bannerItrNew,
+    fallback_image: bannerItrNew,
     redirect: { type: 'service', id: 13, url: null },
   },
   {
-    id: 6,
-    title: 'Bike Insurance',
-    subtitle: 'Bike',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256860323-2dl4o4-Bike insurance.png?v=2026-06-01%2001%3A17%3A41',
-    hd_image: bannerBikeHD,
-    fallback_image: bannerBikeHD,
-    redirect: { type: 'service', id: 11, url: null },
-  },
-  {
-    id: 9,
-    title: 'Pan Card Service',
-    subtitle: 'Pan Card',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780257049156-2m1dig-Pan card.png?v=2026-06-01%2001%3A21%3A56',
-    hd_image: bannerPanHD,
-    fallback_image: bannerPanHD,
+    id: 1,
+    title: 'PAN Card Update',
+    subtitle: 'PAN Card Update Made Simple',
+    hd_image: bannerPanUpdate,
+    fallback_image: bannerPanUpdate,
     redirect: { type: 'service', id: 1, url: null },
   },
   {
-    id: 8,
-    title: 'Rent Agreement',
-    subtitle: 'Rent',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/1780256972078-mya2g9-Rent agreement.png?v=2026-06-01%2001%3A19%3A32',
-    hd_image: bannerRentHD,
-    fallback_image: bannerRentHD,
-    redirect: { type: 'service', id: 9, url: null },
+    id: 10,
+    title: 'Car Insurance',
+    subtitle: 'Save up to ₹600 on new or renewal',
+    hd_image: bannerCarNew,
+    fallback_image: bannerCarNew,
+    redirect: { type: 'service', id: 10, url: null },
   },
   {
-    id: 3,
+    id: 9,
+    title: 'PAN Card Services',
+    subtitle: 'PAN Card Services Made Easy',
+    hd_image: bannerPanService,
+    fallback_image: bannerPanService,
+    redirect: { type: 'service', id: 1, url: null },
+  },
+  {
+    id: 11,
+    title: 'Two-Wheeler Insurance',
+    subtitle: 'Flat ₹200 OFF on renewals',
+    hd_image: bannerBikeNew,
+    fallback_image: bannerBikeNew,
+    redirect: { type: 'service', id: 11, url: null },
+  },
+  {
+    id: 12,
     title: 'Health Insurance',
-    subtitle: 'Health',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/3/1780253035033-byjzb6.png?v=2026-06-01%2000%3A13%3A55',
-    hd_image: bannerHealthHD,
-    fallback_image: bannerHealthHD,
+    subtitle: 'Extra 5% OFF on first purchase',
+    hd_image: bannerHealthNew,
+    fallback_image: bannerHealthNew,
     redirect: { type: 'service', id: 12, url: null },
   },
   {
-    id: 4,
-    title: 'Two wheeler Insurance',
-    subtitle: 'Two wheeler',
-    image_url: 'https://cdn.rewardplanners.com/public/service-banners/4/1780253044733-ll0xwy.png?v=2026-06-01%2000%3A14%3A05',
-    hd_image: bannerTwoWheelerHD,
-    fallback_image: bannerTwoWheelerHD,
-    redirect: { type: 'service', id: 11, url: null },
+    id: 101,
+    title: 'Car Insurance Offer',
+    subtitle: 'Get up to ₹600 off On Car Insurance!',
+    hd_image: bannerCarOffer,
+    fallback_image: bannerCarOffer,
+    redirect: { type: 'service', id: 10, url: null },
   },
 ];
 
-export const ServiceBannerCarousel = ({ banners: propBanners = null }: { banners?: any } = {}) => {
+export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ banners: propBanners, fullWidthArtwork = false }) => {
   const navigate = useNavigate();
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef(null);
+  const [activeIdx, setActiveIdx] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const timerRef = useRef<any>(null);
 
-  const displayBanners = Array.isArray(propBanners) && propBanners.length > 0
+  // If propBanners is empty or contains items without hd_image, use high quality local banners
+  const displayBanners = Array.isArray(propBanners) && propBanners.length > 0 && propBanners.some((b) => b.hd_image)
     ? propBanners
     : DUMMY_SERVICE_BANNERS;
 
@@ -121,20 +135,22 @@ export const ServiceBannerCarousel = ({ banners: propBanners = null }: { banners
       setActiveIdx((prev) => (prev + 1) % totalSlides);
     }, 3500);
 
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [isPaused, totalSlides]);
 
-  const handlePrev = (e) => {
+  const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setActiveIdx((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  const handleNext = (e) => {
+  const handleNext = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setActiveIdx((prev) => (prev + 1) % totalSlides);
   };
 
-  const handleBannerClick = (banner) => {
+  const handleBannerClick = (banner: ServiceBannerItem) => {
     if (banner?.redirect?.type === 'service' && banner?.redirect?.id) {
       navigate(`/services/detail/${banner.redirect.id}`);
     } else if (banner?.redirect?.url) {
@@ -146,41 +162,50 @@ export const ServiceBannerCarousel = ({ banners: propBanners = null }: { banners
 
   return (
     <div
-      className="w-full relative h-48 sm:h-56 md:h-64 lg:h-72 xl:h-76 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs border border-gray-200/80 bg-gradient-to-r from-[#F8F9FD] via-[#F4F5FA] to-[#EEF0F8] group select-none"
+      className="w-full relative rounded-2xl sm:rounded-3xl overflow-hidden select-none group shadow-sm"
+      style={fullWidthArtwork ? { aspectRatio: '10 / 3' } : { aspectRatio: '1024 / 395', maxHeight: '340px' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Uniform Sliding Track - Every Banner Slide Has Exactly Identical Dimensions */}
+      {/* Sliding Track - Direct full-width image slides */}
       <div
         className="flex w-full h-full transition-transform duration-500 ease-in-out cursor-pointer"
         style={{ transform: `translateX(-${activeIdx * 100}%)` }}
       >
         {displayBanners.map((banner, i) => {
           // Prefer high-definition local asset for crispness; fallback to API or default
-          const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarHD);
+          const imgSrc = banner.hd_image || banner.fallback_image || (banner.image_url ? getImageUrl(banner.image_url) : bannerCarNew);
+
           return (
-            <div
+            <button
+              type="button"
               key={banner.id || i}
+              tabIndex={i === activeIdx ? 0 : -1}
+              aria-hidden={i !== activeIdx}
               onClick={() => handleBannerClick(banner)}
-              className="w-full h-full shrink-0 flex items-center justify-center p-2 sm:p-4 overflow-hidden select-none bg-gradient-to-r from-[#F8F9FD] via-[#F4F5FA] to-[#EEF0F8]"
+              className="w-full h-full shrink-0 relative select-none overflow-hidden bg-[#101820]"
               title={banner.title || 'Service Banner'}
             >
-              <img
+              {!fullWidthArtwork && <div
+                aria-hidden="true"
+                className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl brightness-[0.35] pointer-events-none"
+                style={{ backgroundImage: `url(${imgSrc})` }}
+              />}
+              <ServiceImage
                 src={imgSrc}
+                fallbackSrc={banner.fallback_image}
+                sizes="(min-width: 1600px) 1500px, 100vw"
+                loading={i === activeIdx ? 'eager' : 'lazy'}
+                fetchPriority={i === 0 ? 'high' : 'auto'}
                 alt={banner.title || 'Service Banner'}
-                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.01] drop-shadow-xs"
+                className={fullWidthArtwork
+                  ? 'relative w-full h-full object-cover select-none pointer-events-none'
+                  : 'relative w-full h-full object-contain px-10 pt-4 pb-8 sm:px-14 sm:pt-5 select-none pointer-events-none'}
                 style={{
                   imageRendering: '-webkit-optimize-contrast',
-                  transform: 'translateZ(0)',
-                  backfaceVisibility: 'hidden',
-                }}
-                onError={(e) => {
-                  if (banner.fallback_image && (e.target as any).src !== banner.fallback_image) {
-                    (e.target as any).src = banner.fallback_image;
-                  }
                 }}
               />
-            </div>
+            </button>
           );
         })}
       </div>
@@ -211,7 +236,7 @@ export const ServiceBannerCarousel = ({ banners: propBanners = null }: { banners
           {displayBanners.map((_, i) => (
             <button
               key={i}
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 setActiveIdx(i);
               }}
@@ -227,4 +252,4 @@ export const ServiceBannerCarousel = ({ banners: propBanners = null }: { banners
   );
 };
 
-export default ServiceBannerCarousel;
+export default React.memo(ServiceBannerCarousel);

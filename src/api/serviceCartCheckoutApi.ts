@@ -1,6 +1,11 @@
 // src/api/serviceCartCheckoutApi.js
 import api from './client';
 
+const requireServiceSuccess = (response: any) => {
+  if (response?.success === false) throw new Error(response.message || 'The service request was rejected.');
+  return response;
+};
+
 // ==========================================
 // 🛒 SERVICE CART APIs
 // ==========================================
@@ -16,9 +21,9 @@ export const addServiceToCart = async ({ service_id, variant_id }) => {
   return res.data;
 };
 
-export const fetchServiceCartItems = async () => {
+export const fetchServiceCartItems = async (signal?: AbortSignal) => {
   try {
-    const res = await api.get('/v1/service-cart/cart-items');
+    const res = await api.get('/v1/service-cart/cart-items', { signal });
     const data = res.data?.data || res.data || {};
     return {
       bundles: Array.isArray(data.bundles) ? data.bundles : [],
@@ -33,7 +38,7 @@ export const fetchServiceCartItems = async () => {
     // If cart items endpoint returns 404/empty, try fallback to checkout-preview
     if (err.response?.status === 404) {
       try {
-        const previewRes = await api.get('/v1/service-checkout/checkout-preview');
+        const previewRes = await api.get('/v1/service-checkout/checkout-preview', { signal });
         const data = previewRes.data?.data || previewRes.data || {};
         return {
           bundles: Array.isArray(data.bundles) ? data.bundles : [],
@@ -44,13 +49,8 @@ export const fetchServiceCartItems = async () => {
             max_redeem_coins: Number(data.rewards?.max_redeem_coins || 0),
           },
         };
-      } catch {
-        return {
-          bundles: [],
-          individual_items: [],
-          total: 0,
-          rewards: { earn_coins: 0, max_redeem_coins: 0 },
-        };
+      } catch (fallbackError) {
+        throw fallbackError;
       }
     }
     throw err;
@@ -80,38 +80,41 @@ export const addBundleToCart = async (bundle_id, selected_items = []) => {
 // ⚡ SERVICE CHECKOUT APIs
 // ==========================================
 
-export const fetchServiceBuyNowPreview = async ({ service_id, variant_id, redeem_coins = 0 }) => {
+export const fetchServiceBuyNowPreview = async ({ service_id, variant_id, redeem_coins = 0 }, signal?: AbortSignal) => {
   if (!service_id || !variant_id) {
     throw new Error('Missing service_id or variant_id');
   }
   const res = await api.get('/v1/service-checkout/buy-now-preview', {
+    signal,
     params: {
       service_id: Number(service_id),
       variant_id: Number(variant_id),
       redeem_coins: Number(redeem_coins || 0),
     },
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
-export const fetchServiceCheckoutPreview = async (redeem_coins = 0) => {
+export const fetchServiceCheckoutPreview = async (redeem_coins = 0, signal?: AbortSignal) => {
   const res = await api.get('/v1/service-checkout/checkout-preview', {
+    signal,
     params: { redeem_coins: Number(redeem_coins || 0) },
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
-export const fetchBuyNowBundlePreview = async ({ bundle_id, selected_items = [], redeem_coins = 0 }) => {
+export const fetchBuyNowBundlePreview = async ({ bundle_id, selected_items = [], redeem_coins = 0 }, signal?: AbortSignal) => {
   if (!bundle_id) throw new Error('Missing bundle_id');
   const itemsStr = Array.isArray(selected_items) ? selected_items.join(',') : String(selected_items);
   const res = await api.get('/v1/service-checkout/buy-now-bundle-preview', {
+    signal,
     params: {
       bundle_id: Number(bundle_id),
       selected_items: itemsStr,
       redeem_coins: Number(redeem_coins || 0),
     },
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
 export const placeServiceBuyNowOrder = async ({ service_id, variant_id, address_id, redeem_coins = 0 }) => {
@@ -124,7 +127,7 @@ export const placeServiceBuyNowOrder = async ({ service_id, variant_id, address_
     address_id: Number(address_id),
     redeem_coins: Number(redeem_coins || 0),
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
 export const placeServiceCartOrder = async ({ address_id, redeem_coins = 0 }) => {
@@ -134,7 +137,7 @@ export const placeServiceCartOrder = async ({ address_id, redeem_coins = 0 }) =>
     address_id: Number(address_id),
     redeem_coins: Number(redeem_coins || 0),
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
 export const placeBuyNowBundleOrder = async ({ bundle_id, selected_items = [], address_id, redeem_coins = 0 }) => {
@@ -147,7 +150,7 @@ export const placeBuyNowBundleOrder = async ({ bundle_id, selected_items = [], a
     address_id: Number(address_id),
     redeem_coins: Number(redeem_coins || 0),
   });
-  return res.data?.data || res.data;
+  return requireServiceSuccess(res.data)?.data || res.data;
 };
 
 // ==========================================
@@ -177,10 +180,4 @@ export const checkServicePaymentStatus = async (parent_order_id) => {
   return res.data;
 };
 
-export const isServicePaymentVerified = (res) => {
-  const status = String(res?.payment_status ?? res?.status ?? '').toLowerCase();
-  if (status) {
-    return status === 'paid' || status === 'captured' || status === 'success' || status === 'verified';
-  }
-  return res?.success === true || res?.verified === true;
-};
+export { isServicePaymentVerified } from './servicePaymentStatus';

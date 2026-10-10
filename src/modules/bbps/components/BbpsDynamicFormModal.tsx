@@ -1,6 +1,7 @@
-// src/modules/bbps/components/BbpsDynamicFormModal.jsx
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ShieldCheck, ArrowRight, Smartphone, AlertCircle, Sparkles, HelpCircle, Layers } from 'lucide-react';
+import BbpsOperatorLogo from './BbpsOperatorLogo';
 
 export const BbpsDynamicFormModal = ({
   operator,
@@ -43,12 +44,24 @@ export const BbpsDynamicFormModal = ({
     }
   }, [selectedPlan, isPrepaid]);
 
+  // Prevent background scrolling while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   const handleChange = (fieldName, value, fieldConfig) => {
     // If numeric field, strip non-digits
     let cleanVal = value;
     if (fieldConfig?.param_type?.toLowerCase() === 'numeric') {
       cleanVal = value.replace(/[^0-9]/g, '');
     }
+    const isVehicleNumber = /vehicle/i.test(fieldConfig?.param_label || '') ||
+      (/fastag/i.test(operator?.name || '') && fieldName === 'utility_acc_no');
+    if (isVehicleNumber) cleanVal = cleanVal.toUpperCase();
 
     setFormValues((prev) => ({
       ...prev,
@@ -106,6 +119,19 @@ export const BbpsDynamicFormModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleBrowsePlans = () => {
+    const mobile = String(formValues.utility_acc_no || formValues.mobile || '').trim();
+    const planErrors: Record<string, string> = {};
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      planErrors[formValues.mobile !== undefined ? 'mobile' : 'utility_acc_no'] = 'Please enter a valid 10-digit mobile number.';
+    }
+    if (!selectedCircle) planErrors.circle = 'Please select your telecom circle.';
+    setErrors(planErrors);
+    if (Object.keys(planErrors).length === 0) {
+      onOpenPlans({ mobile, circleId: selectedCircle });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -121,15 +147,13 @@ export const BbpsDynamicFormModal = ({
     (f) => f.param_name && f.param_name !== 'recharge_plan_id'
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] my-auto">
         {/* Modal Header */}
         <div className="px-6 py-5 bg-gradient-to-r from-[#1C0E28] to-[#3B1953] text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-300 font-bold text-sm border border-white/10">
-              ⚡
-            </div>
+            <BbpsOperatorLogo operator={operator} className="h-10 w-10" eager />
             <div>
               <h3 className="text-base font-bold text-white leading-tight">
                 {operator.name}
@@ -143,6 +167,7 @@ export const BbpsDynamicFormModal = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
           >
             <X size={18} />
@@ -193,12 +218,15 @@ export const BbpsDynamicFormModal = ({
                   return (
                     <div key={field.param_name} className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <label className="block text-xs font-bold text-gray-700">
+                        <label htmlFor={`bbps-field-${field.param_name}`} className="block text-xs font-bold text-gray-700">
                           {field.param_label} <span className="text-rose-500">*</span>
                         </label>
                       </div>
 
                       <input
+                        id={`bbps-field-${field.param_name}`}
+                        aria-invalid={Boolean(error)}
+                        aria-describedby={error ? `bbps-error-${field.param_name}` : undefined}
                         type={field.param_type?.toLowerCase() === 'numeric' ? 'tel' : 'text'}
                         value={formValues[field.param_name] || ''}
                         onChange={(e) => handleChange(field.param_name, e.target.value, field)}
@@ -211,7 +239,7 @@ export const BbpsDynamicFormModal = ({
                       />
 
                       {error && (
-                        <p className="text-[11px] font-medium text-rose-500 flex items-center gap-1">
+                        <p id={`bbps-error-${field.param_name}`} role="alert" className="text-[11px] font-medium text-rose-500 flex items-center gap-1">
                           <AlertCircle size={12} />
                           <span>{error}</span>
                         </p>
@@ -257,7 +285,7 @@ export const BbpsDynamicFormModal = ({
                         </label>
                         <button
                           type="button"
-                          onClick={onOpenPlans}
+                          onClick={handleBrowsePlans}
                           className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
                         >
                           <Layers size={14} />
@@ -282,7 +310,7 @@ export const BbpsDynamicFormModal = ({
                           </div>
                           <button
                             type="button"
-                            onClick={onOpenPlans}
+                            onClick={handleBrowsePlans}
                             className="text-xs font-bold text-purple-700 hover:underline cursor-pointer"
                           >
                             Change
@@ -291,7 +319,7 @@ export const BbpsDynamicFormModal = ({
                       ) : (
                         <button
                           type="button"
-                          onClick={onOpenPlans}
+                          onClick={handleBrowsePlans}
                           className="w-full py-3 px-4 rounded-xl border border-dashed border-purple-300 hover:border-purple-500 bg-purple-50/40 hover:bg-purple-50 text-purple-800 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
                         >
                           <Sparkles size={16} className="text-purple-600" />
@@ -339,7 +367,8 @@ export const BbpsDynamicFormModal = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

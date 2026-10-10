@@ -1,9 +1,14 @@
 // src/modules/services/ServiceCategoryPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchServicesByCategory } from '../../api/servicesApi';
+import { useServiceQuery } from './serviceQueries';
+import ServiceSectionState from './components/ServiceSectionState';
+import ServiceImage from '../../components/services/ServiceImage';
+import { filterServices } from './serviceCatalog';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
 
 // Material UI Icons
@@ -15,44 +20,24 @@ import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 
 
-export const ServiceCategoryPage = () => {
-  const { categoryId } = useParams();
+export const ServiceCategoryPage: React.FC = () => {
+  const { categoryId } = useParams<{ categoryId?: string }>();
   const navigate = useNavigate();
-  const [category, setCategory] = useState(null);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const query = useServiceQuery('category', categoryId);
+  const category = query.data?.data?.category || null;
+  const services: any[] = query.data?.data?.services || [];
+  const loading = query.isPending;
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
+  const filtered = useMemo(() => filterServices(services, debouncedSearch, false), [services, debouncedSearch]);
 
-  
-  useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    fetchServicesByCategory(categoryId)
-      .then((res) => {
-        if (!isMounted) return;
-        if (res?.data?.category) setCategory(res.data.category);
-        if (Array.isArray(res?.data?.services)) setServices(res.data.services);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [categoryId]);
-
-  const filtered = services.filter((s) =>
-    (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
-    (s.description || '').toLowerCase().includes(search.toLowerCase())
-  );
+  if (query.isError) return <ServiceSectionState query={query} label="category services" />;
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5 font-['Poppins',sans-serif]">
+      <ServiceSectionState query={query} label="category services" />
       {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (like above) */}
-      <ServiceBannerCarousel />
+      <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 
       {/* 2. Breadcrumbs & Back Navigation */}
       <div className="flex items-center gap-3">
@@ -80,7 +65,7 @@ export const ServiceCategoryPage = () => {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/20 backdrop-blur-md p-3 flex items-center justify-center shrink-0 border border-white/30">
               {category?.icon ? (
-                <img
+                <ServiceImage
                   src={getImageUrl(category.icon)}
                   alt={category.name}
                   className="w-full h-full object-contain filter drop-shadow"
@@ -107,6 +92,7 @@ export const ServiceCategoryPage = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search category services"
               placeholder={`Search in ${category?.name || 'category'}...`}
               className="w-full px-4 py-2.5 text-xs bg-white text-gray-900 rounded-xl outline-none shadow-sm placeholder:text-gray-400 font-medium"
             />
@@ -143,24 +129,20 @@ export const ServiceCategoryPage = () => {
               const reviews = srv.review_count || 0;
 
               return (
-                <div
+                <Link
                   key={srv.id}
-                  onClick={() => navigate(`/services/detail/${srv.id}`)}
+                  to={`/services/detail/${srv.id}`}
                   className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group space-y-4"
                 >
                   <div className="flex gap-4 items-start">
                     <div className="w-24 h-20 sm:w-28 sm:h-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#F8F9FD] to-[#EEF0F8] border border-gray-100 flex items-center justify-center p-1.5 shrink-0 group-hover:scale-102 transition-transform">
-                      <img
+                      <ServiceImage
                         src={srv.service_image ? getImageUrl(srv.service_image) : getServiceBanner(srv.id, srv.name)}
+                        fallbackSrc={getServiceBanner(srv.id, srv.name)}
+                        sizes="128px"
                         alt={srv.name}
                         className="w-full h-full object-contain drop-shadow-2xs"
                         style={{ imageRendering: '-webkit-optimize-contrast' }}
-                        onError={(e) => {
-                          const fallback = getServiceBanner(srv.id, srv.name);
-                          if ((e.target as any).src !== fallback) {
-                            (e.target as any).src = fallback;
-                          }
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -192,12 +174,12 @@ export const ServiceCategoryPage = () => {
                       <span className="text-[10px] text-gray-400 block font-medium">all inclusive</span>
                     </div>
 
-                    <button className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
+                    <span className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
                       <span>Get Started</span>
                       <ArrowForwardIcon sx={{ fontSize: 13 }} />
-                    </button>
+                    </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

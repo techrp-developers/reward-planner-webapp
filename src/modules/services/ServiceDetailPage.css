@@ -1,0 +1,81 @@
+.service-detail {
+  --service-header-height: 112px;
+  --service-sticky-top: calc(var(--service-header-height) + 16px);
+  background: radial-gradient(ellipse at top right, #f1ebff80, transparent 48%), #fdfbf9;
+}
+
+/* Hidden overflow creates a separate scroll ancestor and breaks sticky panels.
+   Clip horizontal overflow only on detail routes; retain document scrolling. */
+html:has(.service-detail),
+body:has(.service-detail),
+body:has(.service-detail) #root {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.service-detail__content > .bg-white,
+.service-detail__sidebar .bg-white {
+  border-color: #e8e3ef;
+  box-shadow: 0 4px 24px -16px #28134c30, 0 1px 2px #28134c08;
+}
+
+.service-detail :is(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 3px;
+}
+
+.service-detail :is(input, select, textarea) {
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.service-detail :is(input, select, textarea):hover {
+  border-color: #b8a7d3;
+}
+
+.service-detail button:disabled {
+  cursor: wait;
+  opacity: .6;
+}
+
+.service-detail__mobile-nav {
+  top: var(--service-header-height);
+}
+
+@media (min-width: 1024px) {
+  .service-detail__sidebar {
+    position: sticky;
+    /* Tall panels scroll naturally until their ending reaches the viewport.
+       Short panels remain below the header. No clipping or nested scrollbar. */
+    top: min(var(--service-sticky-top), calc(100dvh - var(--service-sidebar-height, 0px) - 20px));
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .service-detail__pricing {
+    flex-shrink: 0;
+  }
+
+  .service-detail__sidebar :is(input, select, textarea) {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 700px) {
+  .service-detail__pricing > div {
+    padding: 18px;
+  }
+
+  .service-detail__pricing button {
+    padding-block: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-detail *, .service-detail *::before, .service-detail *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

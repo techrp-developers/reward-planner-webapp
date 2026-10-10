@@ -1,0 +1,129 @@
+{
+  "origin": "http://localhost:5173",
+  "baseURL": "https://rewardplanners.com/api/crm/v1/",
+  "configuredCategory": 4,
+  "categoryIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "faqIds": [
+    1,
+    2,
+    3,
+    4,
+    7,
+    8,
+    9
+  ],
+  "childIds": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "sections": [
+    {
+      "id": 1,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 2,
+      "articles": 4,
+      "correctlyMapped": true
+    },
+    {
+      "id": 3,
+      "articles": 4,
+      "correctlyMapped": true
+    },
+    {
+      "id": 4,
+      "articles": 3,
+      "correctlyMapped": true
+    },
+    {
+      "id": 7,
+      "articles": 4,
+      "correctlyMapped": true
+    },
+    {
+      "id": 8,
+      "articles": 4,
+      "correctlyMapped": true
+    },
+    {
+      "id": 9,
+      "articles": 2,
+      "correctlyMapped": true
+    },
+    {
+      "id": 10,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 11,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 12,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 13,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 14,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 15,
+      "articles": 6,
+      "correctlyMapped": true
+    },
+    {
+      "id": 16,
+      "articles": 5,
+      "correctlyMapped": true
+    },
+    {
+      "id": 17,
+      "articles": 5,
+      "correctlyMapped": true
+    }
+  ],
+  "article": {
+    "id": 27,
+    "sectionId": 12,
+    "hasHtml": true,
+    "thumbnail": "https://cdn.rewardplanners.com/public/mf-articles/27/thumbnail-1783314692777.png?v=2026-07-14%2012%3A30%3A42",
+    "banner": "https://cdn.rewardplanners.com/public/mf-articles/27/banner-1783314693776.png?v=2026-07-14%2012%3A30%3A42"
+  },
+  "missingArticleIsNull": true,
+  "find": {
+    "status": 200,
+    "success": true,
+    "id": 27,
+    "sectionId": 12,
+    "hasHtml": true
+  },
+  "signedInPageVisible": false,
+  "diagnostics": []
+}
