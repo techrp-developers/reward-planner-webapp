@@ -38,6 +38,7 @@ export interface ServiceBannerItem {
 
 export interface ServiceBannerCarouselProps {
   banners?: ServiceBannerItem[];
+  fullWidthArtwork?: boolean;
 }
 
 // Helper to resolve the matching crystal-clear banner for any service
@@ -113,7 +114,7 @@ export const DUMMY_SERVICE_BANNERS: ServiceBannerItem[] = [
   },
 ];
 
-export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ banners: propBanners }) => {
+export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ banners: propBanners, fullWidthArtwork = false }) => {
   const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -162,7 +163,7 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
   return (
     <div
       className="w-full relative rounded-2xl sm:rounded-3xl overflow-hidden select-none group shadow-sm"
-      style={{ aspectRatio: '1024 / 395' }}
+      style={fullWidthArtwork ? { aspectRatio: '10 / 3' } : { aspectRatio: '1024 / 395', maxHeight: '340px' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -182,9 +183,14 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
               tabIndex={i === activeIdx ? 0 : -1}
               aria-hidden={i !== activeIdx}
               onClick={() => handleBannerClick(banner)}
-              className="w-full h-full shrink-0 relative select-none"
+              className="w-full h-full shrink-0 relative select-none overflow-hidden bg-[#101820]"
               title={banner.title || 'Service Banner'}
             >
+              {!fullWidthArtwork && <div
+                aria-hidden="true"
+                className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl brightness-[0.35] pointer-events-none"
+                style={{ backgroundImage: `url(${imgSrc})` }}
+              />}
               <ServiceImage
                 src={imgSrc}
                 fallbackSrc={banner.fallback_image}
@@ -192,7 +198,9 @@ export const ServiceBannerCarousel: React.FC<ServiceBannerCarouselProps> = ({ ba
                 loading={i === activeIdx ? 'eager' : 'lazy'}
                 fetchPriority={i === 0 ? 'high' : 'auto'}
                 alt={banner.title || 'Service Banner'}
-                className="w-full h-full object-cover select-none pointer-events-none"
+                className={fullWidthArtwork
+                  ? 'relative w-full h-full object-cover select-none pointer-events-none'
+                  : 'relative w-full h-full object-contain px-10 pt-4 pb-8 sm:px-14 sm:pt-5 select-none pointer-events-none'}
                 style={{
                   imageRendering: '-webkit-optimize-contrast',
                 }}

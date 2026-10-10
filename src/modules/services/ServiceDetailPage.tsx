@@ -14,6 +14,7 @@ import ServiceImage from '../../components/services/ServiceImage';
 import { useAuth } from '../../context/AuthContext';
 import { useServiceCart } from '../../context/ServiceCartContext';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import RichText from '../../components/common/RichText';
 import { resolveServiceId, STATIC_SERVICES_DATA } from '../../data/serviceStaticData';
 import type { StaticServiceItem } from '../../data/serviceStaticData';
@@ -722,16 +723,16 @@ export const ServiceDetailPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
                 {/* Purple Call Button */}
                 <a
-                  href="tel:+918000780078"
+                  href="tel:+918660583751"
                   className="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-[#2A1870] hover:bg-[#201058] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
                 >
                   <PhoneInTalkIcon sx={{ fontSize: 16 }} />
-                  <span>+91 8000780078</span>
+                  <span>+91 8660583751</span>
                 </a>
 
                 {/* Bright Green WhatsApp / Chat Button */}
                 <a
-                  href="https://wa.me/918000780078?text=Hi%2C%20I%20need%20assistance%20with%20Government%20Services"
+                  href="https://wa.me/918660583751?text=Hi%2C%20I%20need%20assistance%20with%20Government%20Services"
                   target="_blank"
                   rel="noreferrer"
                   className="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-[#22C55E] hover:bg-[#16A34A] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
@@ -750,7 +751,7 @@ export const ServiceDetailPage: React.FC = () => {
                 </h3>
                 <span className="text-[11px] text-[#7C3AED] font-bold">100% Verified</span>
               </div>
-              <ServiceBannerCarousel />
+              <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
             </div>
 
           </div>
@@ -789,8 +790,8 @@ export const ServiceDetailPage: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <span className="text-[11px] font-bold text-gray-500 uppercase block">Expert Helpline</span>
-                <a href="tel:+918000780078" className="text-xs font-black text-gray-900 hover:text-[#7C3AED] block">
-                  +91 8000780078 (9 AM - 7 PM)
+                <a href="tel:+918660583751" className="text-xs font-black text-gray-900 hover:text-[#7C3AED] block">
+                  +91 8660583751 (9 AM - 7 PM)
                 </a>
               </div>
             </div>

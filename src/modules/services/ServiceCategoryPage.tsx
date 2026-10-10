@@ -8,6 +8,7 @@ import { filterServices } from './serviceCatalog';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
 
 // Material UI Icons
@@ -33,10 +34,10 @@ export const ServiceCategoryPage: React.FC = () => {
   if (query.isError) return <ServiceSectionState query={query} label="category services" />;
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5 font-['Poppins',sans-serif]">
       <ServiceSectionState query={query} label="category services" />
       {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (like above) */}
-      <ServiceBannerCarousel />
+      <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 
       {/* 2. Breadcrumbs & Back Navigation */}
       <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">

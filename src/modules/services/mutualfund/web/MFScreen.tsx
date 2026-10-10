@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import ArrowLeft from '@mui/icons-material/ArrowBack';
+import ChevronRight from '@mui/icons-material/ChevronRight';
 import { getMutualFundCategories, getSectionContent, MF_CATEGORY_ID, type MFCategory, type MFChildCategory, type MFArticleSummary } from '../../../../api/mutualFundApi';
 import CommonQuestions from './CommonQuestions';
 import SmartWealthBanner from './SmartWealthBanner';
@@ -74,7 +75,7 @@ export default function MFScreen() {
   const articles = unique([...categories.flatMap(flatten), ...(searchArticles || [])]);
   const results = articles.filter(article => `${article.title} ${plainText(article.short_description)}`.toLowerCase().includes(query.trim().toLowerCase()));
   const selectedCalculator = CALCULATORS.find(item => item.id === calculator);
-  return <div className="mf-page mx-auto max-w-[1440px] px-4 py-6 sm:px-8 lg:px-12"><nav aria-label="Breadcrumb" className="mf-muted mb-6 flex items-center gap-2 text-sm"><Link to="/services" className="mf-accent flex items-center gap-1"><ArrowLeft size={15} /> Services</Link><span>/</span><span>Mutual Funds</span></nav>
+  return <div className="mf-page mx-auto max-w-[1440px] px-4 py-6 sm:px-8 lg:px-12"><nav aria-label="Breadcrumb" className="mf-muted mb-6 flex items-center gap-2 text-sm"><Link to="/services" className="mf-accent flex items-center gap-1"><ArrowLeft sx={{ fontSize: 15 }} /> Services</Link><span>/</span><span>Mutual Funds</span></nav>
     <SmartWealthBanner />
     <CommonQuestions categories={matchingFaq} query={query} onQuery={setQuery} results={results} onSection={openSection} onArticle={openArticle} status={loading ? 'loading' : error ? 'error' : undefined} />
     {hasQuery && !searchArticles && !searchError && !loading && !error && <p role="status" className="mf-muted -mt-8 mb-8 text-sm">Searching FAQ articles…</p>}
@@ -87,6 +88,6 @@ export default function MFScreen() {
       </CalculatorScreen>
     </Dialog>}
     {selection && <ArticleDetails key={`${selection.kind}-${selection.id}`} selection={selection} onClose={() => setSelection(null)} onArticle={openArticle} />}
-    {group && <Dialog title={group.title} onClose={() => setGroup(null)}><div className="space-y-4">{sorted(group.children).map(child => <button key={child.id} onClick={() => openSection(child)} className="mf-topic flex w-full items-center justify-between gap-4 rounded-2xl p-5 text-left"><span>{child.title}</span><ChevronRight className="mf-accent" size={20} /></button>)}</div>{group.articles?.length ? <div className="mt-6 grid gap-5 sm:grid-cols-2">{group.articles.map(article => <ArticleCard key={article.id} article={article} onOpen={openArticle} />)}</div> : null}</Dialog>}
+    {group && <Dialog title={group.title} onClose={() => setGroup(null)}><div className="space-y-4">{sorted(group.children).map(child => <button key={child.id} onClick={() => openSection(child)} className="mf-topic flex w-full items-center justify-between gap-4 rounded-2xl p-5 text-left"><span>{child.title}</span><ChevronRight className="mf-accent" sx={{ fontSize: 20 }} /></button>)}</div>{group.articles?.length ? <div className="mt-6 grid gap-5 sm:grid-cols-2">{group.articles.map(article => <ArticleCard key={article.id} article={article} onOpen={openArticle} />)}</div> : null}</Dialog>}
   </div>;
 }

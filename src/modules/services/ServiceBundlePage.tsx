@@ -18,6 +18,8 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { useServiceCart } from '../../context/ServiceCartContext';
 
@@ -292,7 +294,7 @@ export const ServiceBundlePage: React.FC = () => {
                   onClick={() => navigate('/services/cart')}
                   className="w-full py-2 px-4 rounded-xl font-bold text-[11px] text-gray-600 hover:text-gray-900 transition-colors text-center cursor-pointer"
                 >
-                  View Services Cart ({serviceCartCount}) →
+                  View Services Cart ({serviceCartCount}) <ArrowForwardIcon sx={{ fontSize: 14 }} />
                 </button>
               )}
             </div>
@@ -351,7 +353,7 @@ export const ServiceBundlePage: React.FC = () => {
               </GradientButton>
 
               <div className="pt-2 text-center text-[11px] text-gray-400">
-                🔒 Includes door-step document pickup and CA review.
+                <LockOutlinedIcon sx={{ fontSize: 13 }} /> Includes door-step document pickup and CA review.
               </div>
             </form>
           </div>

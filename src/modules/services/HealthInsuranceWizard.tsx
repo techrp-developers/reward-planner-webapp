@@ -13,6 +13,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CloseIcon from '@mui/icons-material/Close';
+import FaceIcon from '@mui/icons-material/Face';
+import Face3Icon from '@mui/icons-material/Face3';
+import ChildCareIcon from '@mui/icons-material/ChildCare';
+import Avatar from '@mui/material/Avatar';
 
 export interface HealthInsuranceWizardProps {
   onClose?: () => void;
@@ -36,82 +40,31 @@ export interface PersonalDetailsState {
   cover_amount: string;
 }
 
-// SVG Avatars matching reference designs
+// MUI avatars for family member selection.
+const memberAvatarSx = { width: { xs: 64, sm: 72 }, height: { xs: 64, sm: 72 } };
+
 const AvatarSelf: React.FC<{ gender?: GenderType }> = ({ gender = 'male' }) => (
-  <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
-    <circle cx="50" cy="50" r="50" fill={gender === 'male' ? '#60A5FA' : '#F472B6'} />
-    {/* Body */}
-    <path d="M22 92 C 22 70, 32 64, 50 64 C 68 64, 78 70, 78 92 Z" fill="#1E293B" />
-    {/* Shirt collar / Tie */}
-    <path d="M44 64 L50 78 L56 64 Z" fill="#FFFFFF" />
-    <path d="M48 68 L52 68 L53 82 L47 82 Z" fill="#EF4444" />
-    {/* Face */}
-    <circle cx="50" cy="44" r="20" fill="#FCD34D" />
-    {/* Hair */}
-    <path d="M30 40 C 30 24, 40 20, 50 20 C 60 20, 70 24, 70 40 C 66 32, 58 30, 50 30 C 42 30, 34 32, 30 40 Z" fill="#1F2937" />
-    {/* Sunglasses / Eyes */}
-    <rect x="38" y="38" width="10" height="7" rx="3.5" fill="#111827" />
-    <rect x="52" y="38" width="10" height="7" rx="3.5" fill="#111827" />
-    <line x1="48" y1="41" x2="52" y2="41" stroke="#111827" strokeWidth="2" />
-    {/* Moustache */}
-    <path d="M43 51 C 46 54, 50 51, 50 51 C 50 51, 54 54, 57 51 C 54 49, 46 49, 43 51 Z" fill="#1F2937" />
-  </svg>
+  <Avatar className="shadow-2xs" sx={{ ...memberAvatarSx, bgcolor: gender === 'male' ? '#60A5FA' : '#F472B6', color: '#1E293B' }}>
+    {gender === 'male' ? <FaceIcon sx={{ fontSize: 44 }} /> : <Face3Icon sx={{ fontSize: 44 }} />}
+  </Avatar>
 );
 
 const AvatarSpouse: React.FC = () => (
-  <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
-    <circle cx="50" cy="50" r="50" fill="#38BDF8" />
-    {/* Body */}
-    <path d="M22 92 C 22 72, 32 65, 50 65 C 68 65, 78 72, 78 92 Z" fill="#475569" />
-    {/* Yellow Scarf/Collar */}
-    <path d="M40 65 C 40 76, 50 82, 50 82 C 50 82, 60 76, 60 65 Z" fill="#FBBF24" />
-    {/* Face */}
-    <circle cx="50" cy="44" r="19" fill="#FDE68A" />
-    {/* Hair */}
-    <path d="M29 46 C 29 25, 40 22, 50 22 C 60 22, 71 25, 71 46 C 66 58, 62 60, 62 60 C 60 48, 56 32, 50 32 C 44 32, 40 48, 38 60 C 38 60, 34 58, 29 46 Z" fill="#92400E" />
-    {/* Eyes & Smile */}
-    <circle cx="43" cy="42" r="2.5" fill="#1F2937" />
-    <circle cx="57" cy="42" r="2.5" fill="#1F2937" />
-    <path d="M45 49 Q50 54 55 49" stroke="#DC2626" strokeWidth="2" fill="none" strokeLinecap="round" />
-  </svg>
+  <Avatar className="shadow-2xs" sx={{ ...memberAvatarSx, bgcolor: '#38BDF8', color: '#475569' }}>
+    <Face3Icon sx={{ fontSize: 44 }} />
+  </Avatar>
 );
 
 const AvatarSon: React.FC = () => (
-  <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
-    <circle cx="50" cy="50" r="50" fill="#86EFAC" />
-    {/* Body */}
-    <path d="M25 94 C 25 76, 34 70, 50 70 C 66 70, 75 76, 75 94 Z" fill="#3B82F6" />
-    {/* Shirt detail */}
-    <path d="M46 70 L50 80 L54 70 Z" fill="#EF4444" />
-    {/* Face */}
-    <circle cx="50" cy="46" r="20" fill="#FDE68A" />
-    {/* Spiky Boy Hair */}
-    <path d="M30 42 C 30 26, 38 22, 50 22 C 54 22, 58 20, 62 25 C 67 24, 71 29, 70 38 C 65 30, 55 30, 48 30 C 40 30, 35 34, 30 42 Z" fill="#1F2937" />
-    {/* Eyes & Big Smile */}
-    <circle cx="43" cy="44" r="2.5" fill="#1F2937" />
-    <circle cx="57" cy="44" r="2.5" fill="#1F2937" />
-    <path d="M45 52 Q50 57 55 52" stroke="#1F2937" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-  </svg>
+  <Avatar className="shadow-2xs" sx={{ ...memberAvatarSx, bgcolor: '#86EFAC', color: '#3B82F6' }}>
+    <ChildCareIcon sx={{ fontSize: 44 }} />
+  </Avatar>
 );
 
 const AvatarDaughter: React.FC = () => (
-  <svg viewBox="0 0 100 100" className="w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-2xs">
-    <circle cx="50" cy="50" r="50" fill="#86EFAC" />
-    {/* Body */}
-    <path d="M25 94 C 25 76, 34 70, 50 70 C 66 70, 75 76, 75 94 Z" fill="#EC4899" />
-    {/* Heart on Shirt */}
-    <path d="M48 76 C 45 73, 42 75, 45 79 L50 84 L55 79 C 58 75, 55 73, 52 76 Z" fill="#BE185D" />
-    {/* Face */}
-    <circle cx="50" cy="46" r="19" fill="#FDE68A" />
-    {/* Pigtails / Hair */}
-    <circle cx="28" cy="38" r="8" fill="#B45309" />
-    <circle cx="72" cy="38" r="8" fill="#B45309" />
-    <path d="M31 42 C 31 26, 40 24, 50 24 C 60 24, 69 26, 69 42 C 64 33, 56 32, 50 32 C 44 32, 36 33, 31 42 Z" fill="#B45309" />
-    {/* Eyes & Smile */}
-    <circle cx="43" cy="44" r="2.5" fill="#1F2937" />
-    <circle cx="57" cy="44" r="2.5" fill="#1F2937" />
-    <path d="M45 51 Q50 56 55 51" stroke="#DC2626" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-  </svg>
+  <Avatar className="shadow-2xs" sx={{ ...memberAvatarSx, bgcolor: '#86EFAC', color: '#EC4899' }}>
+    <ChildCareIcon sx={{ fontSize: 44 }} />
+  </Avatar>
 );
 
 export const HealthInsuranceWizard: React.FC<HealthInsuranceWizardProps> = ({ onClose }) => {

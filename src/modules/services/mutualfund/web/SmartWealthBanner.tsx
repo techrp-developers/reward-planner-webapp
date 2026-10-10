@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react';
+import Sparkles from '@mui/icons-material/AutoAwesome';
 
 interface SmartWealthBannerProps {
   onScrollToCalculators?: () => void;
@@ -59,7 +59,7 @@ export default function SmartWealthBanner({
       <div className="relative z-10 w-full">
         {/* Pill Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md shadow-sm">
-          <Sparkles size={14} className="text-blue-200" aria-hidden="true" />
+          <Sparkles sx={{ fontSize: 14 }} className="text-blue-200" aria-hidden="true"  />
           <span>Smart Wealth Tools</span>
         </div>
 

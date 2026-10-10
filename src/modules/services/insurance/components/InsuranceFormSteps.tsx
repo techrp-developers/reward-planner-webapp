@@ -1,6 +1,9 @@
 import { useId } from 'react';
 import type { FieldErrors } from '../utils/insuranceValidation';
-import { Check, Minus, Plus, UserRound } from 'lucide-react';
+import Check from '@mui/icons-material/Check';
+import Minus from '@mui/icons-material/Remove';
+import Plus from '@mui/icons-material/Add';
+import UserRound from '@mui/icons-material/PersonOutlined';
 import Husband from '../../../../assets/insurance/Gender (1).png';
 import Wife from '../../../../assets/insurance/Gender (2).png';
 import Son from '../../../../assets/insurance/Gender (3).png';
@@ -65,14 +68,14 @@ export function MemberSelectionStep({ form, errors = {}, insuranceType, onGender
           <button type="button" disabled={isPersonalAccident && member !== 'self'} aria-pressed={selected} onClick={() => !isPersonalAccident && onMemberToggle(member)} className={`relative flex min-h-28 w-full flex-col items-center justify-center gap-2 rounded-md border p-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-purple/25 disabled:cursor-default ${selected ? 'border-brand-purple bg-purple-50/60 text-slate-900' : 'border-slate-200 bg-white text-slate-700 hover:border-brand-purple/40'}`}>
             <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-slate-100"><img src={avatar} alt="" className="h-full w-full object-contain" /></span>
             <span>{labels[member]}</span>
-            <span className={`absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full border ${selected ? 'border-brand-purple bg-brand-purple text-white' : 'border-slate-300 bg-white'}`}>{selected && <Check size={13} />}</span>
+            <span className={`absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full border ${selected ? 'border-brand-purple bg-brand-purple text-white' : 'border-slate-300 bg-white'}`}>{selected && <Check sx={{ fontSize: 13 }} />}</span>
           </button>
-          {(member === 'son' || member === 'daughter') && selected && !isPersonalAccident && <div className="mt-2 flex items-center justify-between rounded border border-slate-200 bg-white px-2 py-1"><button type="button" disabled={(form.memberCounts[member] || 1) <= 1} aria-label={`Remove one ${member}`} onClick={() => onMemberCountChange(member, -1)} className="grid h-7 w-7 place-items-center rounded text-brand-purple hover:bg-purple-50"><Minus size={14} /></button><span className="text-sm font-bold text-slate-800">{form.memberCounts[member] || 1}</span><button type="button" disabled={(['son', 'daughter'] as const).reduce((total, child) => total + (form.members.includes(child) ? form.memberCounts[child] || 1 : 0), 0) >= 4} aria-label={`Add one ${member}`} onClick={() => onMemberCountChange(member, 1)} className="grid h-7 w-7 place-items-center rounded text-brand-purple hover:bg-purple-50"><Plus size={14} /></button></div>}
+          {(member === 'son' || member === 'daughter') && selected && !isPersonalAccident && <div className="mt-2 flex items-center justify-between rounded border border-slate-200 bg-white px-2 py-1"><button type="button" disabled={(form.memberCounts[member] || 1) <= 1} aria-label={`Remove one ${member}`} onClick={() => onMemberCountChange(member, -1)} className="grid h-7 w-7 place-items-center rounded text-brand-purple hover:bg-purple-50"><Minus sx={{ fontSize: 14 }} /></button><span className="text-sm font-bold text-slate-800">{form.memberCounts[member] || 1}</span><button type="button" disabled={(['son', 'daughter'] as const).reduce((total, child) => total + (form.members.includes(child) ? form.memberCounts[child] || 1 : 0), 0) >= 4} aria-label={`Add one ${member}`} onClick={() => onMemberCountChange(member, 1)} className="grid h-7 w-7 place-items-center rounded text-brand-purple hover:bg-purple-50"><Plus sx={{ fontSize: 14 }} /></button></div>}
         </div>;
       })}
     </div>
     {(errors.gender || errors.members) && <p className="mt-3 text-sm text-red-700">{errors.gender || errors.members}</p>}
-    {isPersonalAccident && <p className="mt-4 flex items-center gap-2 text-sm text-slate-600"><UserRound size={16} className="text-brand-purple" />Personal Accident insurance covers the self member only.</p>}
+    {isPersonalAccident && <p className="mt-4 flex items-center gap-2 text-sm text-slate-600"><UserRound sx={{ fontSize: 16 }} className="text-brand-purple" />Personal Accident insurance covers the self member only.</p>}
   </section>;
 }
 
@@ -123,7 +126,7 @@ export function PersonalAccidentDetailsStep({ form, errors = {}, onDetailsChange
       <label className="block min-w-0 sm:col-span-2"><span className="mb-1.5 block text-sm font-semibold text-slate-700">Nature of work / designation</span><select aria-label="Nature of work / designation" aria-invalid={Boolean(errors.natureOfWork)} aria-describedby={errors.natureOfWork ? "work-error" : undefined} className={inputClass} value={form.details.natureOfWork || ''} onChange={(event) => onDetailsChange('natureOfWork', event.target.value)}><option value="">Select nature of work</option>{Object.entries(NATURE_OF_WORK).map(([risk, options]) => <optgroup label={`Category ${risk}`} key={risk}>{options.map((option) => <option value={option.label} key={option.value}>{option.label}</option>)}</optgroup>)}</select>{errors.natureOfWork && <span id="work-error" className="mt-1 block text-xs text-red-700">{errors.natureOfWork}</span>}</label>
       <SelectField label="Cover amount" error={errors.coverAmount} value={form.details.coverAmount || ''} onChange={(value) => onDetailsChange('coverAmount', value)} options={PA_COVER_AMOUNTS.map((option) => ({ value: option.label, label: option.label }))} />
     </div>
-    {category && <p className="mt-4 inline-flex items-center gap-2 rounded-md border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-brand-dark"><Check size={16} />Mapped to risk category {category}</p>}
+    {category && <p className="mt-4 inline-flex items-center gap-2 rounded-md border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-brand-dark"><Check sx={{ fontSize: 16 }} />Mapped to risk category {category}</p>}
     {errors.agreeToTerms && <p className="mt-3 text-xs text-red-700">{errors.agreeToTerms}</p>}
     <label className="mt-5 flex cursor-pointer items-start gap-2.5 text-sm leading-5 text-slate-600"><input type="checkbox" className="mt-0.5 h-4 w-4 accent-brand-purple" aria-invalid={Boolean(errors.agreeToTerms)} checked={Boolean(form.details.agreeToTerms)} onChange={(event) => onDetailsChange('agreeToTerms', event.target.checked)} /><span>I agree to the <a href="/terms" target="_blank" rel="noreferrer" className="font-semibold text-brand-purple underline">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noreferrer" className="font-semibold text-brand-purple underline">Privacy Policy</a>.</span></label>
   </section>;

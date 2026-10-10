@@ -3,7 +3,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 export default function ServiceSectionState({ query, label, empty = false, skeleton = 'cards' }: {
   query: Pick<UseQueryResult, 'isPending' | 'isError' | 'refetch'>; label: string; empty?: boolean; skeleton?: 'banner' | 'categories' | 'cards';
 }) {
-  if (query.isPending && skeleton === 'banner') return <div role="status" aria-label={`Loading ${label}`} className="w-full animate-pulse rounded-2xl bg-gray-100 sm:rounded-3xl" style={{ aspectRatio: '1024 / 395' }} />;
+  if (query.isPending && skeleton === 'banner') return <div role="status" aria-label={`Loading ${label}`} className="w-full animate-pulse rounded-2xl bg-gray-100 sm:rounded-3xl" style={{ aspectRatio: '1024 / 395', maxHeight: '340px' }} />;
   if (query.isPending && skeleton === 'categories') return <div role="status" aria-label={`Loading ${label}`} className="grid grid-cols-1 gap-4 sm:grid-cols-12">
     {[1, 2, 3, 4, 5].map(id => <div key={id} className={`${id === 4 ? 'sm:col-span-8' : 'sm:col-span-4'} h-32 animate-pulse rounded-2xl bg-gray-100`} />)}
   </div>;

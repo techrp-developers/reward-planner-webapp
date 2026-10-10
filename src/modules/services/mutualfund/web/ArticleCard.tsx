@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import ArrowRight from '@mui/icons-material/ArrowForward';
 import type { MFArticleSummary } from '../../../../api/mutualFundApi';
 import MFImage from './MFImage';
 export const plainText = (text: string | null) => new DOMParser().parseFromString(text || '', 'text/html').body.textContent || '';
@@ -12,7 +12,7 @@ export default function ArticleCard({ article, onOpen }: { article: MFArticleSum
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <h3 className="line-clamp-3 text-lg font-semibold leading-snug">{article.title}</h3>
         <p className="mf-muted mt-3 line-clamp-3 text-sm leading-6">{plainText(article.short_description)}</p>
-        <span className="mf-accent mt-auto flex items-center gap-2 pt-5 text-sm font-semibold">Read more <ArrowRight size={16} /></span>
+        <span className="mf-accent mt-auto flex items-center gap-2 pt-5 text-sm font-semibold">Read more <ArrowRight sx={{ fontSize: 16 }} /></span>
       </div>
     </button>
   );

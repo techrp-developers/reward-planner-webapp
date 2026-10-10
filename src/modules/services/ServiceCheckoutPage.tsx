@@ -1,3 +1,4 @@
+import CelebrationOutlinedIcon from '@mui/icons-material/CelebrationOutlined';
 import ServiceImage from '../../components/services/ServiceImage';
 // src/modules/services/ServiceCheckoutPage.jsx
 import React, { useState, useEffect, useMemo, useRef } from 'react';
@@ -32,6 +33,7 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import AddIcon from '@mui/icons-material/Add';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
@@ -371,7 +373,7 @@ const ServiceCheckoutFlow: React.FC = () => {
   // 3. SUCCESS / CONFIRMATION SCREEN
   if (confirmedOrder) {
     return (
-      <div className="w-full max-w-[1000px] mx-auto px-4 lg:px-8 py-12 font-['Poppins',sans-serif]">
+      <div className="w-full max-w-[1000px] mx-auto px-4 lg:px-8 py-12 lg:h-full lg:overflow-y-auto font-['Poppins',sans-serif]">
         <div className="bg-white rounded-3xl border border-gray-200 p-8 sm:p-12 shadow-md text-center space-y-6">
           <div className="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
             <CheckCircleIcon sx={{ fontSize: 44 }} />
@@ -453,9 +455,9 @@ const ServiceCheckoutFlow: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+    <div className="w-full max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6 lg:flex lg:h-full lg:min-h-0 lg:flex-col font-['Poppins',sans-serif]">
       {/* 1. Header */}
-      <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
+      <div className="flex shrink-0 items-center gap-3 border-b border-gray-200 pb-4">
         <button
           onClick={() => navigate(-1)}
           className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
@@ -474,16 +476,21 @@ const ServiceCheckoutFlow: React.FC = () => {
 
       {/* Error Alert */}
       {errorMsg && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+        <div className="shrink-0 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
           <ErrorOutlineOutlinedIcon sx={{ fontSize: 18 }} />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start lg:min-h-0 lg:flex-1">
         {/* Left 2 Cols: Address & Items */}
-        <div className="lg:col-span-2 space-y-6">
+        <div
+          role="region"
+          aria-label="Checkout address and services"
+          tabIndex={0}
+          className="lg:col-span-2 space-y-6 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:pr-2 lg:pb-1 focus-visible:outline-2 focus-visible:outline-purple-500 focus-visible:outline-offset-2"
+        >
           {/* Section A: Communication / Delivery Address */}
           <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -544,8 +551,8 @@ const ServiceCheckoutFlow: React.FC = () => {
                         {addr.address1 || addr.address}, {addr.locality ? `${addr.locality}, ` : ''}
                         {addr.city}, {addr.state} - {addr.zipcode || addr.pincode}
                       </p>
-                      <span className="text-[11px] font-semibold text-gray-500 block mt-1">
-                        📞 {addr.contact_phone || addr.phone || user?.phone}
+                      <span className="text-[11px] font-semibold text-gray-500 flex items-center gap-1 mt-1">
+                        <PhoneOutlinedIcon sx={{ fontSize: 13 }} /> {addr.contact_phone || addr.phone || user?.phone}
                       </span>
                     </button>
                   );
@@ -600,8 +607,8 @@ const ServiceCheckoutFlow: React.FC = () => {
         </div>
 
         {/* Right Col: Bill & Pay Button */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-5 sticky top-24">
+        <div className="space-y-4 lg:sticky lg:top-0 lg:max-h-full lg:overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-5">
             <h2 className="text-base font-black text-gray-900 border-b border-gray-100 pb-3">
               Payment Summary
             </h2>
@@ -660,8 +667,8 @@ const ServiceCheckoutFlow: React.FC = () => {
               </div>
 
               {summary.earnCoins > 0 && (
-                <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 text-[11px] font-bold text-center border border-emerald-200">
-                  🎉 You will earn +{summary.earnCoins} RP Coins on completion!
+                <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 text-[11px] font-bold text-center border border-emerald-200 flex items-center justify-center gap-1">
+                  <CelebrationOutlinedIcon sx={{ fontSize: 16 }} /> You will earn +{summary.earnCoins} RP Coins on completion!
                 </div>
               )}
             </div>

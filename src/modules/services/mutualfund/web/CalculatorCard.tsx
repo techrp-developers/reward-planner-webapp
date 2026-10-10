@@ -1,4 +1,10 @@
-import { Wallet, Palmtree, TrendingUp, ArrowDownUp, Calculator, type LucideIcon } from 'lucide-react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Wallet from '@mui/icons-material/AccountBalanceWalletOutlined';
+import Palmtree from '@mui/icons-material/BeachAccessOutlined';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import ArrowDownUp from '@mui/icons-material/SwapVert';
+import Calculator from '@mui/icons-material/CalculateOutlined';
+import type SvgIcon from '@mui/material/SvgIcon';
 import type { CalculatorItem } from './calculatorItems';
 
 interface CalculatorCardProps {
@@ -6,7 +12,7 @@ interface CalculatorCardProps {
   onPress: () => void;
 }
 
-const FALLBACK_ICONS: Record<string, LucideIcon> = {
+const FALLBACK_ICONS: Record<string, typeof SvgIcon> = {
   lumpsum: Wallet,
   retirement: Palmtree,
   stepup_sip: TrendingUp,
@@ -45,7 +51,7 @@ export default function CalculatorCard({ item, onPress }: CalculatorCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[#8665FF]/15 to-[#3545A3]/15">
-              <FallbackIcon size={36} strokeWidth={1.5} className="text-[#3545A3] dark:text-[#b5bfff]" />
+              <FallbackIcon sx={{ fontSize: 36 }} className="text-[#3545A3] dark:text-[#b5bfff]" />
             </div>
           )}
         </div>
@@ -59,7 +65,7 @@ export default function CalculatorCard({ item, onPress }: CalculatorCardProps) {
           aria-hidden="true"
           className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3545A3] text-white shadow-sm transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-[#283685] dark:bg-[#3545A3]"
         >
-          →
+          <ArrowForwardIcon sx={{ fontSize: 18 }} />
         </span>
       </span>
     </button>

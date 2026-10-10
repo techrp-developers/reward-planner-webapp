@@ -8,6 +8,7 @@ import { filterServices, getCategoryLayout } from './serviceCatalog';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
 import { getInsuranceQuotePath } from './insurance/insuranceProducts';
 
@@ -17,16 +18,16 @@ import StarIcon from '@mui/icons-material/Star';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
 export const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
   const categoriesQuery = useServiceQuery('categories');
-  const bannersQuery = useServiceQuery('banners');
   const bundlesQuery = useServiceQuery('bundles');
   const servicesQuery = useServiceQuery('list');
   const categories = categoriesQuery.data || [];
-  const banners = bannersQuery.data || [];
   const bundles = bundlesQuery.data || [];
   const services: any[] = servicesQuery.data || [];
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,14 +51,13 @@ export const ServicesPage: React.FC = () => {
   const filteredServices = useMemo(() => filterServices(services, search), [services, search]);
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-8">
-      {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (EXACT PREVIOUS BANNER UI, DUMMY FALLBACKS, SAME BG IMAGES & CONTENT) */}
-      <ServiceSectionState query={bannersQuery} label="service banners" empty={!banners.length} skeleton="banner" />
-      {!bannersQuery.isPending && !bannersQuery.isError && banners.length > 0 && <ServiceBannerCarousel banners={banners} />}
+    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5">
+      {/* Promotional banners supplied for the Service page. */}
+      <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 
       {/* 2. SEARCH BAR & QUICK FILTERS */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm sm:text-base font-black text-gray-900">
             Explore Services
           </span>
@@ -66,7 +66,7 @@ export const ServicesPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="w-full sm:w-80">
+        <div className="w-full sm:w-96 sm:max-w-[45%]">
           <input
             type="text"
             value={searchQuery}
@@ -79,8 +79,8 @@ export const ServicesPage: React.FC = () => {
       </div>
 
       {/* 3. SERVICE CATEGORIES (App UI Layout: 3 equal cards on Row 1, Wide + Narrow card on Row 2) */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3 border-b border-gray-200 pb-2">
           <h2 className="text-sm sm:text-base font-black text-gray-900">
             Browse Services by Category
           </h2>
@@ -102,7 +102,7 @@ export const ServicesPage: React.FC = () => {
                 <div className={`absolute right-3 bottom-2 ${getCategoryLayout(cat) === 'wide' ? 'w-28 h-24' : 'w-20 h-20'} flex items-center justify-center pointer-events-none group-hover:scale-108 transition-transform duration-300`}>
                   {cat.icon ? <ServiceImage src={getImageUrl(cat.icon)} alt="" sizes="80px" className="w-full h-full object-contain" /> : <BuildOutlinedIcon sx={{ fontSize: 40 }} className="text-[#A654CD]" />}
                 </div>
-                <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">{Number(cat.id) === 5 ? 'Book Now →' : 'Explore Services →'}</span>
+                <span className="text-[11px] font-bold text-[#7C3AED] group-hover:underline">{Number(cat.id) === 5 ? 'Book Now' : 'Explore Services'} <ArrowForwardIcon sx={{ fontSize: 13 }} /></span>
               </button>
             ))}
           </div>
@@ -297,10 +297,10 @@ export const ServicesPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-xs font-bold text-gray-700 bg-white/80 px-3 py-1.5 rounded-lg border border-gray-200">
-            🔒 256-bit Encrypted
+            <LockOutlinedIcon sx={{ fontSize: 14 }} /> 256-bit Encrypted
           </span>
           <span className="text-xs font-bold text-gray-700 bg-white/80 px-3 py-1.5 rounded-lg border border-gray-200">
-            🛡️ Authorized Govt Vendors
+            <ShieldOutlinedIcon sx={{ fontSize: 14 }} /> Authorized Govt Vendors
           </span>
         </div>
       </div>

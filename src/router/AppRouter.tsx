@@ -75,6 +75,7 @@ export const AppRouter = () => {
     location.pathname.startsWith('/rewards') ||
     location.pathname === '/my-rewards';
   const isFixedLayout = isStageRoute || isEventsPage || isWellnessPage || isBenefitsPage || isReportsPage || isRewardsPage;
+  const isServicePurchasePage = location.pathname === '/services/cart' || location.pathname === '/services/checkout';
 
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
@@ -118,7 +119,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] ${isFixedLayout ? 'h-screen overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
@@ -127,7 +128,7 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''}`}>
+      <main className={`flex-1 w-full ${isFixedLayout ? 'h-[calc(100vh-4.25rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
         <Suspense fallback={<div role="status" className="p-8 text-center text-sm text-gray-500">Loading page...</div>}>
         {isStageRoute ? (
           <CinematicModuleStage />
@@ -202,7 +203,9 @@ export const AppRouter = () => {
       <AuthModal />
 
       {/* FULL-WIDTH FOOTER (Hidden on fixed layout app pages, policy pages, and e-commerce per user specification) */}
-      {!isPolicyPage && !isEcommercePage && !isFixedLayout && <Footer />}
+      {!isPolicyPage && !isEcommercePage && !isFixedLayout && (
+        isServicePurchasePage ? <div className="lg:hidden"><Footer /></div> : <Footer />
+      )}
       <MobileBottomBar />
     </div>
   );
