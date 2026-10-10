@@ -131,7 +131,7 @@ export const TopHeader = () => {
       <LocationModal />
 
 
-      <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2 sm:py-2.5 px-4 sm:px-8 lg:px-12 antialiased">
+      <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-3 sm:py-3.5 lg:py-4 px-4 sm:px-8 lg:px-12 antialiased">
         <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-3 sm:gap-4">
           
           {/* Left Group: [ + / Logo Squircle ] and [ ::: Name Pill ] */}
@@ -147,16 +147,16 @@ export const TopHeader = () => {
             <button
               type="button"
               onClick={() => navigate('/profile')}
-              className="h-8.5 sm:h-9.5 px-2 sm:px-3.5 rounded-full bg-[#1C0E28] hover:bg-black text-white flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
+              className="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full bg-[#1C0E28] hover:bg-black text-white flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer group shrink-0"
               title="Profile & Settings" aria-label="Profile and settings"
             >
-              <AppsIcon sx={{ fontSize: 15 }} className="text-zinc-300 group-hover:text-white" />
+              <AppsIcon sx={{ fontSize: 16 }} className="text-zinc-300 group-hover:text-white" />
               <span className="hidden sm:inline tracking-tight text-white font-medium truncate max-w-[120px]">{displayName}</span>
             </button>
           </div>
 
           {/* Center Group: 3-Module Circular Carousel Navigation */}
-          <div className="hidden lg:flex items-center justify-center flex-1 max-w-[460px] mx-2">
+          <div className="hidden lg:flex items-center justify-center flex-1 max-w-[480px] mx-2">
             <CircularHeaderNav
               currentPath={routerLocation.pathname}
               onNavigate={(path) => navigate(path)}

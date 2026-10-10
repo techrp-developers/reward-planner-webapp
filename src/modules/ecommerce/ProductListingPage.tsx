@@ -361,8 +361,16 @@ export const ProductListingPage = () => {
 
           {/* NAVRATRI SPECIAL FESTIVE HERO BANNER */}
           <div
-            onClick={() => handleSelectCategory('all')}
-            className="relative w-full h-[180px] sm:h-[270px] md:h-[350px] lg:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002]"
+            onClick={() => navigate('/navratri')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                navigate('/navratri');
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            className="relative w-full h-[180px] sm:h-[270px] md:h-[350px] lg:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
             title="Navratri Special - Shop Now"
           >
             <img

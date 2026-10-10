@@ -2,6 +2,7 @@
 export const POLICIES_DATA = {
   terms: {
     id: 'terms',
+    path: '/terms',
     title: 'Terms & Conditions',
     headerBadge: 'RewardPlanners Legal Policy',
     intro:
@@ -124,7 +125,10 @@ export const POLICIES_DATA = {
       {
         num: 14,
         title: 'Changes to Terms',
-        text: 'RewardPlanners may update or modify these Terms & Conditions periodically. Continued usage of the platform after updates constitutes acceptance of revised terms.',
+        paragraphs: [
+          'RewardPlanners may update or modify these Terms & Conditions periodically.',
+          'Continued usage of the platform after updates constitutes acceptance of revised terms.',
+        ],
       },
       {
         num: 15,

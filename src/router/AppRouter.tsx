@@ -14,6 +14,7 @@ import HomePage from '../modules/home/HomePage';
 import CinematicModuleStage from '../modules/stage/CinematicModuleStage';
 import ProductListingPage from '../modules/ecommerce/ProductListingPage';
 import ProductDetailPage from '../modules/ecommerce/ProductDetailPage';
+import NavratriProductsPage from '../modules/ecommerce/NavratriProductsPage';
 import CartPage from '../modules/ecommerce/CartPage';
 import CheckoutPage from '../modules/ecommerce/CheckoutPage';
 import BBPSPage from '../modules/bbps/BBPSPage';
@@ -54,7 +55,8 @@ export const AppRouter = () => {
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
     location.pathname.startsWith('/deals') ||
-    location.pathname.startsWith('/product');
+    location.pathname.startsWith('/product') ||
+    location.pathname.startsWith('/navratri');
 
   // 1. Initial Session Hydration Screen
   if (loading) {
@@ -77,6 +79,9 @@ export const AppRouter = () => {
           <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/terms" element={<PolicyPage policyId="terms" />} />
+          <Route path="/terms-and-conditions" element={<PolicyPage policyId="terms" />} />
+          <Route path="/terms-conditions" element={<PolicyPage policyId="terms" />} />
+          <Route path="/privacy" element={<PolicyPage policyId="privacy" />} />
           <Route path="/privacy-policy" element={<PolicyPage policyId="privacy" />} />
           <Route path="/shipping-delivery-policy" element={<PolicyPage policyId="shipping" />} />
           <Route path="/refund-cancellation-policy" element={<PolicyPage policyId="refund" />} />
@@ -119,6 +124,8 @@ export const AppRouter = () => {
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/navratri" element={<NavratriProductsPage />} />
+            <Route path="/store/navratri" element={<NavratriProductsPage />} />
             
             {/* SERVICES FULL SUITE */}
             <Route path="/services/cart" element={<ServiceCartPage />} />
@@ -133,6 +140,9 @@ export const AppRouter = () => {
 
             {/* POLICIES & GOVERNANCE */}
             <Route path="/terms" element={<PolicyPage policyId="terms" />} />
+            <Route path="/terms-and-conditions" element={<PolicyPage policyId="terms" />} />
+            <Route path="/terms-conditions" element={<PolicyPage policyId="terms" />} />
+            <Route path="/privacy" element={<PolicyPage policyId="privacy" />} />
             <Route path="/privacy-policy" element={<PolicyPage policyId="privacy" />} />
             <Route path="/shipping-delivery-policy" element={<PolicyPage policyId="shipping" />} />
             <Route path="/refund-cancellation-policy" element={<PolicyPage policyId="refund" />} />

@@ -65,6 +65,7 @@
 .glyph-orange { background: linear-gradient(145deg, #fb923c, #ea580c); }
 .glyph-purple { background: linear-gradient(145deg, #c084fc, #9333ea); }
 .glyph-teal { background: linear-gradient(145deg, #2dd4bf, #0d9488); }
+.glyph-emerald { background: linear-gradient(145deg, #34d399, #059669); }
 .glyph-gold { background: linear-gradient(145deg, #facc15, #ca8a04); }
 .glyph-indigo { background: linear-gradient(145deg, #818cf8, #4f46e5); }
 
@@ -92,6 +93,11 @@
 .service-shortcut.tone-teal {
   background: linear-gradient(150deg, #cbf6f0 0%, #aef0e6 100%);
   border: 1px solid #81e6d9;
+}
+
+.service-shortcut.tone-emerald {
+  background: linear-gradient(150deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 1px solid #6ee7b7;
 }
 
 .service-shortcut.tone-gold {
@@ -124,6 +130,11 @@
   background: linear-gradient(150deg, #f5ecfc 0%, #e6d1f7 100%);
   border-color: #d6b8f4;
   --service-art: #8f6ab8;
+}
+.service-discovery-card.tone-emerald {
+  background: linear-gradient(150deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: #a7f3d0;
+  --service-art: #059669;
 }
 .service-discovery-card.tone-teal {
   background: linear-gradient(150deg, #ebfaf6 0%, #cefaee 100%);
@@ -257,15 +268,17 @@
 
 .service-discovery-card li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8.5px;
   font-size: 13.5px;
   font-weight: 600;
   color: #1e293b;
+  line-height: 1.4;
 }
 
 .service-discovery-card li svg {
   flex-shrink: 0;
+  margin-top: 2.5px;
   color: #6366f1;
 }
 

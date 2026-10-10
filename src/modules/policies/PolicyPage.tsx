@@ -38,15 +38,21 @@ export const PolicyPage = ({ policyId: defaultPolicyId = null }: { policyId?: st
 
   const policy = POLICIES_DATA[activeId] || POLICIES_DATA.terms;
 
+  const handleBack = () => {
+    if (location.state?.from === 'profile' || document.referrer.includes('profile')) {
+      navigate('/profile');
+    } else if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate('/profile');
+    }
+  };
+
   const handleAcknowledge = () => {
     setAcknowledged(true);
     setTimeout(() => {
-      if (window.history.length > 2) {
-        navigate(-1);
-      } else {
-        navigate('/');
-      }
-    }, 800);
+      navigate('/profile');
+    }, 600);
   };
 
   return (
@@ -56,17 +62,17 @@ export const PolicyPage = ({ policyId: defaultPolicyId = null }: { policyId?: st
         <div className="flex flex-wrap items-center justify-between gap-4">
           <button
             type="button"
-            onClick={() => (window.history.length > 2 ? navigate(-1) : navigate('/'))}
+            onClick={handleBack}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-50 text-sm font-semibold shadow-xs cursor-pointer transition-all hover:-translate-x-0.5"
           >
             <ArrowBackIcon sx={{ fontSize: 18 }} />
-            <span>Back</span>
+            <span>Back to Profile</span>
           </button>
 
           <nav className="text-xs text-gray-500 flex items-center gap-1.5">
-            <Link to="/" className="hover:text-[#EA4988] transition-colors">Home</Link>
+            <Link to="/" className="hover:text-[#6366F1] transition-colors">Home</Link>
             <span>/</span>
-            <span className="text-gray-400">Policies & Governance</span>
+            <Link to="/profile" className="hover:text-[#6366F1] transition-colors">My Profile</Link>
             <span>/</span>
             <span className="text-gray-800 font-semibold">{policy.title}</span>
           </nav>
@@ -126,19 +132,19 @@ export const PolicyPage = ({ policyId: defaultPolicyId = null }: { policyId?: st
                 </div>
 
                 {section.text && (
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-10">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-0 sm:pl-10 whitespace-pre-line">
                     {section.text}
                   </p>
                 )}
 
                 {section.intro && (
-                  <p className="text-xs sm:text-sm font-medium text-gray-700 pl-10">
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 pl-0 sm:pl-10">
                     {section.intro}
                   </p>
                 )}
 
                 {section.items && (
-                  <ul className="space-y-2 pl-10">
+                  <ul className="space-y-2 pl-0 sm:pl-10">
                     {section.items.map((item, idx) => (
                       <li key={idx} className="text-xs sm:text-sm text-gray-600 flex items-start gap-2.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#EA4988] shrink-0 mt-1.5" />
@@ -229,7 +235,7 @@ export const PolicyPage = ({ policyId: defaultPolicyId = null }: { policyId?: st
                 )}
 
                 {section.note && (
-                  <div className="mt-2 ml-10 p-3 rounded-xl bg-purple-50/70 border border-purple-100 text-xs text-purple-900 font-medium">
+                  <div className="mt-2 ml-0 sm:ml-10 p-3 rounded-xl bg-purple-50/70 border border-purple-100 text-xs text-purple-900 font-medium">
                     {section.note}
                   </div>
                 )}
@@ -278,20 +284,20 @@ export const PolicyPage = ({ policyId: defaultPolicyId = null }: { policyId?: st
           <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               type="button"
-              onClick={() => (window.history.length > 2 ? navigate(-1) : navigate('/'))}
+              onClick={handleBack}
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm cursor-pointer transition-colors flex items-center justify-center gap-2"
             >
               <ArrowBackIcon sx={{ fontSize: 18 }} />
-              <span>Back</span>
+              <span>Back to Profile</span>
             </button>
 
             <button
               type="button"
               onClick={handleAcknowledge}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] text-white font-bold text-sm shadow-md hover:shadow-lg hover:opacity-95 active:scale-95 cursor-pointer transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white font-bold text-sm shadow-md hover:shadow-lg hover:opacity-95 active:scale-95 cursor-pointer transition-all flex items-center justify-center gap-2"
             >
               <CheckCircleOutlinedIcon sx={{ fontSize: 18 }} />
-              <span>{acknowledged ? 'Acknowledged!' : 'Okay, I Understand'}</span>
+              <span>{acknowledged ? 'Returning to Profile...' : 'Okay, Return to Profile'}</span>
             </button>
           </div>
         </div>
