@@ -272,6 +272,10 @@ function calculateTimelinePercentage(timeStr: string): number {
 
 export default function OccasionCalendar() {
   const today = useMemo(() => new Date(), []);
+  const todayDateStr = useMemo(() => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  }, [today]);
 
   // 1. Calendar starts defaulted to CURRENT REAL DATE
   const [currentYear, setCurrentYear] = useState<number>(() => today.getFullYear());
@@ -289,8 +293,8 @@ export default function OccasionCalendar() {
   const [isLiveClock, setIsLiveClock] = useState<boolean>(true);
   const [currentTimeTick, setCurrentTimeTick] = useState<Date>(() => new Date());
 
-  // 3. Chart filter starts defaulted to 'Day' (Current Day Wise)
-  const [timeframe, setTimeframe] = useState<TimeframeType>('Day');
+  // 3. Chart filter starts defaulted to 'All' (Shows all tasks: past, present, and future of any date)
+  const [timeframe, setTimeframe] = useState<TimeframeType>('All');
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<'all' | ComputedStatus>('all');
 
@@ -383,8 +387,7 @@ export default function OccasionCalendar() {
           return parsed.filter(
             (m) =>
               !DUMMY_TITLES.has(m.title) &&
-              typeof m.id === 'string' &&
-              m.id.startsWith('m-custom-')
+              Boolean(m.title && m.dateStr)
           );
         }
       }
@@ -511,26 +514,24 @@ export default function OccasionCalendar() {
     showToast(`Switched calendar to ${MONTH_NAMES[currentMonthIndex === 11 ? 0 : currentMonthIndex + 1]}`);
   };
 
-  // Compute week bounds (Sunday through Saturday) for the selected date
+  // Compute week bounds: Rolling week covering recent past (±7 days) so recent past tasks (like 2 days ago) and upcoming tasks are never hidden
   const weekRange = useMemo(() => {
     const targetDate = new Date(currentYear, currentMonthIndex, selectedDay);
-    const dayOfWeek = targetDate.getDay(); // 0 (Sun) to 6 (Sat)
+    const pastDays = new Date(targetDate);
+    pastDays.setDate(targetDate.getDate() - 7);
 
-    const sunday = new Date(targetDate);
-    sunday.setDate(targetDate.getDate() - dayOfWeek);
-
-    const saturday = new Date(targetDate);
-    saturday.setDate(targetDate.getDate() + (6 - dayOfWeek));
+    const futureDays = new Date(targetDate);
+    futureDays.setDate(targetDate.getDate() + 7);
 
     const pad = (n: number) => String(n).padStart(2, '0');
-    const startStr = `${sunday.getFullYear()}-${pad(sunday.getMonth() + 1)}-${pad(sunday.getDate())}`;
-    const endStr = `${saturday.getFullYear()}-${pad(saturday.getMonth() + 1)}-${pad(saturday.getDate())}`;
+    const startStr = `${pastDays.getFullYear()}-${pad(pastDays.getMonth() + 1)}-${pad(pastDays.getDate())}`;
+    const endStr = `${futureDays.getFullYear()}-${pad(futureDays.getMonth() + 1)}-${pad(futureDays.getDate())}`;
 
-    const label = `${MONTH_NAMES[sunday.getMonth()].slice(0, 3)} ${sunday.getDate()} – ${MONTH_NAMES[saturday.getMonth()].slice(0, 3)} ${saturday.getDate()}`;
+    const label = `${MONTH_NAMES[pastDays.getMonth()].slice(0, 3)} ${pastDays.getDate()} – ${MONTH_NAMES[futureDays.getMonth()].slice(0, 3)} ${futureDays.getDate()}`;
     return { startStr, endStr, label };
   }, [currentYear, currentMonthIndex, selectedDay]);
 
-  // 5. Timeframe-based filtered meetings (Day, Week, Month, All)
+  // 5. Timeframe-based filtered meetings (All, Week, Month, Day)
   const timeframeMeetings = useMemo(() => {
     if (timeframe === 'Day') {
       return evaluatedMeetings.filter((m) => m.dateStr === selectedDateStr);
@@ -542,7 +543,7 @@ export default function OccasionCalendar() {
       const monthPrefix = `${currentYear}-${String(currentMonthIndex + 1).padStart(2, '0')}-`;
       return evaluatedMeetings.filter((m) => m.dateStr.startsWith(monthPrefix));
     }
-    // 'All'
+    // 'All' - Shows all tasks (past, present, and future of any date)
     return evaluatedMeetings;
   }, [evaluatedMeetings, timeframe, selectedDateStr, weekRange, currentYear, currentMonthIndex]);
 
@@ -552,8 +553,11 @@ export default function OccasionCalendar() {
     if (statusFilter !== 'all') {
       list = list.filter((m) => m.displayType === statusFilter);
     }
-    // Sort chronologically by time
+    // Sort chronologically: by date first, then by time of day
     return [...list].sort((a, b) => {
+      if (a.dateStr !== b.dateStr) {
+        return a.dateStr.localeCompare(b.dateStr);
+      }
       const getMin = (t: string) => {
         const clean = t.trim().toUpperCase();
         const parts = clean.split(' ');
@@ -582,10 +586,9 @@ export default function OccasionCalendar() {
     return evaluatedMeetings.filter((m) => m.dateStr === selectedDateStr);
   }, [evaluatedMeetings, selectedDateStr]);
 
-  // 7. Click on date: Updates date, sets chart to Day view, and opens Schedule Meeting Modal for clicked date
+  // 7. Click on date: Updates date and opens Schedule Meeting Modal for clicked date
   const handleDateClick = (dayNum: number) => {
     setSelectedDay(dayNum);
-    setTimeframe('Day'); // Focus chart on this day
     const pad = (n: number) => String(n).padStart(2, '0');
     const targetDateStr = `${currentYear}-${pad(currentMonthIndex + 1)}-${pad(dayNum)}`;
     handleOpenAddModal(targetDateStr);
@@ -694,7 +697,6 @@ export default function OccasionCalendar() {
         setCurrentMonthIndex(parts[1] - 1);
         setSelectedDay(parts[2]);
       }
-      setTimeframe('Day');
       showToast(`Added meeting to ${targetDate}: ${formTitle}`);
     }
 
@@ -721,6 +723,9 @@ export default function OccasionCalendar() {
 
   // Dynamic header overview title
   const overviewTitle = useMemo(() => {
+    if (timeframe === 'All') {
+      return 'All Tasks (Past, Present & Future)';
+    }
     if (timeframe === 'Day') {
       return isSelectedDateToday
         ? `Today (${MONTH_NAMES[currentMonthIndex].slice(0, 3)} ${selectedDay})`
@@ -732,7 +737,7 @@ export default function OccasionCalendar() {
     if (timeframe === 'Month') {
       return `${MONTH_NAMES[currentMonthIndex]} ${currentYear}`;
     }
-    return 'All Scheduled Meetings';
+    return 'All Tasks';
   }, [timeframe, isSelectedDateToday, currentMonthIndex, selectedDay, currentYear, weekRange]);
 
   // Evaluated selected meeting for Details Modal
@@ -847,7 +852,6 @@ export default function OccasionCalendar() {
                   setCurrentMonthIndex(today.getMonth());
                   setCurrentYear(today.getFullYear());
                   setSelectedDay(today.getDate());
-                  setTimeframe('Day');
                   showToast(`Jumped to Today: ${MONTH_NAMES[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`);
                 }}
                 title="Click to jump to Today"
@@ -1088,7 +1092,7 @@ export default function OccasionCalendar() {
                   </button>
                 </div>
 
-                {/* Filter Dropdown (Day, Week, Month, All) */}
+                {/* Filter Dropdown (All, Week, Month, Day) */}
                 <div className="relative">
                   <button
                     type="button"
@@ -1096,17 +1100,17 @@ export default function OccasionCalendar() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="px-3.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs font-bold text-slate-700 flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
                   >
-                    <span>{timeframe}</span>
+                    <span>{timeframe === 'All' ? 'All Tasks' : timeframe}</span>
                     <KeyboardArrowDownIcon sx={{ fontSize: 16 }} className="text-slate-400" />
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 top-full mt-1.5 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-30 w-44 animate-fadeIn">
+                    <div className="absolute right-0 top-full mt-1.5 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-30 w-52 animate-fadeIn">
                       {[
-                        { id: 'Day', label: 'Day', desc: 'Selected Day / Today' },
-                        { id: 'Week', label: 'Week', desc: 'Current Week (Sun-Sat)' },
+                        { id: 'All', label: 'All Tasks', desc: 'Past, Present & Future of any date' },
+                        { id: 'Week', label: 'Week', desc: 'Recent & Upcoming (±7 Days)' },
                         { id: 'Month', label: 'Month', desc: 'Current Month' },
-                        { id: 'All', label: 'All', desc: 'All Events' },
+                        { id: 'Day', label: 'Day', desc: 'Selected Day Only' },
                       ].map((item) => (
                         <button
                           key={item.id}
@@ -1160,7 +1164,9 @@ export default function OccasionCalendar() {
                   <span className="w-16 text-center hover:text-slate-600 transition-colors">4:00 PM</span>
                   <span className="w-16 text-center hover:text-slate-600 transition-colors">5:00 PM</span>
                   <span className="w-16 text-center hover:text-slate-600 transition-colors">6:00 PM</span>
-                  <span className="w-16 text-center text-slate-500 font-semibold">Today</span>
+                  <span className="w-16 text-center text-slate-500 font-semibold">
+                    {timeframe === 'Day' ? (isSelectedDateToday ? 'Today' : formatShortDate(selectedDateStr)) : timeframe === 'All' ? 'All Dates' : timeframe}
+                  </span>
                 </div>
 
                 {/* Empty State when no meetings match */}
@@ -1171,7 +1177,9 @@ export default function OccasionCalendar() {
                     </div>
                     <h4 className="text-sm font-bold text-slate-800">No Meetings Scheduled</h4>
                     <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                      {timeframe === 'Day' && isSelectedDateToday
+                      {timeframe === 'All'
+                        ? 'No meetings scheduled across past, present, or future dates yet. Click below or pick any date to schedule one.'
+                        : timeframe === 'Day' && isSelectedDateToday
                         ? 'No meetings scheduled for today yet. Click below or pick any date on the calendar to schedule a new meeting.'
                         : `No meetings scheduled for ${overviewTitle}. Click below to add one.`}
                     </p>
@@ -1250,12 +1258,25 @@ export default function OccasionCalendar() {
                                 <span className={`text-xs font-bold leading-tight truncate max-w-[140px] ${meeting.displayType === 'cancelled' ? 'line-through' : ''}`}>
                                   {meeting.title}
                                 </span>
-                                {/* Date badge shown when viewing Week, Month, or All */}
-                                {timeframe !== 'Day' && (
-                                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-white/80 text-indigo-700 border border-indigo-200/50 shrink-0">
-                                    {formatShortDate(meeting.dateStr)}
-                                  </span>
-                                )}
+                                {/* Date badge shown for all tasks to clearly identify date and timing */}
+                                <span
+                                  className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border shrink-0 ${
+                                    meeting.dateStr === todayDateStr
+                                      ? 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-2xs'
+                                      : meeting.dateStr < todayDateStr
+                                      ? 'bg-amber-50 text-amber-800 border-amber-200 shadow-2xs'
+                                      : 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-2xs'
+                                  }`}
+                                  title={
+                                    meeting.dateStr === todayDateStr
+                                      ? 'Scheduled for Today'
+                                      : meeting.dateStr < todayDateStr
+                                      ? `Past Task (${meeting.dateStr})`
+                                      : `Upcoming Task (${meeting.dateStr})`
+                                  }
+                                >
+                                  {meeting.dateStr === todayDateStr ? 'Today' : formatShortDate(meeting.dateStr)}
+                                </span>
                               </div>
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <span className={`text-[10px] ${styles.timeTextClass}`}>
