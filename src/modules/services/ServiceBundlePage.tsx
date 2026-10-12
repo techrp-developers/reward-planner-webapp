@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 import { GradientButton } from '../../components/ui/GradientButton';
 import { Modal } from '../../components/ui/Modal';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
+import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import RichText from '../../components/common/RichText';
 
 // Material UI Icons
@@ -145,9 +146,9 @@ export const ServiceBundlePage: React.FC = () => {
   const savings = pricing.savings || Math.max(0, totalPrice - bundlePrice);
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-['Poppins',sans-serif]">
+    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5 font-['Poppins',sans-serif]">
       {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (like above) */}
-      <ServiceBannerCarousel />
+      <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 
       {/* 2. Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">

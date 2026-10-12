@@ -58,7 +58,7 @@ export default function InsuranceQuoteResults({ quotes, insuranceType, enquiryId
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10" aria-live="polite">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10 [&_button:enabled]:cursor-pointer" aria-live="polite">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-wider text-brand-purple">Your quote results</p>

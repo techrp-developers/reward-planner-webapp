@@ -221,8 +221,11 @@ function InsuranceFlow({ insuranceType }: { insuranceType: InsurancePageType }) 
   if (quotes) return <InsuranceQuoteResults quotes={quotes} insuranceType={insuranceType} enquiryId={form.details.enquiryId} coverAmount={resultCover} onEdit={editDetails} notice={notice} />;
 
   const steps = isPA ? ['Select Self', 'Basic Details', 'Additional Details'] : ['Select Member', 'Select Age of Members', 'Basic Details'];
-  return <div className="min-h-full bg-slate-50 px-3 py-6 sm:px-6 lg:px-8 lg:py-10">
+  return <div className="min-h-full bg-slate-50 px-3 py-6 sm:px-6 lg:px-8 lg:py-10 [&_button:enabled]:cursor-pointer">
     <div className="mx-auto w-full max-w-6xl">
+      <Link to="/services" className="mb-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-600 transition-colors hover:text-brand-purple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple/40">
+        <ArrowLeft sx={{ fontSize: 16 }} />Back to Services
+      </Link>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-5">
         <div><p className="mb-1 inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-brand-purple"><ShieldCheck sx={{ fontSize: 15 }} /> RewardPlanners Insurance</p><h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">{product.title}</h1><p className="mt-1 text-sm text-slate-600">{product.subtitle}</p></div>
         <div className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"><Check sx={{ fontSize: 15 }} className="text-emerald-600" />Compare plans from leading insurers</div>
