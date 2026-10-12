@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { QueryClient } from '@tanstack/react-query';
-import { filterServices, getCategoryLayout } from '../src/modules/services/serviceCatalog.ts';
+import { filterServices, filterServiceCategories, getCategoryLayout } from '../src/modules/services/serviceCatalog.ts';
 import { createSubmissionGate } from '../src/modules/services/submissionGate.ts';
 import { isServicePaymentVerified } from '../src/api/servicePaymentStatus.ts';
 
@@ -14,6 +14,15 @@ assert.deepEqual(filterServices(items, 'TAX', false), []);
 assert.deepEqual(filterServices(items, 'income').map(item => item.id), [2]);
 assert.deepEqual(filterServices(items, ''), items);
 assert.deepEqual(filterServices(items, 'missing'), []);
+assert.deepEqual(filterServices(items, ' PAN ').map(item => item.id), [1]);
+const searchCategories = [{ id: 3, name: 'Government Documents' }, { id: 2, name: 'Insurance' }, { id: 4, name: 'Mutual Fund' }];
+const categoryServices = [{ name: 'PAN Card', category_id: '3' }, { name: 'Health Cover', category_name: 'Insurance' }];
+assert.deepEqual(filterServiceCategories(searchCategories, categoryServices, 'pan').map(item => item.id), [3]);
+assert.deepEqual(filterServiceCategories(searchCategories, categoryServices, 'health').map(item => item.id), [2]);
+assert.deepEqual(filterServiceCategories(searchCategories, categoryServices, 'mutual').map(item => item.id), [4]);
+assert.deepEqual(filterServiceCategories(searchCategories, categoryServices, 'missing'), []);
+assert.deepEqual(filterServiceCategories(searchCategories, categoryServices, ' '), searchCategories);
+assert.deepEqual(filterServices([{ name: 'Home Set Up Pack' }, { name: 'Tax Pack' }], 'tax').map(item => item.name), ['Tax Pack']);
 const gate = createSubmissionGate();
 assert.equal(gate.acquire(), true);
 assert.equal(gate.acquire(), false);

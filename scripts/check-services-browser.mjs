@@ -117,8 +117,12 @@ try {
     await page.getByRole('textbox', { name: 'Search services', exact: true }).fill('tax');
     await page.getByRole('link', { name: /Income Tax Filing/ }).waitFor();
     await page.getByRole('link', { name: /PAN Card/ }).waitFor({ state: 'hidden' });
+    await page.getByRole('button', { name: /Government Documents/ }).waitFor({ state: 'hidden' });
+    await page.getByRole('button', { name: /Tax Filing/ }).waitFor();
+    assert.ok(await page.getByRole('status').filter({ hasText: 'Search results for' }).innerText().then(text => text.includes('1 categories, 0 bundles, 1 services')));
     assert.equal(await page.evaluate(() => window.__carouselRenders), beforeRender, 'Search should not re-render banner');
     await page.getByRole('textbox', { name: 'Search services', exact: true }).fill('');
+    await page.getByRole('button', { name: /Government Documents/ }).waitFor();
     report.checks.push('Debounced local search preserves matching; instrumented banner does not re-render on search');
     await go('/services/category/3'); await page.getByRole('heading', { name: /Available Services/ }).waitFor();
     await page.getByRole('textbox', { name: 'Search category services' }).fill('pan');

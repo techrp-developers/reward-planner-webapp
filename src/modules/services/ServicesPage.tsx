@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useServiceQuery } from './serviceQueries';
 import ServiceSectionState from './components/ServiceSectionState';
 import ServiceImage from '../../components/services/ServiceImage';
-import { filterServices, getCategoryLayout } from './serviceCatalog';
+import { filterServices, filterServiceCategories, getCategoryLayout } from './serviceCatalog';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
@@ -27,8 +27,8 @@ export const ServicesPage: React.FC = () => {
   const categoriesQuery = useServiceQuery('categories');
   const bundlesQuery = useServiceQuery('bundles');
   const servicesQuery = useServiceQuery('list');
-  const categories = categoriesQuery.data || [];
-  const bundles = bundlesQuery.data || [];
+  const categories: any[] = categoriesQuery.data || [];
+  const bundles: any[] = bundlesQuery.data || [];
   const services: any[] = servicesQuery.data || [];
   const [searchQuery, setSearchQuery] = useState('');
   const search = useDebouncedValue(searchQuery);
@@ -49,6 +49,9 @@ export const ServicesPage: React.FC = () => {
   };
 
   const filteredServices = useMemo(() => filterServices(services, search), [services, search]);
+  const filteredCategories = useMemo(() => filterServiceCategories(categories, services, search), [categories, services, search]);
+  const filteredBundles = useMemo(() => filterServices(bundles, search), [bundles, search]);
+  const isSearching = Boolean(search.trim());
 
   return (
     <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5">
@@ -62,7 +65,7 @@ export const ServicesPage: React.FC = () => {
             Explore Services
           </span>
           <span className="text-xs text-gray-400 font-semibold">
-            ({categories.length} Categories · {services.length} Services)
+            ({filteredCategories.length} Categories · {filteredServices.length} Services)
           </span>
         </div>
 
@@ -79,20 +82,21 @@ export const ServicesPage: React.FC = () => {
       </div>
 
       {/* 3. SERVICE CATEGORIES (App UI Layout: 3 equal cards on Row 1, Wide + Narrow card on Row 2) */}
+      {isSearching && <p role="status" className="text-xs text-gray-600">Search results for “{search.trim()}”: {filteredCategories.length} categories, {filteredBundles.length} bundles, {filteredServices.length} services.</p>}
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3 border-b border-gray-200 pb-2">
           <h2 className="text-sm sm:text-base font-black text-gray-900">
             Browse Services by Category
           </h2>
           <span className="text-xs text-gray-400">
-            {categories.length} Specialized Hubs
+            {filteredCategories.length} Specialized Hubs
           </span>
         </div>
 
         <ServiceSectionState query={categoriesQuery} label="service categories" empty={!categories.length} skeleton="categories" />
         {!categoriesQuery.isPending && !categoriesQuery.isError && (
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            {categories.map(cat => (
+            {filteredCategories.map(cat => (
               <button type="button" key={cat.id} onClick={() => handleCategoryClick(cat)}
                 className={`${getCategoryLayout(cat) === 'wide' ? 'sm:col-span-8' : 'sm:col-span-4'} text-left relative h-32 rounded-2xl p-5 overflow-hidden border border-[#ECE7FF] bg-gradient-to-br from-[#FAF8FF] to-[#EFEAFF] shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group`}>
                 <div className="max-w-[65%] space-y-1">
@@ -107,6 +111,7 @@ export const ServicesPage: React.FC = () => {
             ))}
           </div>
         )}
+        {isSearching && !categoriesQuery.isPending && !categoriesQuery.isError && filteredCategories.length === 0 && <p className="text-sm text-gray-500">No categories match your search.</p>}
       </section>
 
       {/* 4. VALUE SERVICE BUNDLES & PACKS (Clean 2:1 ratio, uncropped graphics) */}
@@ -128,7 +133,7 @@ export const ServicesPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {bundles.map((bundle) => {
+            {filteredBundles.map((bundle) => {
               const savings = Math.max(0, Number(bundle.original_price || 0) - Number(bundle.bundle_price || 0));
               return (
                 <Link
@@ -185,6 +190,7 @@ export const ServicesPage: React.FC = () => {
               );
             })}
           </div>
+          {isSearching && filteredBundles.length === 0 && <p className="text-sm text-gray-500">No bundles match your search.</p>}
         </section>
       )}
 
