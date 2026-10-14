@@ -26,21 +26,21 @@ export default function CalculatorCard({ item, onPress }: CalculatorCardProps) {
     <button
       type="button"
       onClick={onPress}
-      className="mf-calculator-card group relative flex h-full min-h-[200px] w-full flex-col justify-between overflow-hidden rounded-2xl border border-[#3545A3]/15 bg-gradient-to-br from-white to-[#F7F3FF] p-5 sm:p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#3545A3]/40 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3545A3] focus-visible:ring-offset-2 dark:border-white/10 dark:from-[#1c1c26] dark:to-[#18112a]"
+      className="mf-calculator-card group relative flex h-full min-h-[150px] w-full flex-col justify-between overflow-hidden rounded-2xl border border-[#E9E4FB] bg-white p-5 text-left shadow-[0_2px_10px_rgba(80,60,160,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-[#C9BDF7] hover:shadow-[0_10px_24px_rgba(80,60,160,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6C56F0] focus-visible:ring-offset-2"
     >
-      <div className="flex items-start justify-between gap-3 sm:gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0 pr-1">
-          <h3 className="text-base sm:text-lg font-extrabold leading-6 text-[#241C3B] transition-colors group-hover:text-[#3545A3] dark:text-[#f4f0ff] dark:group-hover:text-[#b5bfff]">
+          <h3 className="text-[15px] sm:text-base font-bold leading-6 text-[#14123A]">
             {item.title}
           </h3>
-          <p className="mt-2 text-xs sm:text-sm leading-5 text-[#746B86] dark:text-[#b9b2ca]">
+          <p className="mt-1.5 text-xs leading-5 text-[#6B6880]">
             {item.subtitle}
           </p>
         </div>
 
         <div
           aria-hidden="true"
-          className="mf-calculator-art relative flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl border border-[#3545A3]/10 bg-white/90 p-2 shadow-sm overflow-hidden transition-transform duration-300 group-hover:scale-105 dark:border-white/10 dark:bg-white/5"
+          className="mf-calculator-icon relative flex h-16 w-16 sm:h-[72px] sm:w-[72px] shrink-0 items-center justify-center rounded-full p-2"
         >
           {item.image ? (
             <img
@@ -50,22 +50,20 @@ export default function CalculatorCard({ item, onPress }: CalculatorCardProps) {
               className="h-full w-full object-contain select-none"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-[#8665FF]/15 to-[#3545A3]/15">
-              <FallbackIcon sx={{ fontSize: 36 }} className="text-[#3545A3] dark:text-[#b5bfff]" />
-            </div>
+            <FallbackIcon sx={{ fontSize: 34 }} className="mf-calculator-cta" />
           )}
         </div>
       </div>
 
-      <span className="mt-5 flex items-center justify-between border-t border-[#3545A3]/10 pt-4 dark:border-white/10">
-        <span className="text-sm font-bold text-[#3545A3] transition-colors group-hover:text-[#283685] group-hover:underline dark:text-[#b5bfff]">
+      <span className="mt-4 flex items-center justify-between">
+        <span className="mf-calculator-cta text-sm font-bold group-hover:underline">
           Calculate Now
         </span>
         <span
           aria-hidden="true"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3545A3] text-white shadow-sm transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-[#283685] dark:bg-[#3545A3]"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#B9A6FF] to-[#7C66F2] text-white shadow-[0_2px_6px_rgba(124,102,242,0.35)] transition-transform duration-300 group-hover:translate-x-1"
         >
-          <ArrowForwardIcon sx={{ fontSize: 18 }} />
+          <ArrowForwardIcon sx={{ fontSize: 16 }} />
         </span>
       </span>
     </button>

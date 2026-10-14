@@ -1,14 +1,14 @@
 import type { CalculatorKind } from './calculations';
 
-import sipImg from '../../../../assets/calculators/calc-sip.png';
-import goalSipImg from '../../../../assets/calculators/calc-goal-sip.png';
-import smartGoalImg from '../../../../assets/calculators/calc-smart-goal.png';
-import inflationImg from '../../../../assets/calculators/calc-inflation.png';
-import costDelayImg from '../../../../assets/calculators/calc-cost-delay.png';
-import lumpsumImg from '../../../../assets/calculators/calc-lumpsum.png';
-import retirementImg from '../../../../assets/calculators/calc-retirement.png';
-import stepupSipImg from '../../../../assets/calculators/calc-stepup-sip.png';
-import swpImg from '../../../../assets/calculators/calc-swp.png';
+import sipImg from '../../../../assets/calculators/calc-sip.svg';
+import goalSipImg from '../../../../assets/calculators/calc-goal-sip.svg';
+import smartGoalImg from '../../../../assets/calculators/calc-smart-goal.svg';
+import inflationImg from '../../../../assets/calculators/calc-inflation.svg';
+import costDelayImg from '../../../../assets/calculators/calc-cost-delay.svg';
+import lumpsumImg from '../../../../assets/calculators/calc-lumpsum.svg';
+import retirementImg from '../../../../assets/calculators/calc-retirement.svg';
+import stepupSipImg from '../../../../assets/calculators/calc-stepup-sip.svg';
+import swpImg from '../../../../assets/calculators/calc-swp.svg';
 
 export interface CalculatorItem {
   id: CalculatorKind;
