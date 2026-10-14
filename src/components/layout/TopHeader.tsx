@@ -155,10 +155,10 @@ export const TopHeader = () => {
 
 
       <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2.5 sm:py-3.5 lg:py-3.5 px-3.5 sm:px-6 lg:px-10 antialiased">
-        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
+        <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2.5 sm:gap-4 relative">
           
           {/* Left Group: RP Logo Circle + Company Logo Chip (in front of R logo) */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 z-10">
             <Link
               to="/"
               className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
@@ -196,15 +196,16 @@ export const TopHeader = () => {
             </Link>
           </div>
 
-          {/* Right Group: Modules Navigation + RP Coins + Notifications + Menu */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-            {/* Desktop: Modules Navigation (Shown on the right side with increased width) */}
-            <div className="hidden lg:block w-[530px] xl:w-[560px]" style={{ marginLeft: '-8em' }}>
-              <CircularHeaderNav
-                currentPath={routerLocation.pathname}
-                onNavigate={(path) => navigate(path)}
-              />
-            </div>
+          {/* Center Group: Modules Navigation (Centered in Desktop Header) */}
+          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center z-10 w-[530px] xl:w-[560px]">
+            <CircularHeaderNav
+              currentPath={routerLocation.pathname}
+              onNavigate={(path) => navigate(path)}
+            />
+          </div>
+
+          {/* Right Group: RP Coins + Notifications + Menu */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 z-10">
             {isServicesPath && (
               <Link
                 to="/services/cart"
