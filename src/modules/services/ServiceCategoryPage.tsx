@@ -34,7 +34,7 @@ export const ServiceCategoryPage: React.FC = () => {
   if (query.isError) return <ServiceSectionState query={query} label="category services" />;
 
   return (
-    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5 font-['Poppins',sans-serif]">
+    <div className="w-full mx-auto px-4 lg:px-8 pt-2 pb-4 space-y-4 font-['Poppins',sans-serif]">
       <ServiceSectionState query={query} label="category services" />
       {/* 1. TOP PROMOTIONAL SERVICE BANNERS CAROUSEL (like above) */}
       <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />

@@ -5,16 +5,33 @@
    ========================================================================== */
 
 .benefit-highlights {
-  margin-top: 24px;
+  margin-top: 0px;
   margin-bottom: 36px;
 }
 
+.benefit-highlights-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+@media (min-width: 640px) {
+  .benefit-highlights-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+
+.benefit-highlights-header h2,
 .benefit-highlights > h2 {
   font-size: 24.5px;
   font-weight: 700;
   letter-spacing: -0.025em;
   color: #1c0e28;
-  margin-bottom: 18px;
+  margin: 0;
 }
 
 /* Two-column layout: Hero Health card on left, 3 stacked cards on right */

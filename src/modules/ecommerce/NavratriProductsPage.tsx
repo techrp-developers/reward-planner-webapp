@@ -12,9 +12,8 @@ import {
   Gift,
   Flame,
 } from 'lucide-react';
-import navratriBanner from '../../assets/home/Navratri_banner.png';
 import ProductCard from '../../components/product/ProductCard';
-import { fetchAllProducts } from '../../api/productApi';
+import { fetchAllProducts, fetchNavratriProducts } from '../../api/productApi';
 import { useCart } from '../../context/CartContext';
 
 // Festive collection quick filter tabs
@@ -32,6 +31,7 @@ export const NavratriProductsPage = () => {
   const { totalQuantity, openCartDrawer } = useCart();
 
   const [products, setProducts] = useState<any[]>([]);
+  const [bannerContent, setBannerContent] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTag, setSelectedTag] = useState<string>('All Deals');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -39,39 +39,53 @@ export const NavratriProductsPage = () => {
 
   // =========================================================================
   // NAVRATRI SPECIAL PRODUCTS API INTEGRATION:
-  // When your backend Navratri API is available (e.g. GET /v1/product/navratri-products),
-  // simply plug the endpoint call in here.
+  // Calls GET https://rewardplanners.com/api/crm/v1/cms/content/13/products
   // =========================================================================
   useEffect(() => {
     let isMounted = true;
-    const fetchNavratriProducts = async () => {
+    const loadNavratriProducts = async () => {
       setLoading(true);
       try {
-        /*
-        // --- LIVE API CALL (UNCOMMENT WHEN API IS AVAILABLE) ---
-        // import api from '../../api/client';
-        // const res = await api.get('/v1/product/navratri-special');
-        // if (isMounted) setProducts(res.data?.products || []);
-        */
-
-        // Current graceful fallback: Load catalog products so page is active
-        const data = await fetchAllProducts({ limit: 40 });
+        const { content, products: apiProducts } = await fetchNavratriProducts();
         if (isMounted) {
-          setProducts(Array.isArray(data) ? data : []);
+          if (content) setBannerContent(content);
+          if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+            setProducts(apiProducts);
+          } else {
+            // Graceful fallback: Load catalog products if empty
+            const fallback = await fetchAllProducts({ limit: 40 });
+            setProducts(Array.isArray(fallback) ? fallback : []);
+          }
         }
       } catch (err) {
-        console.error('Failed to load Navratri products:', err);
-        if (isMounted) setProducts([]);
+        console.error('Failed to load Navratri products from CMS API:', err);
+        if (isMounted) {
+          const fallback = await fetchAllProducts({ limit: 40 });
+          setProducts(Array.isArray(fallback) ? fallback : []);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
     };
 
-    fetchNavratriProducts();
+    loadNavratriProducts();
     return () => {
       isMounted = false;
     };
   }, []);
+
+  // Dynamic category tags derived from products
+  const festiveTags = useMemo(() => {
+    const cats = new Set<string>();
+    products.forEach((p) => {
+      const c = p.category || p.category_name;
+      if (c && typeof c === 'string') cats.add(c.trim());
+    });
+    if (cats.size > 0) {
+      return ['All Deals', ...Array.from(cats)];
+    }
+    return FESTIVE_TAGS;
+  }, [products]);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -82,8 +96,10 @@ export const NavratriProductsPage = () => {
       const q = searchQuery.toLowerCase().trim();
       list = list.filter((p) => {
         const title = (p.title || p.product_name || p.name || '').toLowerCase();
-        const category = (p.category_name || '').toLowerCase();
-        return title.includes(q) || category.includes(q);
+        const category = (p.category_name || p.category || '').toLowerCase();
+        const subcategory = (p.subcategory_name || p.subcategory || '').toLowerCase();
+        const brand = (p.brand || p.brand_name || '').toLowerCase();
+        return title.includes(q) || category.includes(q) || subcategory.includes(q) || brand.includes(q);
       });
     }
 
@@ -92,37 +108,39 @@ export const NavratriProductsPage = () => {
       const tagLower = selectedTag.toLowerCase();
       const filtered = list.filter((p) => {
         const title = (p.title || p.product_name || p.name || '').toLowerCase();
-        const category = (p.category_name || '').toLowerCase();
+        const category = (p.category_name || p.category || '').toLowerCase();
+        const subcategory = (p.subcategory_name || p.subcategory || '').toLowerCase();
         if (tagLower.includes('ethnic') || tagLower.includes('wear')) {
           return category.includes('fashion') || category.includes('cloth') || title.includes('kurta') || title.includes('saree');
         }
-        if (tagLower.includes('pooja') || tagLower.includes('home')) {
-          return category.includes('home') || title.includes('diya') || title.includes('pooja') || title.includes('light');
+        if (tagLower.includes('pooja') || tagLower.includes('home') || tagLower.includes('kitchen')) {
+          return category.includes('home') || category.includes('kitchen') || title.includes('diya') || title.includes('pooja') || title.includes('light');
         }
-        if (tagLower.includes('electronics') || tagLower.includes('sound')) {
-          return category.includes('electronic') || title.includes('speaker') || title.includes('audio') || title.includes('earbud');
+        if (tagLower.includes('electronics') || tagLower.includes('sound') || tagLower.includes('tech')) {
+          return category.includes('electronic') || title.includes('speaker') || title.includes('audio') || title.includes('earbud') || title.includes('watch') || subcategory.includes('wearable');
         }
-        return title.includes(tagLower) || category.includes(tagLower);
+        return title.includes(tagLower) || category.includes(tagLower) || subcategory.includes(tagLower);
       });
-      // Fallback to all if tag filter yields zero while waiting for specific tags in real API
       if (filtered.length > 0) list = filtered;
     }
 
     // Sort
     if (sortBy === 'price-low') {
-      list.sort((a, b) => (a.price ?? a.sale_price ?? 0) - (b.price ?? b.sale_price ?? 0));
+      list.sort((a, b) => Number(a.price ?? a.sale_price ?? 0) - Number(b.price ?? b.sale_price ?? 0));
     } else if (sortBy === 'price-high') {
-      list.sort((a, b) => (b.price ?? b.sale_price ?? 0) - (a.price ?? a.sale_price ?? 0));
+      list.sort((a, b) => Number(b.price ?? b.sale_price ?? 0) - Number(a.price ?? a.sale_price ?? 0));
     } else if (sortBy === 'discount') {
       list.sort((a, b) => {
-        const discA = a.mrp && a.price ? ((a.mrp - a.price) / a.mrp) : 0;
-        const discB = b.mrp && b.price ? ((b.mrp - b.price) / b.mrp) : 0;
+        const discA = parseFloat(String(a.discount || '0').replace('%', '')) || 0;
+        const discB = parseFloat(String(b.discount || '0').replace('%', '')) || 0;
         return discB - discA;
       });
     }
 
     return list;
   }, [products, searchQuery, selectedTag, sortBy]);
+
+  const bannerTitle = bannerContent?.title || 'Navratri Festival';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFFDF7] via-[#FFF9EE] to-[#FAF8FF] font-['Plus_Jakarta_Sans',sans-serif] pb-16">
@@ -145,7 +163,7 @@ export const NavratriProductsPage = () => {
               <span>/</span>
               <Link to="/store" className="hover:text-amber-700">Store</Link>
               <span>/</span>
-              <span className="text-amber-800 font-semibold">Navratri Special</span>
+              <span className="text-amber-800 font-semibold">{bannerTitle}</span>
             </div>
           </div>
 
@@ -169,30 +187,25 @@ export const NavratriProductsPage = () => {
       </div>
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pt-4 sm:pt-6">
-        {/* 2. HERO NAVRATRI BANNER HEADER */}
-        <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(245,158,11,0.18)] border border-amber-200/90 mb-6 bg-gradient-to-r from-amber-500 to-rose-500">
-          <img
-            src={navratriBanner}
-            alt="Navratri Special - Shop • Celebrate • Save"
-            className="w-full h-[180px] sm:h-[280px] md:h-[360px] lg:h-[420px] object-cover object-[center_42%]"
-            draggable={false}
-          />
-
-          {/* Bottom Festive Strip */}
-          <div className="bg-gradient-to-r from-amber-900/90 via-rose-900/90 to-purple-900/90 text-white px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-medium">
-            <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-amber-300" />
-              <span><strong>Navratri Mahotsav</strong> — Exclusive Deals & Special Rewards</span>
-            </div>
-            <div className="flex items-center gap-4 text-amber-200">
-              <span className="flex items-center gap-1.5">
-                <Flame size={14} className="text-orange-400" /> Flat Festive Discounts
-              </span>
-              <span className="hidden md:inline">•</span>
-              <span className="hidden md:flex items-center gap-1.5">
-                <Gift size={14} className="text-amber-300" /> 2x RP Reward Coins
+        {/* Title & Festive Details Header (No duplicate banner) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-amber-200/60">
+          <div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F162B] tracking-tight">
+                {bannerTitle}
+              </h1>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-800 border border-amber-300/80">
+                <Sparkles size={12} className="text-amber-600" />
+                Festive Deals
               </span>
             </div>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Curated festive offers, top discounts and exclusive reward coin benefits.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-800 bg-amber-50/80 px-3.5 py-1.5 rounded-xl border border-amber-200/70 self-start sm:self-auto">
+            <Gift size={15} className="text-amber-600" />
+            <span>2x RP Reward Points</span>
           </div>
         </div>
 
@@ -243,7 +256,7 @@ export const NavratriProductsPage = () => {
 
           {/* Category Filter Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pt-3 mt-3 border-t border-slate-100 no-scrollbar">
-            {FESTIVE_TAGS.map((tag) => {
+            {festiveTags.map((tag) => {
               const active = selectedTag === tag;
               return (
                 <button

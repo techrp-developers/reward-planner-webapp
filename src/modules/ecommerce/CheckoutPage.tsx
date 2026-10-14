@@ -484,7 +484,7 @@ export const CheckoutPage = () => {
   }
 
   return (
-    <div className="w-full max-w-[1500px] mx-auto px-4 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-[1500px] mx-auto px-4 lg:px-8 pt-2.5 pb-8 space-y-6">
       {/* Top Navigation & Breadcrumbs */}
       <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
         <div className="flex items-center gap-3">

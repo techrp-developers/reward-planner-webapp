@@ -421,7 +421,7 @@ export const BBPSPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF9FD] text-[#17131D] pb-20 pt-4">
+    <div className="min-h-screen bg-[#FBF9FD] text-[#17131D] pb-20 pt-2 sm:pt-2.5">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 p-4 rounded-2xl bg-gray-900 text-white shadow-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold border border-purple-500/30 animate-in slide-in-from-top-4 duration-200">

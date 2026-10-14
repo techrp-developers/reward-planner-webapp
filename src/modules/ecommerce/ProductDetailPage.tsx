@@ -177,7 +177,7 @@ export const ProductDetailPage = () => {
   const imageList = Array.isArray(product.images) && product.images.length > 0 ? product.images : [product.image || '/placeholder.png'];
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 pt-2.5 pb-6 space-y-5">
       {/* TOP NAVIGATION & BREADCRUMBS */}
       <div className="flex items-center justify-between gap-4 flex-wrap border-b border-gray-100 pb-3">
         <div className="flex items-center gap-3">

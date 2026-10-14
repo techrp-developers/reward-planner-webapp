@@ -190,5 +190,8 @@ export const ENDPOINTS = {
     markAllRead: '/v1/notification/read-all',
     delete: (id: string | number) => `/v1/notification/${id}`,
   },
+  cms: {
+    contentProducts: (id: ApiId) => `/v1/cms/content/${id}/products`,
+  },
 };
 

@@ -8,6 +8,7 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 
 import healthHeroImage from '../../../assets/sidebarpagesimages/health_runner_clean.jpg';
 import insuranceImage from '../../../assets/sidebarpagesimages/health insurance my benefits pages.png';
@@ -53,7 +54,24 @@ const stackedHighlights = [
 export default function BenefitHighlights() {
   return (
     <section className="benefit-highlights" aria-labelledby="benefit-highlights-title">
-      <h2 id="benefit-highlights-title">Your Benefit Highlights</h2>
+      <div className="benefit-highlights-header">
+        <h2 id="benefit-highlights-title">Your Benefit Highlights</h2>
+
+        <div className="flex flex-col items-start sm:items-end shrink-0">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#24162F]">
+            <ApartmentOutlinedIcon sx={{ fontSize: 18 }} className="text-[#1C0E28]" />
+            <span>Reward Planners Enterprise</span>
+          </div>
+          <div className="text-xs text-[#776B80] font-medium mt-0.5">
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
+          </div>
+        </div>
+      </div>
       
       <div className="benefit-highlights-layout">
         {/* BIG HERO: Health Checkup Card with Full Image Cover */}

@@ -12,6 +12,7 @@ import {
   fetchMostViewedProducts,
   fetchRecentProducts,
   fetchRecommendations,
+  fetchNavratriProducts,
 } from '../../api/productApi';
 import ProductCard from '../../components/product/ProductCard';
 import EcommerceAdBannerCarousel from './components/EcommerceAdBannerCarousel';
@@ -316,14 +317,14 @@ export const ProductListingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-10 space-y-6 text-gray-900 pt-5">
+    <div className="min-h-screen bg-white pb-10 space-y-6 text-gray-900 pt-2 sm:pt-2.5">
       {/* ========================================================================= */}
       {/* VIEW A: STORE LANDING VIEW (WHEN ALL PRODUCTS / FILTERS NOT EXPLICITLY CLICKED) */}
       {/* ========================================================================= */}
       {isLandingMode ? (
         <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 space-y-8">
           {/* Top End-Corner: Back Button, Festive Banner & Shopping Cart */}
-          <div className="flex justify-between items-center gap-2 sm:gap-3 mb-1 pt-1 flex-wrap">
+          <div className="flex justify-between items-center gap-2 sm:gap-3 mb-1 flex-wrap">
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
@@ -370,10 +371,17 @@ export const ProductListingPage = () => {
 
           {/* NAVRATRI SPECIAL FESTIVE HERO BANNER */}
           <div
-            onClick={() => navigate('/navratri')}
+            onClick={() => {
+              fetchNavratriProducts();
+              navigate('/navratri');
+            }}
+            onMouseEnter={() => {
+              fetchNavratriProducts();
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                fetchNavratriProducts();
                 navigate('/navratri');
               }
             }}

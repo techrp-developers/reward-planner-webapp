@@ -412,7 +412,7 @@ export const ServiceDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-8 font-['Poppins',sans-serif]">
+    <div className="w-full max-w-[1600px] mx-auto px-4 lg:px-8 pt-2.5 pb-6 space-y-6 font-['Poppins',sans-serif]">
       {/* 1. TOP BREADCRUMB & BACK NAVIGATION */}
       <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">

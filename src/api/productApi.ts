@@ -197,6 +197,39 @@ export const fetchGlobalSearchSuggestions = async (q, signal) => {
   }
 };
 
+export const fetchNavratriProducts = async () => {
+  try {
+    const res = await api.get(ENDPOINTS.cms.contentProducts(13));
+    const payload = res.data?.data || res.data || {};
+    const content = payload.content || null;
+    const rawList = payload.products || [];
+    const normalized = wrapNormalizedList(rawList);
+    return {
+      content,
+      products: normalized,
+      count: payload.count || normalized.length,
+    };
+  } catch (err) {
+    console.warn('api client failed to fetch navratri products, attempting direct fallback', err);
+    try {
+      const direct = await fetch('https://rewardplanners.com/api/crm/v1/cms/content/13/products');
+      const directJson = await direct.json();
+      const payload = directJson?.data || directJson || {};
+      const content = payload.content || null;
+      const rawList = payload.products || [];
+      const normalized = wrapNormalizedList(rawList);
+      return {
+        content,
+        products: normalized,
+        count: payload.count || normalized.length,
+      };
+    } catch (fallbackErr) {
+      console.error('Failed to load Navratri products from CMS API:', fallbackErr);
+      return { content: null, products: [], count: 0 };
+    }
+  }
+};
+
 export default {
   fetchCategoriesWithSub,
   fetchAllCategories,
@@ -213,4 +246,5 @@ export default {
   fetchRecentProducts,
   fetchRecommendations,
   fetchGlobalSearchSuggestions,
+  fetchNavratriProducts,
 };

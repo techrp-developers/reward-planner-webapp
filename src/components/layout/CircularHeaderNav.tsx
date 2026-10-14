@@ -290,7 +290,7 @@ export const CircularHeaderNav: React.FC<CircularHeaderNavProps> = ({
 
   return (
     <nav
-      className={`relative bg-white/95 backdrop-blur-md rounded-full border border-[#E2E8F0] shadow-[0_2px_14px_rgba(15,23,42,0.06)] flex items-center select-none w-full ${
+      className={`relative bg-white/95 backdrop-blur-md rounded-full border border-[#E2E8F0] shadow-[0_2px_10px_rgba(15,23,42,0.04)] flex items-center select-none w-full ${
         isMobile ? 'p-1' : 'p-1 sm:p-1.5'
       }`}
       role="navigation"
@@ -307,14 +307,14 @@ export const CircularHeaderNav: React.FC<CircularHeaderNavProps> = ({
         title="Previous Module"
         aria-label="Previous module"
       >
-        <ChevronLeftIcon sx={{ fontSize: isMobile ? 18 : 20 }} />
+        <ChevronLeftIcon sx={{ fontSize: isMobile ? 17 : 20 }} />
       </button>
 
       {/* 3-Module Visible Viewport Window */}
       <div className="overflow-hidden flex-1 relative rounded-full mx-0.5">
         {/* Floating Smooth Sliding Active Pill Indicator */}
         <div
-          className="absolute top-0.5 bottom-0.5 sm:top-1 sm:bottom-1 rounded-full bg-[#1C0E28] shadow-sm pointer-events-none z-0"
+          className="absolute top-0.5 bottom-0.5 sm:top-1 sm:bottom-1 rounded-full bg-[#1C0E28] shadow-xs pointer-events-none z-0"
           style={{
             width: 'calc(33.3333% - 4px)',
             left: `calc(${activeSlot * 33.3333}% + 2px)`,
@@ -354,8 +354,8 @@ export const CircularHeaderNav: React.FC<CircularHeaderNavProps> = ({
                   onClick={() => handleItemClick(item.ribbonIndex, item.module)}
                   className={`w-full rounded-full text-center tracking-tight transition-colors duration-250 cursor-pointer flex items-center justify-center select-none ${
                     isMobile
-                      ? 'py-1.5 px-1.5 text-[13px] font-bold'
-                      : 'py-2 sm:py-2.5 px-2.5 text-sm sm:text-[15px] font-bold'
+                      ? 'py-1.5 px-2 text-[13px] sm:text-sm font-bold'
+                      : 'py-2 sm:py-2.5 px-3.5 sm:px-4 text-sm sm:text-[15px] font-bold'
                   } ${
                     isActive
                       ? 'text-white font-extrabold'
@@ -382,7 +382,7 @@ export const CircularHeaderNav: React.FC<CircularHeaderNavProps> = ({
         title="Next Module"
         aria-label="Next module"
       >
-        <ChevronRightIcon sx={{ fontSize: isMobile ? 18 : 20 }} />
+        <ChevronRightIcon sx={{ fontSize: isMobile ? 17 : 20 }} />
       </button>
     </nav>
   );

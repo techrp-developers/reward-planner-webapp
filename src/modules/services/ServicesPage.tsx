@@ -54,7 +54,7 @@ export const ServicesPage: React.FC = () => {
   const isSearching = Boolean(search.trim());
 
   return (
-    <div className="w-full mx-auto px-4 lg:px-8 py-4 space-y-5">
+    <div className="w-full mx-auto px-4 lg:px-8 pt-2 pb-4 space-y-4">
       {/* Promotional banners supplied for the Service page. */}
       <ServiceBannerCarousel banners={SERVICE_PAGE_BANNERS} fullWidthArtwork />
 

@@ -15,6 +15,8 @@ import { OrdersModal } from './OrdersModal';
 import coinsIcon from '../../assets/home/coinsicon.png';
 import userAvatarPlaceholder from '../../assets/home/user-avatar.png';
 import profileCardBg from '../../assets/home/profilecardbg.png';
+import mpsLogo from '../../assets/mps_logo.svg';
+import { IMAGE_BASE_URL } from '../../api/endpoints';
 
 // Material UI Icons
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
@@ -256,6 +258,19 @@ export const ProfilePage = () => {
   const roleName = emp?.role || activeUser?.role || activeUser?.designation || 'Software Engineer';
   const departmentName = emp?.department || activeUser?.department || 'IT';
   const companyName = activeUser?.company?.name || activeUser?.company_name || 'MPS Global';
+  const rawCompanyLogo =
+    activeUser?.company?.logo ||
+    activeUser?.company?.logo_url ||
+    activeUser?.company?.image ||
+    activeUser?.company_logo ||
+    activeUser?.companyLogo ||
+    emp?.company_logo ||
+    emp?.company?.logo;
+  const companyLogo = rawCompanyLogo && typeof rawCompanyLogo === 'string' && rawCompanyLogo.trim()
+    ? (/^https?:\/\//i.test(rawCompanyLogo.trim())
+        ? rawCompanyLogo.trim()
+        : `${IMAGE_BASE_URL}/${encodeURI(rawCompanyLogo.trim().replace(/^\/+/, ''))}`)
+    : (/mps/i.test(companyName) ? mpsLogo : null);
   const phoneDisplay = formatPhone(activeUser?.phone || activeUser?.mobile);
   const emailDisplay = activeUser?.email || 'chavansakshi685@gmail.com';
   const userIdDisplay = activeUser?.user_id || (activeUser?.id ? `#RP-${String(activeUser.id).padStart(5, '0')}` : '#RP-00037');
@@ -274,7 +289,7 @@ export const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC] py-6 sm:py-8 px-4 sm:px-6 lg:px-10 font-['Poppins',sans-serif] text-slate-900 pb-20 select-none">
+    <div className="min-h-screen bg-[#F6F8FC] pt-3 sm:pt-4 pb-20 px-4 sm:px-6 lg:px-10 font-['Poppins',sans-serif] text-slate-900 select-none">
       {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 animate-fadeIn border border-white/15">
@@ -405,9 +420,20 @@ export const ProfilePage = () => {
 
             {/* Stat 2: Company */}
             <div className="bg-white/95 backdrop-blur-xs border border-purple-100/90 rounded-2xl p-3.5 sm:px-6 sm:py-4 shadow-2xs flex items-center gap-3.5 min-w-[150px] sm:min-w-[170px]">
-              <div className="w-11 h-11 rounded-xl bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                <BusinessOutlinedIcon sx={{ fontSize: 24 }} />
-              </div>
+              {companyLogo ? (
+                <div className="w-11 h-11 rounded-xl bg-white border border-[#E4DCE9] p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                  <img
+                    src={companyLogo}
+                    alt={companyName}
+                    className="w-full h-full object-contain rounded-md"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                </div>
+              ) : (
+                <div className="w-11 h-11 rounded-xl bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
+                  <BusinessOutlinedIcon sx={{ fontSize: 24 }} />
+                </div>
+              )}
               <div>
                 <span className="block text-base sm:text-lg font-extrabold text-[#0F172A] leading-tight truncate max-w-[130px]">
                   {companyName}
@@ -534,9 +560,20 @@ export const ProfilePage = () => {
                 {/* Company */}
                 <div className="flex items-center justify-between py-3.5">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                      <ApartmentOutlinedIcon sx={{ fontSize: 20 }} />
-                    </div>
+                    {companyLogo ? (
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#E4DCE9] p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                        <img
+                          src={companyLogo}
+                          alt={companyName}
+                          className="w-full h-full object-contain rounded-md"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
+                        <ApartmentOutlinedIcon sx={{ fontSize: 20 }} />
+                      </div>
+                    )}
                     <span className="text-sm font-semibold text-[#64748B]">Company</span>
                   </div>
                   <span className="text-sm sm:text-base font-bold text-[#0F172A]">
