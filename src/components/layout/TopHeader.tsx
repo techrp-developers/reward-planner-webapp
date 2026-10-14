@@ -199,7 +199,7 @@ export const TopHeader = () => {
           {/* Right Group: Modules Navigation + RP Coins + Notifications + Menu */}
           <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
             {/* Desktop: Modules Navigation (Shown on the right side with increased width) */}
-            <div className="hidden lg:block w-[530px] xl:w-[560px]">
+            <div className="hidden lg:block w-[530px] xl:w-[560px]" style={{ marginLeft: '-8em' }}>
               <CircularHeaderNav
                 currentPath={routerLocation.pathname}
                 onNavigate={(path) => navigate(path)}
