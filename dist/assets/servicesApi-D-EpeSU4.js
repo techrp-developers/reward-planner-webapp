@@ -1,0 +1,1 @@
+import{i as e,t}from"./client--d8xiLhu.js";var n=async n=>(await t.post(e.services.enquiry,n)).data;export{n as t};
