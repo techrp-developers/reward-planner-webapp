@@ -157,55 +157,53 @@ export const TopHeader = () => {
       <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2.5 sm:py-3.5 lg:py-3.5 px-3.5 sm:px-6 lg:px-10 antialiased">
         <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
           
-          {/* Left Group: RP Logo Circle */}
-          <div className="flex items-center shrink-0">
+          {/* Left Group: RP Logo Circle + Company Logo Chip (in front of R logo) */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
             <Link
               to="/"
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
+              className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
               title="Reward Planners Home"
             >
               <img
                 src={rpLogo}
                 alt="RewardPlanners"
-                className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
+                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-8.5 lg:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
               />
+            </Link>
+
+            {/* Active User's Company Logo Chip */}
+            <Link
+              to="/profile"
+              aria-label={`Company: ${companyName}`}
+              title={`Company: ${companyName}`}
+              className="flex items-center gap-2 sm:gap-2.5 h-10 sm:h-11 lg:h-[46px] px-3 sm:px-3.5 lg:px-4 rounded-full bg-white hover:bg-[#F6F2F8] border border-[#E2E8F0] text-[#1C0E28] shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:shadow-xs transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#78538F]"
+            >
+              {companyLogoSrc && !companyLogoFailed ? (
+                <img
+                  src={companyLogoSrc}
+                  alt={`${companyName} Logo`}
+                  onError={() => setCompanyLogoFailed(true)}
+                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 object-contain rounded-xs shrink-0"
+                />
+              ) : (
+                <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
+                  <BusinessOutlinedIcon sx={{ fontSize: 18 }} />
+                </div>
+              )}
+              <span className="text-xs sm:text-[13px] lg:text-sm font-bold text-[#1C0E28] max-w-[120px] sm:max-w-[150px] lg:max-w-[170px] truncate leading-tight">
+                {companyName}
+              </span>
             </Link>
           </div>
 
-          {/* Right Group: Modules Navigation + Company Logo Chip + RP Coins + Notifications + Menu */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Desktop: Modules Navigation + Company Logo Chip (Shown on the right side with no gap between them) */}
-            <div className="hidden lg:flex items-center gap-2 sm:gap-2.5">
-              <div className="w-[490px]">
-                <CircularHeaderNav
-                  currentPath={routerLocation.pathname}
-                  onNavigate={(path) => navigate(path)}
-                />
-              </div>
-
-              {/* Active User's Company Logo Chip */}
-              <Link
-                to="/profile"
-                aria-label={`Company: ${companyName}`}
-                title={`Company: ${companyName}`}
-                className="flex items-center gap-2 sm:gap-2.5 h-11 sm:h-11.5 lg:h-[46px] px-3 sm:px-3.5 rounded-full bg-white hover:bg-[#F6F2F8] border border-[#E2E8F0] text-[#1C0E28] shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:shadow-xs transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#78538F]"
-              >
-                {companyLogoSrc && !companyLogoFailed ? (
-                  <img
-                    src={companyLogoSrc}
-                    alt={`${companyName} Logo`}
-                    onError={() => setCompanyLogoFailed(true)}
-                    className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 object-contain rounded-xs shrink-0"
-                  />
-                ) : (
-                  <div className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                    <BusinessOutlinedIcon sx={{ fontSize: 18 }} />
-                  </div>
-                )}
-                <span className="hidden md:inline text-[13px] sm:text-sm font-bold text-[#1C0E28] max-w-[130px] truncate leading-tight">
-                  {companyName}
-                </span>
-              </Link>
+          {/* Right Group: Modules Navigation + RP Coins + Notifications + Menu */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+            {/* Desktop: Modules Navigation (Shown on the right side with increased width) */}
+            <div className="hidden lg:block w-[530px] xl:w-[560px]">
+              <CircularHeaderNav
+                currentPath={routerLocation.pathname}
+                onNavigate={(path) => navigate(path)}
+              />
             </div>
             {isServicesPath && (
               <Link
@@ -222,30 +220,6 @@ export const TopHeader = () => {
                 )}
               </Link>
             )}
-
-            {/* Active User's Company Logo & Badge (Visible on Mobile / Tablet fallback) */}
-            <Link
-              to="/profile"
-              aria-label={`Company: ${companyName}`}
-              title={`Company: ${companyName}`}
-              className="lg:hidden flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-2.5 rounded-full bg-white hover:bg-[#F6F2F8] border border-[#E4DCE9] text-[#1C0E28] shadow-2xs hover:shadow-xs transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#78538F]"
-            >
-              {companyLogoSrc && !companyLogoFailed ? (
-                <img
-                  src={companyLogoSrc}
-                  alt={`${companyName} Logo`}
-                  onError={() => setCompanyLogoFailed(true)}
-                  className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 object-contain rounded-xs shrink-0"
-                />
-              ) : (
-                <div className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                  <BusinessOutlinedIcon sx={{ fontSize: 16 }} />
-                </div>
-              )}
-              <span className="hidden md:inline text-xs sm:text-[13px] font-bold text-[#1C0E28] max-w-[110px] truncate leading-tight">
-                {companyName}
-              </span>
-            </Link>
 
             {/* RP Coins */}
             <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
