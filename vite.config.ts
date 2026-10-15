@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // base: '/employee-login/',
+  base: '/employee-login/',
   plugins: [react(), tailwindcss()],
   server: {
     watch: { ignored: ['**/.*-validation/**'] },
