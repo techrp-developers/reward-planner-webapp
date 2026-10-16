@@ -595,7 +595,7 @@ export default function EmployeeStories() {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          className="flex items-center gap-7 sm:gap-8 lg:gap-10 overflow-x-auto no-scrollbar py-1 px-1.5 flex-1 cursor-grab active:cursor-grabbing"
+          className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar py-1 px-1.5 flex-1 cursor-grab active:cursor-grabbing"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
           {sortedStories.map((story) => {
