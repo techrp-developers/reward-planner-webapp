@@ -170,11 +170,11 @@ export const TopHeader = () => {
                   src={companyLogoSrc}
                   alt={`${companyName} Logo`}
                   onError={() => setCompanyLogoFailed(true)}
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 object-contain rounded-xs shrink-0"
+                  className="h-[30px] sm:h-[35px] lg:h-[38px] w-auto max-w-[110px] sm:max-w-[130px] lg:max-w-[150px] object-contain shrink-0"
                 />
               ) : (
-                <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                  <BusinessOutlinedIcon sx={{ fontSize: 18 }} />
+                <div className="w-[30px] h-[30px] sm:w-[35px] sm:h-[35px] lg:w-[38px] lg:h-[38px] rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
+                  <BusinessOutlinedIcon sx={{ fontSize: 20 }} />
                 </div>
               )}
               <span className="text-xs sm:text-[13px] lg:text-sm font-bold text-[#1C0E28] max-w-[120px] sm:max-w-[150px] lg:max-w-[170px] truncate leading-tight">
