@@ -3,6 +3,7 @@ import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import CheckIcon from '@mui/icons-material/Check';
+import birthdayBgBubbles from '../../../assets/home/birthday_bg_bubbles.png';
 
 export interface BirthdayPerson {
   id: string | number;
@@ -80,29 +81,18 @@ export default function EmployeeBirthdays() {
         </div>
       )}
 
-      {/* Selected 4th Color Set: Coral Cream · Amber Cream · Soft Blush (#FFF0ED → #FFF5E9 → #FDF1F8) */}
+      {/* Birthday Section Background Card (Matching Uploaded Bubble Layout) */}
       <div
-        className="relative rounded-[22px] sm:rounded-[24px] p-4 sm:p-5 overflow-hidden transition-all duration-300"
+        className="relative rounded-[22px] sm:rounded-[24px] p-4 sm:p-5 overflow-hidden transition-all duration-300 border border-[#F3E8FF] shadow-[0_12px_36px_-6px_rgba(236,72,153,0.09),0_2px_10px_-2px_rgba(139,92,246,0.05),inset_0_1px_2px_rgba(255,255,255,0.95)]"
         style={{
-          background: 'linear-gradient(135deg, #FFF0ED 0%, #FFF5E9 50%, #FDF1F8 100%)',
-          borderColor: '#FCE3DF',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          boxShadow: '0 10px 30px -5px rgba(249, 115, 22, 0.08), 0 2px 8px -2px rgba(0,0,0,0.02), inset 0 1px 2px rgba(255, 255, 255, 0.95)',
+          backgroundImage: `url(${birthdayBgBubbles})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
-        {/* Glossy Specular Light Reflection Sweep */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none rounded-[inherit]" />
-
-        {/* Ambient Luminous Orbs */}
-        <div
-          className="absolute -top-16 -right-16 w-52 h-52 rounded-full blur-2xl pointer-events-none"
-          style={{ background: 'rgba(255, 240, 237, 0.75)' }}
-        />
-        <div
-          className="absolute -bottom-14 -left-14 w-48 h-48 rounded-full blur-2xl pointer-events-none"
-          style={{ background: 'rgba(253, 241, 248, 0.65)' }}
-        />
+        {/* Subtle Glossy Specular Sheen Sweep */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-transparent pointer-events-none rounded-[inherit]" />
 
         {/* Small Title Header */}
         <div className="relative z-10 flex items-center justify-between mb-3.5 sm:mb-4">
