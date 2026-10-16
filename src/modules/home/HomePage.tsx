@@ -44,6 +44,7 @@ import './HomePage.css';
 import OccasionCalendar from './components/OccasionCalendar';
 import BenefitHighlights from './components/BenefitHighlights';
 import ServiceDiscovery, { ServiceShortcuts } from './components/ServiceDiscovery';
+import EmployeeStories from './components/EmployeeStories';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -559,6 +560,9 @@ export const HomePage = () => {
 
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
       <div className="dashboard-content bg-white">
+
+        {/* ── 0. EMPLOYEE STORIES SECTION (Directly below header) ── */}
+        <EmployeeStories />
 
         {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
         <BenefitHighlights />
