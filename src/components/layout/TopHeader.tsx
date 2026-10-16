@@ -154,7 +154,7 @@ export const TopHeader = () => {
       <LocationModal />
 
 
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2 sm:py-2.5 lg:py-2.5 px-3.5 sm:px-5 lg:px-6 antialiased">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2.5 sm:py-3.5 lg:py-3.5 px-2 sm:px-2.5 lg:px-3 antialiased">
         <div className="w-full flex items-center justify-between gap-2 sm:gap-3.5 relative">
           
           {/* Left Group: Active User's Company Logo Chip (in left corner) */}
@@ -163,21 +163,21 @@ export const TopHeader = () => {
               to="/profile"
               aria-label={`Company: ${companyName}`}
               title={`Company: ${companyName}`}
-              className="flex items-center gap-2 sm:gap-2.5 h-9.5 sm:h-10.5 lg:h-[42px] px-3 sm:px-3.5 rounded-full bg-white hover:bg-[#F6F2F8] border border-[#E2E8F0] text-[#1C0E28] shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:shadow-xs transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#78538F]"
+              className="flex items-center gap-2 sm:gap-2.5 h-10 sm:h-11 lg:h-[46px] px-3 sm:px-3.5 lg:px-4 rounded-full bg-white hover:bg-[#F6F2F8] border border-[#E2E8F0] text-[#1C0E28] shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:shadow-xs transition-all shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[#78538F]"
             >
               {companyLogoSrc && !companyLogoFailed ? (
                 <img
                   src={companyLogoSrc}
                   alt={`${companyName} Logo`}
                   onError={() => setCompanyLogoFailed(true)}
-                  className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 lg:w-7 lg:h-7 object-contain rounded-xs shrink-0"
+                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 object-contain rounded-xs shrink-0"
                 />
               ) : (
-                <div className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 lg:w-7 lg:h-7 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
-                  <BusinessOutlinedIcon sx={{ fontSize: 17 }} />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-7.5 lg:h-7.5 rounded-full bg-[#EDE9FE] text-[#6366F1] flex items-center justify-center shrink-0">
+                  <BusinessOutlinedIcon sx={{ fontSize: 18 }} />
                 </div>
               )}
-              <span className="text-xs sm:text-[13px] font-bold text-[#1C0E28] max-w-[120px] sm:max-w-[150px] lg:max-w-[170px] truncate leading-tight">
+              <span className="text-xs sm:text-[13px] lg:text-sm font-bold text-[#1C0E28] max-w-[120px] sm:max-w-[150px] lg:max-w-[170px] truncate leading-tight">
                 {companyName}
               </span>
             </Link>
@@ -198,9 +198,9 @@ export const TopHeader = () => {
                 to="/services/cart"
                 aria-label={`Services cart, ${serviceCartCount} ${serviceCartCount === 1 ? 'item' : 'items'}`}
                 title="View Services Cart"
-                className="relative flex h-9 w-9 sm:h-9.5 sm:w-9.5 shrink-0 items-center justify-center rounded-full border border-[#E4DCE9] bg-white text-[#1C0E28] hover:bg-[#ECE7FF] focus-visible:outline-2 focus-visible:outline-[#78538F]"
+                className="relative flex h-9.5 w-9.5 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full border border-[#E4DCE9] bg-white text-[#1C0E28] hover:bg-[#ECE7FF] focus-visible:outline-2 focus-visible:outline-[#78538F]"
               >
-                <ShoppingCartOutlinedIcon aria-hidden="true" sx={{ fontSize: 19 }} />
+                <ShoppingCartOutlinedIcon aria-hidden="true" sx={{ fontSize: 20 }} />
                 {serviceCartCount > 0 && (
                   <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#7C3AED] px-1 text-[9px] font-bold text-white">
                     {serviceCartCount > 99 ? '99+' : serviceCartCount}
@@ -210,8 +210,8 @@ export const TopHeader = () => {
             )}
 
             {/* RP Coins */}
-            <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-2.5 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
-              <img src={coinsIcon} alt="RP Coins" className="hidden sm:block w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0" />
+            <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
+              <img src={coinsIcon} alt="RP Coins" className="hidden sm:block w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 object-contain shrink-0" />
               <span><strong className="block text-xs sm:text-[13px] font-semibold leading-tight max-w-[92px] truncate">{coinBalance}</strong><span className="block text-[8.5px] sm:text-[9.5px] text-[#776B80] leading-none mt-0.5 whitespace-nowrap">RP Points</span></span>
             </Link>
 
@@ -222,13 +222,13 @@ export const TopHeader = () => {
             {/* RP Logo Circle (in right corner) */}
             <Link
               to="/"
-              className="w-9.5 h-9.5 sm:w-10.5 sm:h-10.5 lg:w-[42px] lg:h-[42px] rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
+              className="w-10 h-10 sm:w-12 sm:h-12 lg:w-13.5 lg:h-13.5 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
               title="Reward Planners Home"
             >
               <img
                 src={rpLogo}
                 alt="RewardPlanners"
-                className="w-6 h-6 sm:w-6.5 sm:h-6.5 lg:w-7 lg:h-7 object-contain transition-transform duration-200 group-hover:scale-105"
+                className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 lg:w-8.5 lg:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
               />
             </Link>
           </div>
