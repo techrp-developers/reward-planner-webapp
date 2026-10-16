@@ -88,111 +88,203 @@ export default function EmployeeBirthdays() {
           return (
             <div
               key={person.id}
-              className={`min-w-[270px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[20px] transition-all relative flex flex-col justify-between ${
+              className={`min-w-[280px] sm:min-w-[300px] lg:min-w-0 lg:flex-1 rounded-[24px] transition-all relative flex flex-col justify-between overflow-hidden ${
                 isToday
-                  ? 'bg-gradient-to-br from-[#FFF5F7] via-[#FFF8FA] to-[#FFF0F4] border border-[#FECDD3] shadow-[0_2px_14px_-2px_rgba(244,63,94,0.08)]'
+                  ? 'bg-white border border-[#FECDD3] shadow-[0_4px_20px_-4px_rgba(244,63,94,0.08)]'
                   : 'bg-white border border-[#E2E8F0] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] hover:shadow-sm'
               }`}
             >
-              {/* Today's Celebratory Decorative Accents */}
+              {/* Today's Card Specific Top-Right Pink Blush */}
               {isToday && (
-                <>
-                  {/* Sparkle 1: Top Left */}
-                  <svg
-                    className="w-3 h-3 text-amber-400 absolute top-3.5 left-3.5 pointer-events-none"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                  </svg>
-
-                  {/* Sparkle 2: Lower Left near Avatar */}
-                  <svg
-                    className="w-2.5 h-2.5 text-amber-400 absolute bottom-14 left-4 pointer-events-none"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                  </svg>
-
-                  {/* Sparkle 3: Lower Right */}
-                  <svg
-                    className="w-2.5 h-2.5 text-amber-400 absolute bottom-12 right-6 pointer-events-none"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                  </svg>
-
-                  {/* Balloons Illustration in Top Right */}
-                  <svg
-                    width="46"
-                    height="58"
-                    viewBox="0 0 48 60"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute top-2.5 right-3 pointer-events-none select-none"
-                  >
-                    {/* Balloon 1: Pastel Peach */}
-                    <g transform="rotate(-6 16 20)">
-                      <ellipse cx="16" cy="18" rx="10" ry="13" fill="#FDBA74" fillOpacity="0.88" />
-                      <polygon points="14,31 18,31 16,33" fill="#FDBA74" />
-                      <ellipse cx="13" cy="14" rx="2.5" ry="5" fill="#FFFFFF" fillOpacity="0.55" transform="rotate(-20 13 14)" />
-                      <path d="M16 33 Q18 42 15 52" stroke="#FDA4AF" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.65" />
-                    </g>
-                    {/* Balloon 2: Pastel Pink */}
-                    <g transform="rotate(8 28 17)">
-                      <ellipse cx="28" cy="16" rx="9" ry="12" fill="#F472B6" fillOpacity="0.88" />
-                      <polygon points="26,28 30,28 28,30" fill="#F472B6" />
-                      <ellipse cx="25" cy="12" rx="2" ry="4" fill="#FFFFFF" fillOpacity="0.55" transform="rotate(-20 25 12)" />
-                      <path d="M28 30 Q25 40 27 50" stroke="#FDA4AF" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.65" />
-                    </g>
-                  </svg>
-                </>
+                <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-gradient-to-br from-pink-200/55 via-rose-100/30 to-transparent pointer-events-none" />
               )}
 
-              {/* Card Top Section: Avatar + Details */}
-              <div className="p-4 sm:p-5 flex items-center gap-3.5">
-                {/* Circular Profile Avatar */}
-                <div className="relative shrink-0">
-                  <img
-                    src={person.avatar}
-                    alt={person.name}
-                    className="w-13 h-13 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-white shadow-xs"
-                    loading="lazy"
-                  />
-                </div>
+              {/* Card Main Body */}
+              {isToday ? (
+                /* TODAY'S BIRTHDAY CARD: Avatar + Info + 3D Cake (Matching Screenshot) */
+                <div className="p-4 sm:p-5 flex items-center justify-between gap-3 relative z-10">
+                  {/* Avatar with soft halo border */}
+                  <div className="relative shrink-0">
+                    <div className="p-[2.5px] rounded-full bg-gradient-to-tr from-rose-200 via-pink-100 to-rose-200 shadow-2xs">
+                      <div className="p-[2px] rounded-full bg-white">
+                        <img
+                          src={person.avatar}
+                          alt={person.name}
+                          className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Profile Information */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
-                    {person.name}
-                  </h4>
-                  <p className="text-xs text-[#64748B] truncate mt-0.5 font-normal">
-                    {person.role}
-                  </p>
-
-                  {/* Badge: Birthday today / Upcoming Date */}
-                  {isToday ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-[#FDA4AF] text-[#E11D48] text-[11px] sm:text-xs font-semibold shadow-2xs mt-1.5">
+                  {/* Middle Info: Tag above name */}
+                  <div className="flex-1 min-w-0 pr-1">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#E11D48] uppercase mb-1">
                       <CalendarTodayOutlinedIcon sx={{ fontSize: 13 }} className="text-[#E11D48]" />
-                      <span>{person.dateStr}</span>
-                    </span>
-                  ) : (
+                      <span>BIRTHDAY TODAY</span>
+                    </div>
+
+                    <h4 className="text-base sm:text-lg font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
+                      {person.name}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-[#776B80] font-normal truncate mt-0.5">
+                      {person.role}
+                    </p>
+                  </div>
+
+                  {/* Right Illustration: 3D Birthday Cake with Candle & Confetti */}
+                  <div className="shrink-0 relative">
+                    <svg
+                      width="78"
+                      height="76"
+                      viewBox="0 0 92 88"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="select-none pointer-events-none"
+                    >
+                      <defs>
+                        <linearGradient id="standGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#FBBF24" />
+                          <stop offset="100%" stopColor="#D97706" />
+                        </linearGradient>
+                        <linearGradient id="cakeBody" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#F472B6" />
+                          <stop offset="50%" stopColor="#FDA4AF" />
+                          <stop offset="100%" stopColor="#F43F5E" />
+                        </linearGradient>
+                        <linearGradient id="frostingCream" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#FFF1F2" />
+                          <stop offset="60%" stopColor="#FECDD3" />
+                          <stop offset="100%" stopColor="#FDA4AF" />
+                        </linearGradient>
+                        <linearGradient id="candleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#FB7185" />
+                          <stop offset="50%" stopColor="#FFF1F2" />
+                          <stop offset="100%" stopColor="#F43F5E" />
+                        </linearGradient>
+                        <radialGradient id="flameGlow" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="#FEF08A" />
+                          <stop offset="50%" stopColor="#F59E0B" />
+                          <stop offset="100%" stopColor="#EA580C" />
+                        </radialGradient>
+                      </defs>
+
+                      {/* Streamer Left (Yellow) */}
+                      <path
+                        d="M14 46 C10 44, 12 39, 16 37 C20 35, 17 30, 21 28"
+                        stroke="#F59E0B"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        fill="none"
+                      />
+
+                      {/* Streamer Right (Pink) */}
+                      <path
+                        d="M78 44 C82 42, 80 37, 76 35 C72 33, 75 28, 71 26"
+                        stroke="#EC4899"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        fill="none"
+                      />
+
+                      {/* Floating Pink Heart Top-Left */}
+                      <path
+                        d="M22 23 C22 20.5 20 18.5 17.5 18.5 C15.5 18.5 14 19.8 13.5 21 C13 19.8 11.5 18.5 9.5 18.5 C7 18.5 5 20.5 5 23 C5 26.5 10 30.5 13.5 32 C17 30.5 22 26.5 22 23 Z"
+                        fill="#F472B6"
+                        transform="scale(0.55) translate(22, 10)"
+                      />
+
+                      {/* 4-Point Pink Sparkle Top-Right */}
+                      <path
+                        d="M58 17 L59.5 21 L63.5 22.5 L59.5 24 L58 28 L56.5 24 L52.5 22.5 L56.5 21 Z"
+                        fill="#F472B6"
+                      />
+
+                      {/* Confetti dots */}
+                      <circle cx="75" cy="21" r="2" fill="#FBBF24" />
+                      <circle cx="78" cy="46" r="1.5" fill="#F472B6" />
+
+                      {/* Stand */}
+                      <ellipse cx="48" cy="74" rx="27" ry="7" fill="url(#standGrad)" />
+                      <ellipse cx="48" cy="72" rx="25" ry="6" fill="#FDE68A" />
+
+                      {/* Cake Body */}
+                      <path
+                        d="M24 57 C24 57 24 68 26 70 C30 73 66 73 70 70 C72 68 72 57 72 57 Z"
+                        fill="url(#cakeBody)"
+                      />
+                      <ellipse cx="48" cy="57" rx="24" ry="7" fill="#F43F5E" />
+
+                      {/* Scalloped Dripping Frosting */}
+                      <path
+                        d="M24 53
+                           C24 53, 25 61, 28 61 C31 61, 31 53, 34 53
+                           C37 53, 37 63, 40 63 C43 63, 43 53, 46 53
+                           C49 53, 49 64, 52 64 C55 64, 55 53, 58 53
+                           C61 53, 61 62, 64 62 C67 62, 68 53, 72 53
+                           C72 53, 72 46, 72 46
+                           C72 46, 24 46, 24 46 Z"
+                        fill="url(#frostingCream)"
+                      />
+                      <ellipse cx="48" cy="46" rx="24" ry="7" fill="url(#frostingCream)" />
+
+                      {/* Frosting puffs */}
+                      <circle cx="27" cy="45" r="3" fill="#FFF1F2" />
+                      <circle cx="34" cy="48" r="3.2" fill="#FFF1F2" />
+                      <circle cx="42" cy="50" r="3.5" fill="#FFF1F2" />
+                      <circle cx="50" cy="50" r="3.5" fill="#FFF1F2" />
+                      <circle cx="58" cy="48" r="3.2" fill="#FFF1F2" />
+                      <circle cx="66" cy="46" r="3" fill="#FFF1F2" />
+
+                      {/* Candle */}
+                      <rect x="46" y="24" width="4" height="20" rx="2" fill="url(#candleGrad)" />
+                      <path d="M46 27 L50 25 M46 32 L50 30 M46 37 L50 35 M46 42 L50 40" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" />
+                      <line x1="48" y1="24" x2="48" y2="21" stroke="#374151" strokeWidth="1" />
+
+                      {/* Glowing flame */}
+                      <path
+                        d="M48 9 C51 14 52 18 50 21 C49 22.5 47 22.5 46 21 C44 18 45 14 48 9 Z"
+                        fill="url(#flameGlow)"
+                      />
+                      <ellipse cx="48" cy="18" rx="1.5" ry="2.5" fill="#FEF08A" />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                /* UPCOMING BIRTHDAY CARD: Avatar + Info */
+                <div className="p-4 sm:p-5 flex items-center gap-3.5 relative z-10">
+                  {/* Circular Avatar */}
+                  <div className="relative shrink-0">
+                    <img
+                      src={person.avatar}
+                      alt={person.name}
+                      className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full object-cover border border-slate-100"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Information */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-base sm:text-lg font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
+                      {person.name}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-[#776B80] font-normal truncate mt-0.5">
+                      {person.role}
+                    </p>
                     <span className="inline-flex items-center gap-1.5 text-xs text-[#64748B] font-medium mt-1.5">
                       <CalendarTodayOutlinedIcon sx={{ fontSize: 13 }} className="text-[#94A3B8]" />
                       <span>{person.dateStr}</span>
                     </span>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Bottom Action Section with Divider */}
-              <div className={`border-t ${isToday ? 'border-[#FFE4E6]' : 'border-[#F1F5F9]'}`}>
+              <div className="border-t border-[#F1F5F9] w-full relative z-10">
                 <button
                   type="button"
                   onClick={() => handleSendWish(person)}
-                  className={`w-full py-2.5 px-3 flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                  className={`w-full py-2.5 px-3 flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
                     isToday
                       ? 'text-[#E11D48] hover:text-[#BE123C]'
                       : 'text-[#7C3AED] hover:text-[#6D28D9]'
@@ -206,7 +298,7 @@ export default function EmployeeBirthdays() {
                     </>
                   ) : (
                     <>
-                      <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                      <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 18 }} />
                       <span>Send wishes</span>
                     </>
                   )}
