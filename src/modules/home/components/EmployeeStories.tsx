@@ -176,20 +176,140 @@ const INITIAL_STORIES: EmployeeStory[] = [
       },
     ],
   },
+  {
+    id: 'vikram',
+    name: 'Vikram K.',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80',
+    role: 'Mobile App Architect',
+    department: 'Mobile Experience',
+    viewed: false,
+    slides: [
+      {
+        id: 'v1',
+        image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1000&q=80',
+        caption: 'New mobile app update is live on iOS & Android! Super fast rewards redemption 📱⚡',
+        tag: 'Mobile Launch',
+        createdAt: '3h ago',
+      },
+    ],
+  },
+  {
+    id: 'ananya',
+    name: 'Ananya V.',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+    role: 'Brand & Communications',
+    department: 'Marketing',
+    viewed: true,
+    slides: [
+      {
+        id: 'av1',
+        image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1000&q=80',
+        caption: 'Behind the scenes at our Employer of Choice brand photoshoot! 📸✨',
+        tag: 'Brand Story',
+        createdAt: '8h ago',
+      },
+    ],
+  },
+  {
+    id: 'kabir',
+    name: 'Kabir R.',
+    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=200&q=80',
+    role: 'Financial Analyst',
+    department: 'Finance & Planning',
+    viewed: false,
+    slides: [
+      {
+        id: 'k1',
+        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80',
+        caption: 'Completed quarterly corporate tax & benefits savings analysis ahead of schedule 💼📊',
+        tag: 'Finance Win',
+        createdAt: '2h ago',
+      },
+    ],
+  },
+  {
+    id: 'neha',
+    name: 'Neha T.',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80',
+    role: 'Customer Success Manager',
+    department: 'Partner Success',
+    viewed: false,
+    slides: [
+      {
+        id: 'nh1',
+        image: 'https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?auto=format&fit=crop&w=1000&q=80',
+        caption: '99.4% customer satisfaction score across our top corporate enterprise clients this month! ❤️🎉',
+        tag: 'Client Delight',
+        createdAt: '5h ago',
+      },
+    ],
+  },
+  {
+    id: 'arjun',
+    name: 'Arjun M.',
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80',
+    role: 'InfoSec Engineer',
+    department: 'Security & Trust',
+    viewed: true,
+    slides: [
+      {
+        id: 'ar1',
+        image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1000&q=80',
+        caption: 'Annual SOC2 Type II audit completed with zero non-conformances! 🛡️🔐',
+        tag: 'Security Win',
+        createdAt: '9h ago',
+      },
+    ],
+  },
+  {
+    id: 'tanvi',
+    name: 'Tanvi B.',
+    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=200&q=80',
+    role: 'Growth Marketing Lead',
+    department: 'User Acquisition',
+    viewed: false,
+    slides: [
+      {
+        id: 'tb1',
+        image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1000&q=80',
+        caption: '250,000 active employees visited our rewards marketplace this week! Record growth 🚀🎯',
+        tag: 'Growth Record',
+        createdAt: '6h ago',
+      },
+    ],
+  },
+  {
+    id: 'sameer',
+    name: 'Sameer G.',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
+    role: 'Corporate Counsel',
+    department: 'Legal & Risk',
+    viewed: true,
+    slides: [
+      {
+        id: 'sg1',
+        image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1000&q=80',
+        caption: '5-year work anniversary at Reward Planners! Grateful for this amazing journey 🥂🎊',
+        tag: '5-Year Milestone',
+        createdAt: '10h ago',
+      },
+    ],
+  },
 ];
 
 export default function EmployeeStories() {
   const { user } = useAuth();
   const [stories, setStories] = useState<EmployeeStory[]>(() => {
     try {
-      const stored = localStorage.getItem('rp_employee_stories_v4');
+      const stored = localStorage.getItem('rp_employee_stories_v5');
       if (stored) return JSON.parse(stored);
     } catch {}
     return INITIAL_STORIES;
   });
 
-  // Track active story modal view
-  const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
+  // Track active story modal view by ID
+  const [activeStoryId, setActiveStoryId] = useState<string | number | null>(null);
+  const [viewingQueue, setViewingQueue] = useState<EmployeeStory[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [slideProgress, setSlideProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -224,6 +344,27 @@ export default function EmployeeStories() {
     }
   }, [user]);
 
+  // Dynamically sort stories:
+  // 1. "Your story" pinned at the beginning (index 0)
+  // 2. All unviewed / newly added stories at the starting
+  // 3. All viewed stories moved to the end
+  const sortedStories = React.useMemo(() => {
+    const userStory = stories.find((s) => s.isUser);
+    const otherStories = stories.filter((s) => !s.isUser);
+    const newStories = otherStories.filter((s) => !s.viewed);
+    const viewedStories = otherStories.filter((s) => s.viewed);
+
+    return [
+      ...(userStory ? [userStory] : []),
+      ...newStories,
+      ...viewedStories,
+    ];
+  }, [stories]);
+
+  const activeStoryIndex = viewingQueue.findIndex((s) => s.id === activeStoryId);
+  const activeStory = activeStoryIndex !== -1 ? viewingQueue[activeStoryIndex] : null;
+  const activeSlide = activeStory ? activeStory.slides[currentSlideIndex] : null;
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -250,7 +391,7 @@ export default function EmployeeStories() {
         !isHovered &&
         !isInteracting &&
         !isDragging &&
-        activeStoryIndex === null &&
+        activeStoryId === null &&
         !isAddModalOpen
       ) {
         el.scrollLeft += 0.65;
@@ -265,7 +406,7 @@ export default function EmployeeStories() {
     animationFrameId = requestAnimationFrame(step);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isHovered, isInteracting, isDragging, activeStoryIndex, isAddModalOpen]);
+  }, [isHovered, isInteracting, isDragging, activeStoryId, isAddModalOpen]);
 
   // Horizontal scroll buttons
   const scroll = (direction: 'left' | 'right') => {
@@ -316,8 +457,10 @@ export default function EmployeeStories() {
   };
 
   // Open a specific story
-  const handleOpenStory = (index: number) => {
-    setActiveStoryIndex(index);
+  const handleOpenStory = (storyId: string | number) => {
+    // Snapshot the current sorted order for uninterrupted modal playback
+    setViewingQueue(sortedStories);
+    setActiveStoryId(storyId);
     setCurrentSlideIndex(0);
     setSlideProgress(0);
     setLiked(false);
@@ -325,17 +468,19 @@ export default function EmployeeStories() {
 
     // Mark as viewed
     setStories((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], viewed: true };
+      const next = prev.map((s) =>
+        s.id === storyId ? { ...s, viewed: true } : s
+      );
       try {
-        localStorage.setItem('rp_employee_stories_v4', JSON.stringify(next));
+        localStorage.setItem('rp_employee_stories_v5', JSON.stringify(next));
       } catch {}
       return next;
     });
   };
 
   const handleCloseStory = () => {
-    setActiveStoryIndex(null);
+    setActiveStoryId(null);
+    setViewingQueue([]);
     setCurrentSlideIndex(0);
     setSlideProgress(0);
     setIsPaused(false);
@@ -343,25 +488,40 @@ export default function EmployeeStories() {
 
   // Next Slide / Next Story
   const handleNextSlide = useCallback(() => {
-    if (activeStoryIndex === null) return;
-    const currentStory = stories[activeStoryIndex];
+    if (!activeStory) return;
 
-    if (currentSlideIndex < currentStory.slides.length - 1) {
+    if (currentSlideIndex < activeStory.slides.length - 1) {
       setCurrentSlideIndex((prev) => prev + 1);
       setSlideProgress(0);
     } else {
-      // Advance to next story if available
-      if (activeStoryIndex < stories.length - 1) {
-        handleOpenStory(activeStoryIndex + 1);
+      // Advance to next story in viewingQueue
+      if (activeStoryIndex < viewingQueue.length - 1) {
+        const nextStory = viewingQueue[activeStoryIndex + 1];
+        setActiveStoryId(nextStory.id);
+        setCurrentSlideIndex(0);
+        setSlideProgress(0);
+        setLiked(false);
+        setReplyText('');
+
+        // Mark as viewed
+        setStories((prev) => {
+          const next = prev.map((s) =>
+            s.id === nextStory.id ? { ...s, viewed: true } : s
+          );
+          try {
+            localStorage.setItem('rp_employee_stories_v5', JSON.stringify(next));
+          } catch {}
+          return next;
+        });
       } else {
         handleCloseStory();
       }
     }
-  }, [activeStoryIndex, currentSlideIndex, stories]);
+  }, [activeStory, activeStoryIndex, currentSlideIndex, viewingQueue]);
 
   // Previous Slide / Previous Story
   const handlePrevSlide = useCallback(() => {
-    if (activeStoryIndex === null) return;
+    if (!activeStory) return;
 
     if (currentSlideIndex > 0) {
       setCurrentSlideIndex((prev) => prev - 1);
@@ -369,18 +529,17 @@ export default function EmployeeStories() {
     } else {
       // Go to previous story if available
       if (activeStoryIndex > 0) {
-        const prevIndex = activeStoryIndex - 1;
-        const prevStory = stories[prevIndex];
-        setActiveStoryIndex(prevIndex);
+        const prevStory = viewingQueue[activeStoryIndex - 1];
+        setActiveStoryId(prevStory.id);
         setCurrentSlideIndex(prevStory.slides.length - 1);
         setSlideProgress(0);
       }
     }
-  }, [activeStoryIndex, currentSlideIndex, stories]);
+  }, [activeStory, activeStoryIndex, currentSlideIndex, viewingQueue]);
 
   // Slide Progress Timer (5 seconds per slide)
   useEffect(() => {
-    if (activeStoryIndex === null || isPaused) return;
+    if (activeStoryId === null || isPaused) return;
 
     const interval = 50; // update every 50ms
     const step = (100 / (5000 / interval)); // 5000ms = 5s
@@ -396,11 +555,11 @@ export default function EmployeeStories() {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [activeStoryIndex, currentSlideIndex, isPaused, handleNextSlide]);
+  }, [activeStoryId, currentSlideIndex, isPaused, handleNextSlide]);
 
   // Keyboard navigation
   useEffect(() => {
-    if (activeStoryIndex === null) return;
+    if (activeStoryId === null) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleCloseStory();
       if (e.key === 'ArrowRight') handleNextSlide();
@@ -408,7 +567,7 @@ export default function EmployeeStories() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeStoryIndex, handleNextSlide, handlePrevSlide]);
+  }, [activeStoryId, handleNextSlide, handlePrevSlide]);
 
   // Post a new story
   const handleCreateStory = (e: React.FormEvent) => {
@@ -435,7 +594,7 @@ export default function EmployeeStories() {
         return s;
       });
       try {
-        localStorage.setItem('rp_employee_stories_v4', JSON.stringify(next));
+        localStorage.setItem('rp_employee_stories_v5', JSON.stringify(next));
       } catch {}
       return next;
     });
@@ -444,9 +603,6 @@ export default function EmployeeStories() {
     setNewCaption('');
     showToast('Your story has been shared with your team! 🎉');
   };
-
-  const activeStory = activeStoryIndex !== null ? stories[activeStoryIndex] : null;
-  const activeSlide = activeStory ? activeStory.slides[currentSlideIndex] : null;
 
   return (
     <section className="w-full mb-3 sm:mb-4 pt-0 select-none" aria-label="Employee Stories">
@@ -491,7 +647,7 @@ export default function EmployeeStories() {
           className="flex items-center gap-5 sm:gap-6.5 lg:gap-8 overflow-x-auto no-scrollbar py-0.5 px-1 flex-1 cursor-grab active:cursor-grabbing"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
-          {stories.map((story, index) => {
+          {sortedStories.map((story) => {
             const isUser = story.isUser;
             const isViewed = story.viewed;
 
@@ -504,7 +660,7 @@ export default function EmployeeStories() {
                   if (isUser && story.slides.length === 0) {
                     setIsAddModalOpen(true);
                   } else {
-                    handleOpenStory(index);
+                    handleOpenStory(story.id);
                   }
                 }}
               >
