@@ -80,26 +80,33 @@ export default function EmployeeBirthdays() {
         </div>
       )}
 
-      {/* Background White Card Container */}
-      <div className="bg-white rounded-[22px] sm:rounded-[24px] border border-[#E2E8F0] p-4 sm:p-5 shadow-[0_2px_14px_-4px_rgba(0,0,0,0.04)]">
+      {/* Background White & Purple Glossy Card Container */}
+      <div className="relative rounded-[22px] sm:rounded-[24px] border border-[#E9D5FF] p-4 sm:p-5 overflow-hidden transition-all duration-300 bg-gradient-to-br from-white via-[#FAF5FF] to-[#F3E8FF]/80 shadow-[0_10px_30px_-5px_rgba(147,51,234,0.08),0_2px_8px_-2px_rgba(147,51,234,0.04),inset_0_1px_2px_rgba(255,255,255,0.95)]">
+        {/* Glossy Specular Light Reflection Sweep */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/20 to-transparent pointer-events-none rounded-[inherit]" />
+
+        {/* Ambient Purple Luminous Orbs */}
+        <div className="absolute -top-16 -right-16 w-52 h-52 rounded-full bg-gradient-to-br from-purple-300/30 via-fuchsia-200/20 to-transparent blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-14 -left-14 w-48 h-48 rounded-full bg-gradient-to-tr from-purple-300/20 via-pink-200/15 to-transparent blur-2xl pointer-events-none" />
+
         {/* Small Title Header */}
-        <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+        <div className="relative z-10 flex items-center justify-between mb-3.5 sm:mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100/80 flex items-center justify-center text-[#E11D48] shrink-0">
-              <CakeOutlinedIcon sx={{ fontSize: 16 }} />
+            <div className="w-7 h-7 rounded-lg bg-white/90 border border-purple-200 shadow-2xs flex items-center justify-center text-[#7C3AED] shrink-0">
+              <CakeOutlinedIcon sx={{ fontSize: 16 }} className="text-[#8B5CF6]" />
             </div>
             <h3 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight">
               Birthdays
             </h3>
           </div>
-          <span className="text-[11px] font-semibold text-[#E11D48] bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-100/80 flex items-center gap-1.5">
+          <span className="text-[11px] font-semibold text-[#7C3AED] bg-white/90 px-2.5 py-0.5 rounded-full border border-purple-200 shadow-2xs flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] animate-pulse" />
             1 Today
           </span>
         </div>
 
         {/* Birthday Cards Track - First Today's Birthday, Then Upcoming */}
-        <div className="flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
+        <div className="relative z-10 flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
           {BIRTHDAY_PROFILES.map((person) => {
             const isToday = person.isToday;
             const isWished = wishedIds.has(person.id);
