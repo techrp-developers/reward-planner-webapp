@@ -45,6 +45,7 @@ import OccasionCalendar from './components/OccasionCalendar';
 import BenefitHighlights from './components/BenefitHighlights';
 import ServiceDiscovery, { ServiceShortcuts } from './components/ServiceDiscovery';
 import EmployeeStories from './components/EmployeeStories';
+import EmployeeBirthdays from './components/EmployeeBirthdays';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -563,6 +564,9 @@ export const HomePage = () => {
 
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
       <div className="dashboard-content bg-white px-4 sm:px-5 lg:px-6">
+
+        {/* ── 0.5. TEAM BIRTHDAYS SECTION (First Today's Birthday, Then Upcoming) ── */}
+        <EmployeeBirthdays />
 
         {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
         <BenefitHighlights />
