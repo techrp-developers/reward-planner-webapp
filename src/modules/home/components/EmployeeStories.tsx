@@ -355,7 +355,7 @@ export default function EmployeeStories() {
   const activeSlide = activeStory ? activeStory.slides[currentSlideIndex] : null;
 
   return (
-    <section className="w-full mb-6 sm:mb-8 pt-1" aria-label="Employee Stories">
+    <section className="w-full mb-4 sm:mb-5 pt-0.5" aria-label="Employee Stories">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#1C0E28] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
@@ -365,15 +365,15 @@ export default function EmployeeStories() {
       )}
 
       {/* ── WHITE CARD CONTAINER WITH MIXED GRADIENT BORDER ── */}
-      <div className="p-[2px] sm:p-[2.5px] rounded-[26px] sm:rounded-[30px] bg-gradient-to-r from-[#F59E0B] via-[#EC4899] to-[#8B5CF6] shadow-[0_4px_24px_-4px_rgba(236,72,153,0.12),0_2px_8px_rgba(139,92,246,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(236,72,153,0.18)] transition-all">
-        <div className="w-full bg-white rounded-[24px] sm:rounded-[27.5px] p-4 sm:p-5 lg:p-6">
+      <div className="p-[1.5px] sm:p-[2px] rounded-[22px] sm:rounded-[26px] bg-gradient-to-r from-[#F59E0B] via-[#EC4899] to-[#8B5CF6] shadow-[0_4px_20px_-4px_rgba(236,72,153,0.1),0_2px_6px_rgba(139,92,246,0.05)] hover:shadow-[0_6px_24px_-4px_rgba(236,72,153,0.15)] transition-all">
+        <div className="w-full bg-white rounded-[20.5px] sm:rounded-[24px] py-2.5 px-3.5 sm:py-3 sm:px-4.5 lg:py-3.5 lg:px-5">
           {/* ── HEADER ROW ── */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 px-0.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2 sm:mb-2.5 px-0.5">
             <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#1C0E28] tracking-tight">
+              <h2 className="text-sm sm:text-base lg:text-[17px] font-bold text-[#1C0E28] tracking-tight">
                 Employee Stories
               </h2>
-              <p className="text-xs sm:text-[13px] text-[#776B80] font-normal mt-0.5">
+              <p className="text-[11px] sm:text-xs text-[#776B80] font-normal mt-0.5">
                 Share moments, celebrate achievements, and stay connected with your team.
               </p>
             </div>
@@ -381,11 +381,11 @@ export default function EmployeeStories() {
             <button
               type="button"
               onClick={() => handleOpenStory(1)}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer self-start sm:self-center group"
+              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer self-start sm:self-center group"
               title="View all stories"
             >
               <span>View all stories</span>
-              <ArrowForwardIcon sx={{ fontSize: 16 }} className="group-hover:translate-x-0.5 transition-transform" />
+              <ArrowForwardIcon sx={{ fontSize: 14 }} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
 
@@ -395,16 +395,16 @@ export default function EmployeeStories() {
             <button
               type="button"
               onClick={() => scroll('left')}
-              className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1"
+              className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-[#E2E8F0] shadow-2xs hover:shadow-sm flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1"
               aria-label="Scroll stories left"
             >
-              <ChevronLeftIcon sx={{ fontSize: 19 }} />
+              <ChevronLeftIcon sx={{ fontSize: 17 }} />
             </button>
 
             {/* Horizontal Story Circles Row */}
             <div
               ref={scrollRef}
-              className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1 flex-1"
+              className="flex items-center gap-4 sm:gap-5 lg:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 flex-1"
             >
               {stories.map((story, index) => {
                 const isUser = story.isUser;
@@ -428,17 +428,17 @@ export default function EmployeeStories() {
                       <div
                         className={`rounded-full transition-all duration-300 group-hover/story:scale-105 ${
                           isUser
-                            ? 'p-[2px] bg-slate-200'
+                            ? 'p-[1.5px] bg-slate-200'
                             : isViewed
-                            ? 'p-[2px] bg-[#E2E8F0]'
-                            : 'p-[2.5px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
+                            ? 'p-[1.5px] bg-[#E2E8F0]'
+                            : 'p-[2px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
                         }`}
                       >
-                        <div className="p-[2.5px] bg-white rounded-full">
+                        <div className="p-[2px] bg-white rounded-full">
                           <img
                             src={story.avatar}
                             alt={story.name}
-                            className="w-16 h-16 sm:w-[68px] sm:h-[68px] lg:w-[72px] lg:h-[72px] rounded-full object-cover shrink-0"
+                            className="w-12 h-12 sm:w-[50px] sm:h-[50px] lg:w-[54px] lg:h-[54px] rounded-full object-cover shrink-0"
                             loading="lazy"
                           />
                         </div>
@@ -452,19 +452,19 @@ export default function EmployeeStories() {
                             e.stopPropagation();
                             setIsAddModalOpen(true);
                           }}
-                          className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-2 border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+                          className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-[1.5px] border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
                           title="Add a moment"
                         >
-                          <AddIcon sx={{ fontSize: 13 }} />
+                          <AddIcon sx={{ fontSize: 11 }} />
                         </button>
                       )}
                     </div>
 
                     {/* Name & Status */}
-                    <span className="mt-1.5 text-xs sm:text-[13px] font-bold text-[#1C0E28] tracking-tight max-w-[80px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors">
+                    <span className="mt-1 text-[11px] sm:text-xs font-bold text-[#1C0E28] tracking-tight max-w-[68px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors leading-tight">
                       {story.name}
                     </span>
-                    <span className="text-[11px] text-[#776B80] font-normal leading-tight max-w-[80px] text-center truncate mt-0.5">
+                    <span className="text-[9.5px] sm:text-[10px] text-[#776B80] font-normal leading-tight max-w-[68px] text-center truncate mt-0.5">
                       {isUser ? 'Add a moment' : isViewed ? 'Viewed' : 'New story'}
                     </span>
                   </div>
@@ -476,10 +476,10 @@ export default function EmployeeStories() {
             <button
               type="button"
               onClick={() => scroll('right')}
-              className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1"
+              className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-[#E2E8F0] shadow-2xs hover:shadow-sm flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1"
               aria-label="Scroll stories right"
             >
-              <ChevronRightIcon sx={{ fontSize: 19 }} />
+              <ChevronRightIcon sx={{ fontSize: 17 }} />
             </button>
           </div>
         </div>
