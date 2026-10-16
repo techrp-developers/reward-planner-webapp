@@ -558,11 +558,11 @@ export const HomePage = () => {
         </div>
       )}
 
+      {/* ── 0. EMPLOYEE STORIES SECTION (Full Screen Width, No Outer Padding) ── */}
+      <EmployeeStories />
+
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
       <div className="dashboard-content bg-white px-4 sm:px-5 lg:px-6">
-
-        {/* ── 0. EMPLOYEE STORIES SECTION (Directly below header) ── */}
-        <EmployeeStories />
 
         {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
         <BenefitHighlights />

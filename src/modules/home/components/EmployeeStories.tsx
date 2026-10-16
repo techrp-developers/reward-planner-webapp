@@ -376,40 +376,11 @@ export default function EmployeeStories() {
   const [scrollLeftState, setScrollLeftState] = useState(0);
   const [draggedDistance, setDraggedDistance] = useState(0);
 
-  // Floating arrow scroll state
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const checkScrollability = useCallback(() => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 6);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
-    }
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    checkScrollability();
-    const timer = setTimeout(checkScrollability, 100);
-
-    el.addEventListener('scroll', checkScrollability, { passive: true });
-    window.addEventListener('resize', checkScrollability);
-    return () => {
-      clearTimeout(timer);
-      el.removeEventListener('scroll', checkScrollability);
-      window.removeEventListener('resize', checkScrollability);
-    };
-  }, [checkScrollability, sortedStories]);
-
   // Horizontal scroll buttons - only scrolls when arrows are clicked
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const offset = direction === 'left' ? -360 : 360;
       scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-      setTimeout(checkScrollability, 350);
     }
   };
 
@@ -605,16 +576,13 @@ export default function EmployeeStories() {
         </div>
       )}
 
-      {/* ── STORIES CAROUSEL TRACK (SEAMLESS DIRECT ON WHITE BACKGROUND) ── */}
-      <div className="relative w-full group/carousel py-1">
-        {/* Floating Left Arrow Button */}
+      {/* ── STORIES CAROUSEL TRACK (FULL SCREEN, ARROWS ON LEFT & RIGHT) ── */}
+      <div className="relative flex items-center w-full py-1 px-1 sm:px-1.5 group/carousel">
+        {/* Left Arrow Button */}
         <button
           type="button"
           onClick={() => scroll('left')}
-          disabled={!canScrollLeft}
-          className={`absolute left-0 sm:left-1 top-[36px] sm:top-[38px] -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] transition-all cursor-pointer ${
-            canScrollLeft ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
-          }`}
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1 sm:mr-1.5"
           aria-label="Scroll stories left"
         >
           <ChevronLeftIcon sx={{ fontSize: 18 }} />
@@ -627,7 +595,7 @@ export default function EmployeeStories() {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar py-1 px-1 sm:px-1.5 w-full cursor-grab active:cursor-grabbing"
+          className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar py-1 flex-1 cursor-grab active:cursor-grabbing"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
           {sortedStories.map((story) => {
@@ -697,14 +665,11 @@ export default function EmployeeStories() {
           })}
         </div>
 
-        {/* Floating Right Arrow Button */}
+        {/* Right Arrow Button */}
         <button
           type="button"
           onClick={() => scroll('right')}
-          disabled={!canScrollRight}
-          className={`absolute right-0 sm:right-1 top-[36px] sm:top-[38px] -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-md hover:shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] transition-all cursor-pointer ${
-            canScrollRight ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
-          }`}
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1 sm:ml-1.5"
           aria-label="Scroll stories right"
         >
           <ChevronRightIcon sx={{ fontSize: 18 }} />
