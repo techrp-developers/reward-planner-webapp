@@ -68,7 +68,7 @@ export default function CinematicModuleStage() {
       >
         {/* Screen 0: Dashboard */}
         <div
-          className={`cinematic-stage-screen screen-dashboard no-scrollbar ${activeIndex === 0 ? 'is-active' : ''}`}
+          className={`cinematic-stage-screen screen-dashboard bg-white no-scrollbar ${activeIndex === 0 ? 'is-active' : ''}`}
           aria-hidden={activeIndex !== 0}
           inert={activeIndex !== 0}
         >

@@ -541,7 +541,7 @@ export const HomePage = () => {
   const currentAnnouncement = announcements[announcementIndex];
 
   return (
-    <div className="dashboard no-scrollbar font-['Poppins',sans-serif]">
+    <div className="dashboard no-scrollbar font-['Poppins',sans-serif] bg-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#0A0A5C] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
@@ -558,7 +558,7 @@ export const HomePage = () => {
       )}
 
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
-      <div className="dashboard-content">
+      <div className="dashboard-content bg-white">
 
         {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
         <BenefitHighlights />

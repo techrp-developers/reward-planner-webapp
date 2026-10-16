@@ -7,7 +7,7 @@
   overflow-x: hidden !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  background: #FFFFFF;
+  background: #FFFFFF !important;
   color: #0F172A;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -26,6 +26,7 @@
   padding: 6px 16px 16px;
   overflow-x: hidden !important;
   box-sizing: border-box;
+  background: #FFFFFF !important;
 }
 
 .dashboard a {
@@ -501,7 +502,7 @@
 }
 
 /* Dashboard palette and spacing: 8px details, 16px cards and gutters. */
-.dashboard { --dashboard-accent: #1C0E28; --dashboard-ink: #24162F; --dashboard-muted: #776B80; --dashboard-border: #E4DCE9; background: #F3F0F5; color: var(--dashboard-ink); overflow-x: hidden !important; }
+.dashboard { --dashboard-accent: #1C0E28; --dashboard-ink: #24162F; --dashboard-muted: #776B80; --dashboard-border: #E4DCE9; background: #FFFFFF !important; color: var(--dashboard-ink); overflow-x: hidden !important; }
 .dashboard-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 .dashboard-content > * { margin-top: 0; margin-bottom: 0; }
 .dashboard :is(h1,h2,h3,h4) { font-weight: 600; }

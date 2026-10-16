@@ -126,7 +126,7 @@ export const AppRouter = () => {
       <MegaMenuStrip />
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className={`flex-1 w-full overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-5rem)] lg:h-[calc(100vh-3.75rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
+      <main className={`flex-1 w-full bg-white overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-5rem)] lg:h-[calc(100vh-3.75rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
         <Suspense fallback={<div role="status" className="p-8 text-center text-sm text-gray-500">Loading page...</div>}>
         {isStageRoute ? (
           <CinematicModuleStage />
