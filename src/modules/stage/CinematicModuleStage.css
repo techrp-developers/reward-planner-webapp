@@ -7,7 +7,7 @@
   height: 100%;
   overflow: hidden !important;
   overflow-x: hidden !important;
-  background: #F8FAFC;
+  background: #FFFFFF;
   contain: paint;
 }
 
@@ -47,6 +47,7 @@
   transform: scale(1);
 }
 
+.cinematic-stage-screen.screen-dashboard,
 .cinematic-stage-screen.screen-products {
   background: #FFFFFF;
 }

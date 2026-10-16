@@ -154,24 +154,11 @@ export const TopHeader = () => {
       <LocationModal />
 
 
-      <header className="sticky top-0 z-40 w-full bg-[#F3F0F5]/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2.5 sm:py-3.5 lg:py-3.5 px-3.5 sm:px-6 lg:px-10 antialiased">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-[#E4DCE9]/80 select-none py-2.5 sm:py-3.5 lg:py-3.5 px-3.5 sm:px-6 lg:px-10 antialiased">
         <div className="w-full max-w-[1680px] mx-auto flex items-center justify-between gap-2.5 sm:gap-4 relative">
           
-          {/* Left Group: RP Logo Circle + Company Logo Chip (in front of R logo) */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 z-10">
-            <Link
-              to="/"
-              className="w-11 h-11 sm:w-13 sm:h-13 lg:w-14 lg:h-14 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
-              title="Reward Planners Home"
-            >
-              <img
-                src={rpLogo}
-                alt="RewardPlanners"
-                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-8.5 lg:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
-              />
-            </Link>
-
-            {/* Active User's Company Logo Chip */}
+          {/* Left Group: Active User's Company Logo Chip (in left corner) */}
+          <div className="flex items-center shrink-0 z-10">
             <Link
               to="/profile"
               aria-label={`Company: ${companyName}`}
@@ -204,8 +191,8 @@ export const TopHeader = () => {
             />
           </div>
 
-          {/* Right Group: RP Coins + Notifications + Menu */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0 z-10">
+          {/* Right Group: RP Coins + Notifications + Menu + RP Logo Circle (in right corner) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3.5 shrink-0 z-10">
             {isServicesPath && (
               <Link
                 to="/services/cart"
@@ -231,6 +218,19 @@ export const TopHeader = () => {
             <NotificationsPanel />
 
             <AccountMenu />
+
+            {/* RP Logo Circle (in right corner) */}
+            <Link
+              to="/"
+              className="w-10 h-10 sm:w-12 sm:h-12 lg:w-13.5 lg:h-13.5 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
+              title="Reward Planners Home"
+            >
+              <img
+                src={rpLogo}
+                alt="RewardPlanners"
+                className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 lg:w-8.5 lg:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
+              />
+            </Link>
           </div>
 
         </div>

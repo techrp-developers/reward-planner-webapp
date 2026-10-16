@@ -117,7 +117,7 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className={`min-h-screen flex flex-col bg-[#EFF2EC] text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col bg-white text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
