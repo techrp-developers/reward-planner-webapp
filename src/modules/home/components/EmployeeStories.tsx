@@ -585,7 +585,7 @@ export default function EmployeeStories() {
   };
 
   return (
-    <section className="w-full mb-3 sm:mb-4 pt-0 select-none" aria-label="Employee Stories">
+    <section className="w-full pt-3 sm:pt-4 pb-2 sm:pb-3 mb-2 sm:mb-3 select-none" aria-label="Employee Stories">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#1C0E28] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
