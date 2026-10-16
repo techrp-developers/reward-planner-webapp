@@ -631,7 +631,7 @@ export default function EmployeeStories() {
                       <img
                         src={story.avatar}
                         alt={story.name}
-                        className="w-14 h-14 sm:w-[58px] sm:h-[58px] lg:w-[62px] lg:h-[62px] rounded-full object-cover shrink-0"
+                        className="w-[50px] h-[50px] sm:w-[54px] sm:h-[54px] lg:w-14 lg:h-14 rounded-full object-cover shrink-0"
                         loading="lazy"
                       />
                     </div>
