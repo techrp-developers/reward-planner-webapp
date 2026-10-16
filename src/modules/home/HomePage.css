@@ -20,10 +20,10 @@
 }
 
 .dashboard-content {
-  width: 100%;
-  max-width: 1680px;
-  margin: 0 auto;
-  padding: 6px 16px 16px;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 6px 8px 32px;
   overflow-x: hidden !important;
   box-sizing: border-box;
   background: #FFFFFF !important;
@@ -445,7 +445,8 @@
 
 @media (max-width: 1050px) {
   .dashboard-content {
-    padding: 16px 16px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .wellbeing-copy {
     padding: 16px 16px;
@@ -454,7 +455,9 @@
 
 @media (max-width: 767px) {
   .dashboard-content {
-    padding: 16px 16px 105px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 104px;
   }
   .dashboard-overview {
     grid-template-columns: 1fr;
@@ -503,7 +506,7 @@
 
 /* Dashboard palette and spacing: 8px details, 16px cards and gutters. */
 .dashboard { --dashboard-accent: #1C0E28; --dashboard-ink: #24162F; --dashboard-muted: #776B80; --dashboard-border: #E4DCE9; background: #FFFFFF !important; color: var(--dashboard-ink); overflow-x: hidden !important; }
-.dashboard-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.dashboard-content { display: flex; flex-direction: column; gap: 16px; }
 .dashboard-content > * { margin-top: 0; margin-bottom: 0; }
 .dashboard :is(h1,h2,h3,h4) { font-weight: 600; }
 .dashboard :is(a,button):focus-visible { outline: 2px solid #78538F; outline-offset: 4px; }
@@ -531,7 +534,7 @@
 .dashboard-rewards-promo > img { width: 38%; }
 .dashboard-mobile-nav a[aria-current] { color: #1C0E28; }
 @media (max-width: 767px) {
-  .dashboard-content { padding: 16px 16px 104px; }
+  .dashboard-content { padding-left: 8px; padding-right: 8px; padding-bottom: 104px; }
   .wellbeing-copy p { max-width: 220px; }
   .dashboard-finance { grid-template-columns: 1fr; }
   .dashboard-mobile-nav { left: 16px; right: 16px; padding: 8px; }
@@ -801,8 +804,8 @@
 }
 
 /* Align the page content with the header's responsive outer gutters. */
-@media (min-width: 640px) { .dashboard-content { padding-left: 32px; padding-right: 32px; } }
-@media (min-width: 1024px) { .dashboard-content { padding-left: 48px; padding-right: 48px; } }
+@media (min-width: 640px) { .dashboard-content { padding-left: 10px; padding-right: 10px; } }
+@media (min-width: 1024px) { .dashboard-content { padding-left: 12px; padding-right: 12px; } }
 
 .engagement-cards-grid {
   margin-bottom: 64px !important;

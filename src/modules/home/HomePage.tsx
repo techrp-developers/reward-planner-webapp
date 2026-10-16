@@ -559,7 +559,7 @@ export const HomePage = () => {
       )}
 
       {/* FULL-WIDTH DASHBOARD CONTENT WRAPPER */}
-      <div className="dashboard-content bg-white">
+      <div className="dashboard-content bg-white px-2 sm:px-2.5 lg:px-3">
 
         {/* ── 0. EMPLOYEE STORIES SECTION (Directly below header) ── */}
         <EmployeeStories />
