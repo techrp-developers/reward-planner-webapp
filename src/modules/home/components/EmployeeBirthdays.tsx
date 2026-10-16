@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import CheckIcon from '@mui/icons-material/Check';
@@ -79,21 +80,39 @@ export default function EmployeeBirthdays() {
         </div>
       )}
 
-      {/* Birthday Cards Track - First Today's Birthday, Then Upcoming */}
-      <div className="flex items-stretch gap-4 sm:gap-5 overflow-x-auto no-scrollbar py-1">
-        {BIRTHDAY_PROFILES.map((person) => {
-          const isToday = person.isToday;
-          const isWished = wishedIds.has(person.id);
+      {/* Background White Card Container */}
+      <div className="bg-white rounded-[22px] sm:rounded-[24px] border border-[#E2E8F0] p-4 sm:p-5 shadow-[0_2px_14px_-4px_rgba(0,0,0,0.04)]">
+        {/* Small Title Header */}
+        <div className="flex items-center justify-between mb-3.5 sm:mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100/80 flex items-center justify-center text-[#E11D48] shrink-0">
+              <CakeOutlinedIcon sx={{ fontSize: 16 }} />
+            </div>
+            <h3 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight">
+              Birthdays
+            </h3>
+          </div>
+          <span className="text-[11px] font-semibold text-[#E11D48] bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-100/80 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] animate-pulse" />
+            1 Today
+          </span>
+        </div>
 
-          return (
-            <div
-              key={person.id}
-              className={`min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[20px] transition-all relative flex flex-col justify-between overflow-hidden ${
-                isToday
-                  ? 'bg-white border border-[#FECDD3] shadow-[0_4px_20px_-4px_rgba(244,63,94,0.08)]'
-                  : 'bg-white border border-[#E2E8F0] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] hover:shadow-sm'
-              }`}
-            >
+        {/* Birthday Cards Track - First Today's Birthday, Then Upcoming */}
+        <div className="flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
+          {BIRTHDAY_PROFILES.map((person) => {
+            const isToday = person.isToday;
+            const isWished = wishedIds.has(person.id);
+
+            return (
+              <div
+                key={person.id}
+                className={`min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[18px] sm:rounded-[20px] transition-all relative flex flex-col justify-between overflow-hidden ${
+                  isToday
+                    ? 'bg-white border border-[#FECDD3] shadow-[0_4px_16px_-4px_rgba(244,63,94,0.10)]'
+                    : 'bg-[#FAFAFC] border border-[#E2E8F0] shadow-2xs hover:shadow-xs'
+                }`}
+              >
               {/* Today's Card Specific Top-Right Pink Blush */}
               {isToday && (
                 <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-gradient-to-br from-pink-200/55 via-rose-100/30 to-transparent pointer-events-none" />
@@ -307,6 +326,7 @@ export default function EmployeeBirthdays() {
             </div>
           );
         })}
+        </div>
       </div>
     </section>
   );
