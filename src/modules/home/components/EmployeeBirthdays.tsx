@@ -296,6 +296,12 @@ export default function EmployeeBirthdays() {
 
                     {/* Information */}
                     <div className="flex-1 min-w-0">
+                      {/* Red Upcoming Label */}
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bold tracking-wider text-[#E11D48] uppercase mb-0.5">
+                        <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#E11D48]" />
+                        <span>UPCOMING</span>
+                      </div>
+
                       <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
                         {person.name}
                       </h4>
