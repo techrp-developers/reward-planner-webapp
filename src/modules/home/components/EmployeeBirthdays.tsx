@@ -82,19 +82,17 @@ export default function EmployeeBirthdays() {
       )}
 
       {/* Birthday Section Background Card (Matching Uploaded Bubble Layout) */}
-      <div className="relative rounded-[22px] sm:rounded-[24px] p-4 sm:p-5 overflow-hidden transition-all duration-300 border border-[#F3E8FF] shadow-[0_12px_36px_-6px_rgba(236,72,153,0.12),0_2px_10px_-2px_rgba(139,92,246,0.06),inset_0_1px_2px_rgba(255,255,255,0.95)]">
-        {/* Crisp & Clear 3D Bubble Layout Artwork */}
-        <img
-          src={birthdayBgBubbles}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
-          style={{
-            filter: 'contrast(1.32) saturate(1.5) brightness(0.95)',
-          }}
-        />
-
-        {/* Subtle Glass Rim Reflection */}
-        <div className="absolute inset-0 ring-1 ring-inset ring-white/60 rounded-[inherit] pointer-events-none" />
+      <div
+        className="relative rounded-[22px] sm:rounded-[24px] p-4 sm:p-5 overflow-hidden transition-all duration-300 border border-[#F3E8FF] shadow-[0_12px_36px_-6px_rgba(236,72,153,0.09),0_2px_10px_-2px_rgba(139,92,246,0.05),inset_0_1px_2px_rgba(255,255,255,0.95)]"
+        style={{
+          backgroundImage: `url(${birthdayBgBubbles})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        {/* Subtle Glossy Specular Sheen Sweep */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-transparent pointer-events-none rounded-[inherit]" />
 
         {/* Small Title Header */}
         <div className="relative z-10 flex items-center justify-between mb-3.5 sm:mb-4">
