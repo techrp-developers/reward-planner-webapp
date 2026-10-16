@@ -10,6 +10,8 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import SendIcon from '@mui/icons-material/Send';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useAuth } from '../../../context/AuthContext';
 
 export interface StorySlide {
@@ -364,6 +366,7 @@ export default function EmployeeStories() {
   const activeStoryIndex = viewingQueue.findIndex((s) => s.id === activeStoryId);
   const activeStory = activeStoryIndex !== -1 ? viewingQueue[activeStoryIndex] : null;
   const activeSlide = activeStory ? activeStory.slides[currentSlideIndex] : null;
+  const hasPrevStory = currentSlideIndex > 0 || activeStoryIndex > 0;
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -770,6 +773,38 @@ export default function EmployeeStories() {
                 title="Next slide"
               />
             </div>
+
+            {/* Story Navigation Arrows (Exact match to user's reference) */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasPrevStory) handlePrevSlide();
+              }}
+              disabled={!hasPrevStory}
+              className={`absolute left-3 sm:left-4 top-[54%] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                hasPrevStory
+                  ? 'bg-white hover:bg-slate-100 text-slate-900 hover:scale-105 active:scale-95 cursor-pointer'
+                  : 'bg-white/40 text-slate-800/60 backdrop-blur-md cursor-not-allowed'
+              }`}
+              title="Previous slide"
+              aria-label="Previous story slide"
+            >
+              <ArrowBackIcon sx={{ fontSize: 24 }} />
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNextSlide();
+              }}
+              className="absolute right-3 sm:right-4 top-[54%] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-slate-100 text-slate-900 shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
+              title="Next slide"
+              aria-label="Next story slide"
+            >
+              <ArrowForwardIcon sx={{ fontSize: 24 }} />
+            </button>
 
             {/* Bottom Section: Tag, Caption, Reaction & Reply Bar */}
             <div className="relative z-20 p-4 sm:p-5 text-white">
