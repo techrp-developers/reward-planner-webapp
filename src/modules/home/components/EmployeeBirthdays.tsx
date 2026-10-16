@@ -71,7 +71,7 @@ export default function EmployeeBirthdays() {
   };
 
   return (
-    <section className="w-full mb-6 select-none" aria-label="Team Birthdays">
+    <section className="w-full mb-9 sm:mb-11 select-none" aria-label="Team Birthdays">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#1C0E28] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
