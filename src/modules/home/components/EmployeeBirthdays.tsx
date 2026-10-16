@@ -88,7 +88,7 @@ export default function EmployeeBirthdays() {
           return (
             <div
               key={person.id}
-              className={`min-w-[280px] sm:min-w-[300px] lg:min-w-0 lg:flex-1 rounded-[24px] transition-all relative flex flex-col justify-between overflow-hidden ${
+              className={`min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[20px] transition-all relative flex flex-col justify-between overflow-hidden ${
                 isToday
                   ? 'bg-white border border-[#FECDD3] shadow-[0_4px_20px_-4px_rgba(244,63,94,0.08)]'
                   : 'bg-white border border-[#E2E8F0] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] hover:shadow-sm'
@@ -102,15 +102,15 @@ export default function EmployeeBirthdays() {
               {/* Card Main Body */}
               {isToday ? (
                 /* TODAY'S BIRTHDAY CARD: Avatar + Info + 3D Cake (Matching Screenshot) */
-                <div className="p-4 sm:p-5 flex items-center justify-between gap-3 relative z-10">
+                <div className="py-3 px-3.5 sm:py-3.5 sm:px-4 flex items-center justify-between gap-2.5 relative z-10">
                   {/* Avatar with soft halo border */}
                   <div className="relative shrink-0">
-                    <div className="p-[2.5px] rounded-full bg-gradient-to-tr from-rose-200 via-pink-100 to-rose-200 shadow-2xs">
-                      <div className="p-[2px] rounded-full bg-white">
+                    <div className="p-[2px] rounded-full bg-gradient-to-tr from-rose-200 via-pink-100 to-rose-200 shadow-2xs">
+                      <div className="p-[1.5px] rounded-full bg-white">
                         <img
                           src={person.avatar}
                           alt={person.name}
-                          className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full object-cover"
+                          className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -119,15 +119,15 @@ export default function EmployeeBirthdays() {
 
                   {/* Middle Info: Tag above name */}
                   <div className="flex-1 min-w-0 pr-1">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#E11D48] uppercase mb-1">
-                      <CalendarTodayOutlinedIcon sx={{ fontSize: 13 }} className="text-[#E11D48]" />
+                    <div className="flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bold tracking-wider text-[#E11D48] uppercase mb-0.5">
+                      <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#E11D48]" />
                       <span>BIRTHDAY TODAY</span>
                     </div>
 
-                    <h4 className="text-base sm:text-lg font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
+                    <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
                       {person.name}
                     </h4>
-                    <p className="text-xs sm:text-sm text-[#776B80] font-normal truncate mt-0.5">
+                    <p className="text-[11px] sm:text-xs text-[#776B80] font-normal truncate mt-0.5">
                       {person.role}
                     </p>
                   </div>
@@ -135,8 +135,8 @@ export default function EmployeeBirthdays() {
                   {/* Right Illustration: 3D Birthday Cake with Candle & Confetti */}
                   <div className="shrink-0 relative">
                     <svg
-                      width="78"
-                      height="76"
+                      width="64"
+                      height="62"
                       viewBox="0 0 92 88"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -252,27 +252,27 @@ export default function EmployeeBirthdays() {
                 </div>
               ) : (
                 /* UPCOMING BIRTHDAY CARD: Avatar + Info */
-                <div className="p-4 sm:p-5 flex items-center gap-3.5 relative z-10">
+                <div className="py-3 px-3.5 sm:py-3.5 sm:px-4 flex items-center gap-3 relative z-10">
                   {/* Circular Avatar */}
                   <div className="relative shrink-0">
                     <img
                       src={person.avatar}
                       alt={person.name}
-                      className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full object-cover border border-slate-100"
+                      className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover border border-slate-100"
                       loading="lazy"
                     />
                   </div>
 
                   {/* Information */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-base sm:text-lg font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
+                    <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
                       {person.name}
                     </h4>
-                    <p className="text-xs sm:text-sm text-[#776B80] font-normal truncate mt-0.5">
+                    <p className="text-[11px] sm:text-xs text-[#776B80] font-normal truncate mt-0.5">
                       {person.role}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-[#64748B] font-medium mt-1.5">
-                      <CalendarTodayOutlinedIcon sx={{ fontSize: 13 }} className="text-[#94A3B8]" />
+                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-[#64748B] font-medium mt-1">
+                      <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#94A3B8]" />
                       <span>{person.dateStr}</span>
                     </span>
                   </div>
@@ -284,7 +284,7 @@ export default function EmployeeBirthdays() {
                 <button
                   type="button"
                   onClick={() => handleSendWish(person)}
-                  className={`w-full py-2.5 px-3 flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
+                  className={`w-full py-2 px-3 flex items-center justify-center gap-1.5 text-xs sm:text-[13px] font-bold transition-colors cursor-pointer ${
                     isToday
                       ? 'text-[#E11D48] hover:text-[#BE123C]'
                       : 'text-[#7C3AED] hover:text-[#6D28D9]'
@@ -293,12 +293,12 @@ export default function EmployeeBirthdays() {
                 >
                   {isWished ? (
                     <>
-                      <CheckIcon sx={{ fontSize: 16 }} className="text-emerald-500" />
+                      <CheckIcon sx={{ fontSize: 15 }} className="text-emerald-500" />
                       <span className="text-emerald-600 font-bold">Wishes sent</span>
                     </>
                   ) : (
                     <>
-                      <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                      <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
                       <span>Send wishes</span>
                     </>
                   )}
