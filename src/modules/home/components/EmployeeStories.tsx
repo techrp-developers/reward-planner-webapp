@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -594,28 +593,6 @@ export default function EmployeeStories() {
           <span>{toastMessage}</span>
         </div>
       )}
-
-      {/* ── HEADER ROW (COMPACT HEIGHT) ── */}
-      <div className="flex items-center justify-between gap-2 mb-1 sm:mb-1.5 px-0.5">
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-          <h2 className="text-sm sm:text-[15px] font-bold text-[#1C0E28] tracking-tight leading-tight">
-            Employee Stories
-          </h2>
-          <p className="text-[11px] sm:text-xs text-[#776B80] font-normal leading-tight">
-            Share moments, celebrate achievements, and stay connected with your team.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => handleOpenStory(1)}
-          className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer shrink-0 group"
-          title="View all stories"
-        >
-          <span>View all stories</span>
-          <ArrowForwardIcon sx={{ fontSize: 13 }} className="group-hover:translate-x-0.5 transition-transform" />
-        </button>
-      </div>
 
       {/* ── STORIES CAROUSEL TRACK (SEAMLESS DIRECT ON WHITE BACKGROUND) ── */}
       <div
