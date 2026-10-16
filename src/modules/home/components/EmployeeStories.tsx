@@ -364,120 +364,125 @@ export default function EmployeeStories() {
         </div>
       )}
 
-      {/* ── HEADER ROW ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 px-0.5">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-[#1C0E28] tracking-tight">
-            Employee Stories
-          </h2>
-          <p className="text-xs sm:text-[13px] text-[#776B80] font-normal mt-0.5">
-            Share moments, celebrate achievements, and stay connected with your team.
-          </p>
-        </div>
+      {/* ── WHITE CARD CONTAINER WITH MIXED GRADIENT BORDER ── */}
+      <div className="p-[2px] sm:p-[2.5px] rounded-[26px] sm:rounded-[30px] bg-gradient-to-r from-[#F59E0B] via-[#EC4899] to-[#8B5CF6] shadow-[0_4px_24px_-4px_rgba(236,72,153,0.12),0_2px_8px_rgba(139,92,246,0.06)] hover:shadow-[0_8px_30px_-4px_rgba(236,72,153,0.18)] transition-all">
+        <div className="w-full bg-white rounded-[24px] sm:rounded-[27.5px] p-4 sm:p-5 lg:p-6">
+          {/* ── HEADER ROW ── */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 px-0.5">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-[#1C0E28] tracking-tight">
+                Employee Stories
+              </h2>
+              <p className="text-xs sm:text-[13px] text-[#776B80] font-normal mt-0.5">
+                Share moments, celebrate achievements, and stay connected with your team.
+              </p>
+            </div>
 
-        <button
-          type="button"
-          onClick={() => handleOpenStory(1)}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer self-start sm:self-center group"
-          title="View all stories"
-        >
-          <span>View all stories</span>
-          <ArrowForwardIcon sx={{ fontSize: 16 }} className="group-hover:translate-x-0.5 transition-transform" />
-        </button>
-      </div>
+            <button
+              type="button"
+              onClick={() => handleOpenStory(1)}
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer self-start sm:self-center group"
+              title="View all stories"
+            >
+              <span>View all stories</span>
+              <ArrowForwardIcon sx={{ fontSize: 16 }} className="group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
 
-      {/* ── STORIES CAROUSEL TRACK ── */}
-      <div className="relative flex items-center group/carousel">
-        {/* Left Arrow Button */}
-        <button
-          type="button"
-          onClick={() => scroll('left')}
-          className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1"
-          aria-label="Scroll stories left"
-        >
-          <ChevronLeftIcon sx={{ fontSize: 19 }} />
-        </button>
+          {/* ── STORIES CAROUSEL TRACK ── */}
+          <div className="relative flex items-center group/carousel">
+            {/* Left Arrow Button */}
+            <button
+              type="button"
+              onClick={() => scroll('left')}
+              className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1"
+              aria-label="Scroll stories left"
+            >
+              <ChevronLeftIcon sx={{ fontSize: 19 }} />
+            </button>
 
-        {/* Horizontal Story Circles Row */}
-        <div
-          ref={scrollRef}
-          className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1 flex-1"
-        >
-          {stories.map((story, index) => {
-            const isUser = story.isUser;
-            const isViewed = story.viewed;
+            {/* Horizontal Story Circles Row */}
+            <div
+              ref={scrollRef}
+              className="flex items-center gap-5 sm:gap-6 lg:gap-7 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1 flex-1"
+            >
+              {stories.map((story, index) => {
+                const isUser = story.isUser;
+                const isViewed = story.viewed;
 
-            return (
-              <div
-                key={story.id}
-                className="flex flex-col items-center shrink-0 cursor-pointer group/story select-none"
-                onClick={() => {
-                  if (isUser && story.slides.length === 0) {
-                    setIsAddModalOpen(true);
-                  } else {
-                    handleOpenStory(index);
-                  }
-                }}
-              >
-                {/* Avatar with Ring */}
-                <div className="relative">
-                  {/* Instagram-style Ring */}
+                return (
                   <div
-                    className={`rounded-full transition-all duration-300 group-hover/story:scale-105 ${
-                      isUser
-                        ? 'p-[2px] bg-slate-200'
-                        : isViewed
-                        ? 'p-[2px] bg-[#E2E8F0]'
-                        : 'p-[2.5px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
-                    }`}
-                  >
-                    <div className="p-[2.5px] bg-white rounded-full">
-                      <img
-                        src={story.avatar}
-                        alt={story.name}
-                        className="w-16 h-16 sm:w-[68px] sm:h-[68px] lg:w-[72px] lg:h-[72px] rounded-full object-cover shrink-0"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Add Story (+) Badge for User */}
-                  {isUser && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                    key={story.id}
+                    className="flex flex-col items-center shrink-0 cursor-pointer group/story select-none"
+                    onClick={() => {
+                      if (isUser && story.slides.length === 0) {
                         setIsAddModalOpen(true);
-                      }}
-                      className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-2 border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
-                      title="Add a moment"
-                    >
-                      <AddIcon sx={{ fontSize: 13 }} />
-                    </button>
-                  )}
-                </div>
+                      } else {
+                        handleOpenStory(index);
+                      }
+                    }}
+                  >
+                    {/* Avatar with Ring */}
+                    <div className="relative">
+                      {/* Instagram-style Ring */}
+                      <div
+                        className={`rounded-full transition-all duration-300 group-hover/story:scale-105 ${
+                          isUser
+                            ? 'p-[2px] bg-slate-200'
+                            : isViewed
+                            ? 'p-[2px] bg-[#E2E8F0]'
+                            : 'p-[2.5px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
+                        }`}
+                      >
+                        <div className="p-[2.5px] bg-white rounded-full">
+                          <img
+                            src={story.avatar}
+                            alt={story.name}
+                            className="w-16 h-16 sm:w-[68px] sm:h-[68px] lg:w-[72px] lg:h-[72px] rounded-full object-cover shrink-0"
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
 
-                {/* Name & Status */}
-                <span className="mt-1.5 text-xs sm:text-[13px] font-bold text-[#1C0E28] tracking-tight max-w-[80px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors">
-                  {story.name}
-                </span>
-                <span className="text-[11px] text-[#776B80] font-normal leading-tight max-w-[80px] text-center truncate mt-0.5">
-                  {isUser ? 'Add a moment' : isViewed ? 'Viewed' : 'New story'}
-                </span>
-              </div>
-            );
-          })}
+                      {/* Add Story (+) Badge for User */}
+                      {isUser && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsAddModalOpen(true);
+                          }}
+                          className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-2 border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+                          title="Add a moment"
+                        >
+                          <AddIcon sx={{ fontSize: 13 }} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Name & Status */}
+                    <span className="mt-1.5 text-xs sm:text-[13px] font-bold text-[#1C0E28] tracking-tight max-w-[80px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors">
+                      {story.name}
+                    </span>
+                    <span className="text-[11px] text-[#776B80] font-normal leading-tight max-w-[80px] text-center truncate mt-0.5">
+                      {isUser ? 'Add a moment' : isViewed ? 'Viewed' : 'New story'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Arrow Button */}
+            <button
+              type="button"
+              onClick={() => scroll('right')}
+              className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1"
+              aria-label="Scroll stories right"
+            >
+              <ChevronRightIcon sx={{ fontSize: 19 }} />
+            </button>
+          </div>
         </div>
-
-        {/* Right Arrow Button */}
-        <button
-          type="button"
-          onClick={() => scroll('right')}
-          className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1"
-          aria-label="Scroll stories right"
-        >
-          <ChevronRightIcon sx={{ fontSize: 19 }} />
-        </button>
       </div>
 
       {/* ══════════════════════════════════════════════════════════
