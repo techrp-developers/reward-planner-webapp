@@ -110,7 +110,7 @@ export default function EmployeeBirthdays() {
                 className={`min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[18px] sm:rounded-[20px] transition-all relative flex flex-col justify-between overflow-hidden ${
                   isToday
                     ? 'bg-white border border-[#FECDD3] shadow-[0_4px_16px_-4px_rgba(244,63,94,0.10)]'
-                    : 'bg-[#FAFAFC] border border-[#E2E8F0] shadow-2xs hover:shadow-xs'
+                    : 'bg-white border border-[#E2E8F0] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.04)] hover:shadow-sm'
                 }`}
               >
               {/* Today's Card Specific Top-Right Pink Blush */}
