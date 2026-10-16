@@ -370,51 +370,17 @@ export default function EmployeeStories() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Interactive scroll & auto-scroll ticker states
-  const [isHovered, setIsHovered] = useState(false);
-  const [isInteracting, setIsInteracting] = useState(false);
+  // Interactive scroll states (drag and wheel)
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftState, setScrollLeftState] = useState(0);
   const [draggedDistance, setDraggedDistance] = useState(0);
 
-  // Smooth continuous auto-scroll to show profiles scrolling
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    let animationFrameId: number;
-
-    const step = () => {
-      if (
-        el &&
-        !isHovered &&
-        !isInteracting &&
-        !isDragging &&
-        activeStoryId === null &&
-        !isAddModalOpen
-      ) {
-        el.scrollLeft += 0.65;
-        // Loop back seamlessly if reached the end
-        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
-          el.scrollLeft = 0;
-        }
-      }
-      animationFrameId = requestAnimationFrame(step);
-    };
-
-    animationFrameId = requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isHovered, isInteracting, isDragging, activeStoryId, isAddModalOpen]);
-
-  // Horizontal scroll buttons
+  // Horizontal scroll buttons - only scrolls when arrows are clicked
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      setIsInteracting(true);
-      const offset = direction === 'left' ? -280 : 280;
+      const offset = direction === 'left' ? -360 : 360;
       scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-      setTimeout(() => setIsInteracting(false), 1200);
     }
   };
 
@@ -422,9 +388,7 @@ export default function EmployeeStories() {
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (scrollRef.current) {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        setIsInteracting(true);
         scrollRef.current.scrollLeft += e.deltaY;
-        setTimeout(() => setIsInteracting(false), 1000);
       }
     }
   };
@@ -433,7 +397,6 @@ export default function EmployeeStories() {
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
-    setIsInteracting(true);
     setStartX(e.pageX - scrollRef.current.offsetLeft);
     setScrollLeftState(scrollRef.current.scrollLeft);
     setDraggedDistance(0);
@@ -452,8 +415,7 @@ export default function EmployeeStories() {
     setIsDragging(false);
     setTimeout(() => {
       setDraggedDistance(0);
-      setIsInteracting(false);
-    }, 1200);
+    }, 200);
   };
 
   // Open a specific story
@@ -615,22 +577,15 @@ export default function EmployeeStories() {
       )}
 
       {/* ── STORIES CAROUSEL TRACK (SEAMLESS DIRECT ON WHITE BACKGROUND) ── */}
-      <div
-        className="relative flex items-center group/carousel"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setIsDragging(false);
-        }}
-      >
+      <div className="relative flex items-center group/carousel py-1">
         {/* Left Arrow Button */}
         <button
           type="button"
           onClick={() => scroll('left')}
-          className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-[#E2E8F0] shadow-xs hover:shadow-sm flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-1"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 mr-2"
           aria-label="Scroll stories left"
         >
-          <ChevronLeftIcon sx={{ fontSize: 16 }} />
+          <ChevronLeftIcon sx={{ fontSize: 18 }} />
         </button>
 
         {/* Horizontal Story Circles Row */}
@@ -640,11 +595,7 @@ export default function EmployeeStories() {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onTouchStart={() => setIsInteracting(true)}
-          onTouchEnd={() => {
-            setTimeout(() => setIsInteracting(false), 1200);
-          }}
-          className="flex items-center gap-5 sm:gap-6.5 lg:gap-8 overflow-x-auto no-scrollbar py-0.5 px-1 flex-1 cursor-grab active:cursor-grabbing"
+          className="flex items-center gap-7 sm:gap-8 lg:gap-10 overflow-x-auto no-scrollbar py-1 px-1.5 flex-1 cursor-grab active:cursor-grabbing"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
           {sortedStories.map((story) => {
@@ -664,23 +615,23 @@ export default function EmployeeStories() {
                   }
                 }}
               >
-                {/* Avatar with Ring (Compact Height: 44px-48px) */}
+                {/* Enlarged Avatar with Ring */}
                 <div className="relative">
                   {/* Instagram-style Ring */}
                   <div
                     className={`rounded-full transition-all duration-300 group-hover/story:scale-105 ${
                       isUser
-                        ? 'p-[1.5px] bg-slate-200'
+                        ? 'p-[2px] bg-slate-200'
                         : isViewed
-                        ? 'p-[1.5px] bg-[#E2E8F0]'
-                        : 'p-[2px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
+                        ? 'p-[2px] bg-[#CBD5E1]'
+                        : 'p-[2.5px] bg-gradient-to-tr from-[#F59E0B] via-[#EC4899] to-[#8B5CF6]'
                     }`}
                   >
-                    <div className="p-[1.5px] bg-white rounded-full">
+                    <div className="p-[2px] bg-white rounded-full">
                       <img
                         src={story.avatar}
                         alt={story.name}
-                        className="w-11 h-11 sm:w-12 sm:h-12 lg:w-[46px] lg:h-[46px] rounded-full object-cover shrink-0"
+                        className="w-14 h-14 sm:w-[58px] sm:h-[58px] lg:w-[62px] lg:h-[62px] rounded-full object-cover shrink-0"
                         loading="lazy"
                       />
                     </div>
@@ -694,19 +645,19 @@ export default function EmployeeStories() {
                         e.stopPropagation();
                         setIsAddModalOpen(true);
                       }}
-                      className="absolute bottom-0 right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-[1.5px] border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
+                      className="absolute bottom-0 right-0 w-4 h-4 sm:w-[18px] sm:h-[18px] rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white border-2 border-white flex items-center justify-center shadow-xs transition-transform hover:scale-110 cursor-pointer"
                       title="Add a moment"
                     >
-                      <AddIcon sx={{ fontSize: 10 }} />
+                      <AddIcon sx={{ fontSize: 12 }} />
                     </button>
                   )}
                 </div>
 
                 {/* Name & Status */}
-                <span className="mt-1 text-[11px] sm:text-xs font-semibold text-[#1C0E28] tracking-tight max-w-[62px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors leading-tight">
+                <span className="mt-1.5 text-xs sm:text-[13px] font-semibold text-[#1C0E28] tracking-tight max-w-[76px] text-center truncate group-hover/story:text-[#7C3AED] transition-colors leading-tight">
                   {story.name}
                 </span>
-                <span className="text-[9.5px] sm:text-[10px] text-[#776B80] font-normal leading-tight max-w-[62px] text-center truncate mt-0.5">
+                <span className="text-[10px] sm:text-[11px] text-[#776B80] font-normal leading-tight max-w-[76px] text-center truncate mt-0.5">
                   {isUser ? 'Add a moment' : isViewed ? 'Viewed' : 'New story'}
                 </span>
               </div>
@@ -718,10 +669,10 @@ export default function EmployeeStories() {
         <button
           type="button"
           onClick={() => scroll('right')}
-          className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-[#E2E8F0] shadow-xs hover:shadow-sm flex items-center justify-center text-slate-600 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-1"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-[#E2E8F0] shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center text-slate-700 hover:text-[#1C0E28] hover:bg-slate-50 transition-all cursor-pointer shrink-0 z-10 ml-2"
           aria-label="Scroll stories right"
         >
-          <ChevronRightIcon sx={{ fontSize: 16 }} />
+          <ChevronRightIcon sx={{ fontSize: 18 }} />
         </button>
       </div>
 
