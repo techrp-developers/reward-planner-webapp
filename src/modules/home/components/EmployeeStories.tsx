@@ -176,149 +176,13 @@ const INITIAL_STORIES: EmployeeStory[] = [
       },
     ],
   },
-  {
-    id: 'vikram',
-    name: 'Vikram K.',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80',
-    role: 'Mobile App Architect',
-    department: 'Mobile Experience',
-    viewed: false,
-    slides: [
-      {
-        id: 'v1',
-        image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1000&q=80',
-        caption: 'New mobile app update is live on iOS & Android! Super fast rewards redemption 📱⚡',
-        tag: 'Mobile Launch',
-        createdAt: '3h ago',
-      },
-    ],
-  },
-  {
-    id: 'ananya',
-    name: 'Ananya V.',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
-    role: 'Brand & Communications',
-    department: 'Marketing',
-    viewed: true,
-    slides: [
-      {
-        id: 'av1',
-        image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Behind the scenes at our Employer of Choice brand photoshoot! 📸✨',
-        tag: 'Brand Story',
-        createdAt: '8h ago',
-      },
-    ],
-  },
-  {
-    id: 'kabir',
-    name: 'Kabir R.',
-    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=200&q=80',
-    role: 'Financial Analyst',
-    department: 'Finance & Planning',
-    viewed: false,
-    slides: [
-      {
-        id: 'k1',
-        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Completed quarterly corporate tax & benefits savings analysis ahead of schedule 💼📊',
-        tag: 'Finance Milestone',
-        createdAt: '2h ago',
-      },
-    ],
-  },
-  {
-    id: 'neha',
-    name: 'Neha T.',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80',
-    role: 'Customer Success Manager',
-    department: 'Partner Success',
-    viewed: false,
-    slides: [
-      {
-        id: 'nh1',
-        image: 'https://images.unsplash.com/photo-1531497865144-0464ef8fb9a9?auto=format&fit=crop&w=1000&q=80',
-        caption: '99.4% customer satisfaction score across our top corporate enterprise clients this month! ❤️🎉',
-        tag: 'Client Delight',
-        createdAt: '5h ago',
-      },
-    ],
-  },
-  {
-    id: 'arjun',
-    name: 'Arjun M.',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80',
-    role: 'InfoSec Engineer',
-    department: 'Security & Trust',
-    viewed: true,
-    slides: [
-      {
-        id: 'ar1',
-        image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Annual SOC2 Type II audit completed with zero non-conformances! 🛡️🔐',
-        tag: 'Security Win',
-        createdAt: '9h ago',
-      },
-    ],
-  },
-  {
-    id: 'tanvi',
-    name: 'Tanvi B.',
-    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=200&q=80',
-    role: 'Growth Marketing Lead',
-    department: 'User Acquisition',
-    viewed: false,
-    slides: [
-      {
-        id: 'tb1',
-        image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1000&q=80',
-        caption: '250,000 active employees visited our rewards marketplace this week! Record growth 🚀🎯',
-        tag: 'Growth Record',
-        createdAt: '6h ago',
-      },
-    ],
-  },
-  {
-    id: 'sameer',
-    name: 'Sameer G.',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
-    role: 'Corporate Counsel',
-    department: 'Legal & Risk',
-    viewed: true,
-    slides: [
-      {
-        id: 'sg1',
-        image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1000&q=80',
-        caption: '5-year work anniversary at Reward Planners! Grateful for this amazing journey 🥂🎊',
-        tag: '5-Year Milestone',
-        createdAt: '10h ago',
-      },
-    ],
-  },
-  {
-    id: 'pooja',
-    name: 'Pooja S.',
-    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=200&q=80',
-    role: 'Product Designer',
-    department: 'Experience Design',
-    viewed: false,
-    slides: [
-      {
-        id: 'pj1',
-        image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Design thinking workshop in full swing! Co-creating the future of employee wellness 🎨💡',
-        tag: 'Design Sprint',
-        createdAt: '1h ago',
-      },
-    ],
-  },
 ];
 
 export default function EmployeeStories() {
   const { user } = useAuth();
   const [stories, setStories] = useState<EmployeeStory[]>(() => {
     try {
-      const stored = localStorage.getItem('rp_employee_stories_v3');
+      const stored = localStorage.getItem('rp_employee_stories_v4');
       if (stored) return JSON.parse(stored);
     } catch {}
     return INITIAL_STORIES;
@@ -464,7 +328,7 @@ export default function EmployeeStories() {
       const next = [...prev];
       next[index] = { ...next[index], viewed: true };
       try {
-        localStorage.setItem('rp_employee_stories_v3', JSON.stringify(next));
+        localStorage.setItem('rp_employee_stories_v4', JSON.stringify(next));
       } catch {}
       return next;
     });
@@ -571,7 +435,7 @@ export default function EmployeeStories() {
         return s;
       });
       try {
-        localStorage.setItem('rp_employee_stories_v3', JSON.stringify(next));
+        localStorage.setItem('rp_employee_stories_v4', JSON.stringify(next));
       } catch {}
       return next;
     });
@@ -624,7 +488,7 @@ export default function EmployeeStories() {
           onTouchEnd={() => {
             setTimeout(() => setIsInteracting(false), 1200);
           }}
-          className="flex items-center gap-3.5 sm:gap-4.5 lg:gap-5 overflow-x-auto no-scrollbar py-0.5 px-0.5 flex-1 cursor-grab active:cursor-grabbing"
+          className="flex items-center gap-5 sm:gap-6.5 lg:gap-8 overflow-x-auto no-scrollbar py-0.5 px-1 flex-1 cursor-grab active:cursor-grabbing"
           style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
         >
           {stories.map((story, index) => {
