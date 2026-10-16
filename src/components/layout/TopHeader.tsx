@@ -222,13 +222,13 @@ export const TopHeader = () => {
             {/* RP Logo Circle (in right corner) */}
             <Link
               to="/"
-              className="w-10 h-10 sm:w-12 sm:h-12 lg:w-13.5 lg:h-13.5 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11.5 lg:h-11.5 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
               title="Reward Planners Home"
             >
               <img
                 src={rpLogo}
                 alt="RewardPlanners"
-                className="w-6.5 h-6.5 sm:w-7.5 sm:h-7.5 lg:w-8.5 lg:h-8.5 object-contain transition-transform duration-200 group-hover:scale-105"
+                className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 lg:w-7 lg:h-7 object-contain transition-transform duration-200 group-hover:scale-105"
               />
             </Link>
           </div>
