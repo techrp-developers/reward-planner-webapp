@@ -12,6 +12,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import { useAuth } from '../../../context/AuthContext';
 
 export interface StorySlide {
@@ -316,11 +317,10 @@ export default function EmployeeStories() {
   const [slideProgress, setSlideProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Add Story Modal state
+  // Add Story Modal state (matching user reference UI)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newCaption, setNewCaption] = useState('');
-  const [newTag, setNewTag] = useState('Team Milestone');
-  const [newImage, setNewImage] = useState('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80');
+  const [storyPreviewImage, setStoryPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Interactive reactions in story viewer
   const [liked, setLiked] = useState(false);
@@ -534,16 +534,31 @@ export default function EmployeeStories() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeStoryId, handleNextSlide, handlePrevSlide]);
 
-  // Post a new story
-  const handleCreateStory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCaption.trim()) return;
+  // Handle image upload from device
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setStoryPreviewImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Add moment slide to preview
+  const handleAddToPreview = () => {
+    const chosenImage =
+      storyPreviewImage ||
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80';
 
     const newSlide: StorySlide = {
       id: Date.now(),
-      image: newImage,
-      caption: newCaption.trim(),
-      tag: newTag,
+      image: chosenImage,
+      caption: 'Shared a new moment with the team ✨',
+      tag: 'Team Milestone',
       createdAt: 'Just now',
     };
 
@@ -565,8 +580,8 @@ export default function EmployeeStories() {
     });
 
     setIsAddModalOpen(false);
-    setNewCaption('');
-    showToast('Your story has been shared with your team! 🎉');
+    setStoryPreviewImage(null);
+    showToast('Your story has been added to preview! 🎉');
   };
 
   return (
@@ -611,7 +626,7 @@ export default function EmployeeStories() {
                 className="flex flex-col items-center shrink-0 cursor-pointer group/story select-none"
                 onClick={() => {
                   if (draggedDistance > 8) return;
-                  if (isUser && story.slides.length === 0) {
+                  if (isUser) {
                     setIsAddModalOpen(true);
                   } else {
                     handleOpenStory(story.id);
@@ -782,7 +797,7 @@ export default function EmployeeStories() {
                 if (hasPrevStory) handlePrevSlide();
               }}
               disabled={!hasPrevStory}
-              className={`absolute left-3 sm:left-4 top-[54%] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+              className={`absolute left-3 sm:left-4 top-[54%] -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all shadow-md ${
                 hasPrevStory
                   ? 'bg-white hover:bg-slate-100 text-slate-900 hover:scale-105 active:scale-95 cursor-pointer'
                   : 'bg-white/40 text-slate-800/60 backdrop-blur-md cursor-not-allowed'
@@ -790,7 +805,7 @@ export default function EmployeeStories() {
               title="Previous slide"
               aria-label="Previous story slide"
             >
-              <ArrowBackIcon sx={{ fontSize: 24 }} />
+              <ArrowBackIcon sx={{ fontSize: 19 }} />
             </button>
 
             <button
@@ -799,11 +814,11 @@ export default function EmployeeStories() {
                 e.stopPropagation();
                 handleNextSlide();
               }}
-              className="absolute right-3 sm:right-4 top-[54%] -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white hover:bg-slate-100 text-slate-900 shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
+              className="absolute right-3 sm:right-4 top-[54%] -translate-y-1/2 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-slate-100 text-slate-900 shadow-md hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
               title="Next slide"
               aria-label="Next story slide"
             >
-              <ArrowForwardIcon sx={{ fontSize: 24 }} />
+              <ArrowForwardIcon sx={{ fontSize: 19 }} />
             </button>
 
             {/* Bottom Section: Tag, Caption, Reaction & Reply Bar */}
@@ -892,128 +907,111 @@ export default function EmployeeStories() {
       )}
 
       {/* ══════════════════════════════════════════════════════════
-          SHARE A MOMENT / ADD STORY MODAL
+          SHARE A MOMENT / ADD STORY MODAL (EXACT MATCH TO USER REFERENCE)
       ══════════════════════════════════════════════════════════ */}
       {isAddModalOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setIsAddModalOpen(false)}
+          onClick={() => {
+            setIsAddModalOpen(false);
+            setStoryPreviewImage(null);
+          }}
         >
           <div
-            className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-100 relative"
+            className="w-full max-w-[440px] bg-white rounded-3xl p-6 sm:p-7 shadow-2xl relative select-none animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
+            {/* Close Button at Top Right */}
             <button
               type="button"
-              onClick={() => setIsAddModalOpen(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setStoryPreviewImage(null);
+              }}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1"
+              title="Close"
+              aria-label="Close modal"
             >
-              <CloseIcon sx={{ fontSize: 16 }} />
+              <CloseIcon sx={{ fontSize: 20 }} />
             </button>
 
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#E11D48] animate-pulse" />
-              <h3 className="text-lg font-bold text-[#1C0E28]">Share Your Story</h3>
-            </div>
-            <p className="text-xs text-[#776B80] mb-4">
-              Post a quick highlight, milestone, or celebration visible to your company for 24 hours.
+            {/* Category Kicker */}
+            <span className="text-[11px] font-bold tracking-wider text-[#8B5CF6] uppercase block mb-1">
+              YOUR MOMENT
+            </span>
+
+            {/* Title */}
+            <h3 className="text-2xl font-bold text-[#1C0E28] tracking-tight mb-1.5">
+              Share a new story
+            </h3>
+
+            {/* Subtitle */}
+            <p className="text-sm text-slate-500 mb-5 leading-normal">
+              Add a photo to share a little moment with your team.
             </p>
 
-            <form onSubmit={handleCreateStory} className="space-y-4">
-              {/* Photo Preview Selection */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Choose a cover moment photo
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    {
-                      label: 'Team Launch',
-                      url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80',
-                    },
-                    {
-                      label: 'Celebration',
-                      url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80',
-                    },
-                    {
-                      label: 'Presentation',
-                      url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
-                    },
-                  ].map((p) => (
-                    <div
-                      key={p.url}
-                      onClick={() => setNewImage(p.url)}
-                      className={`relative rounded-xl overflow-hidden cursor-pointer h-20 border-2 transition-all ${
-                        newImage === p.url ? 'border-[#7C3AED] ring-2 ring-purple-200' : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <img src={p.url} alt={p.label} className="w-full h-full object-cover" />
-                      <span className="absolute bottom-1 left-1 right-1 text-[9px] font-bold text-white bg-black/50 px-1 py-0.5 rounded text-center truncate">
-                        {p.label}
-                      </span>
-                    </div>
-                  ))}
+            {/* Dashed Upload Area */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full rounded-2xl border-2 border-dashed border-[#DDD6FE] bg-[#FAF8FF] hover:bg-[#F5F3FF] transition-all flex flex-col items-center justify-center py-10 px-6 sm:py-11 cursor-pointer group/upload mb-6"
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+
+              {storyPreviewImage ? (
+                <div className="relative w-full h-36 rounded-xl overflow-hidden shadow-xs group/preview">
+                  <img
+                    src={storyPreviewImage}
+                    alt="Selected story preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">
+                    Click to change image
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <AddPhotoAlternateOutlinedIcon
+                    sx={{ fontSize: 42 }}
+                    className="text-[#7C3AED] mb-2.5 group-hover/upload:scale-105 transition-transform"
+                  />
+                  <span className="text-sm sm:text-[15px] font-bold text-[#6D28D9] mb-1">
+                    Choose an image
+                  </span>
+                  <span className="text-xs text-slate-400 font-normal">
+                    Preview only · nothing is published
+                  </span>
+                </>
+              )}
+            </div>
 
-              {/* Tag Selection */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Category Tag
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Team Milestone', 'Kudos & Wins', 'Tech Talk', 'Workspace Moments', 'Life & Wellness'].map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => setNewTag(tag)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                        newTag === tag
-                          ? 'bg-[#1C0E28] text-white shadow-2xs'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Bottom Actions: Cancel & Add to preview */}
+            <div className="flex items-center justify-end gap-3 sm:gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAddModalOpen(false);
+                  setStoryPreviewImage(null);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer bg-transparent"
+              >
+                Cancel
+              </button>
 
-              {/* Caption Input */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  What's happening?
-                </label>
-                <textarea
-                  rows={3}
-                  value={newCaption}
-                  onChange={(e) => setNewCaption(e.target.value)}
-                  placeholder="Share what you're working on, an achievement, or a team shoutout..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-[#7C3AED] resize-none"
-                  required
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!newCaption.trim()}
-                  className="px-5 py-2 rounded-xl bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <SendIcon sx={{ fontSize: 14 }} />
-                  <span>Share Story</span>
-                </button>
-              </div>
-            </form>
+              <button
+                type="button"
+                onClick={handleAddToPreview}
+                className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full bg-[#1C0E28] hover:bg-[#2D1640] text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
+              >
+                <AutoAwesomeIcon sx={{ fontSize: 16 }} className="text-white" />
+                <span>Add to preview</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
