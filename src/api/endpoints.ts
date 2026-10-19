@@ -159,7 +159,9 @@ export const ENDPOINTS = {
   fitness: {
     summary: '/v1/dashboard/summary',
     weekly: '/v1/progress/weekly',
-    stats: '/v1/stats/month',
+    stats: '/v1/stats',
+    monthStats: '/v1/stats/month',
+    todayHourly: '/v1/stats/today-hourly-stats',
     achievements: '/v1/achievement/list',
     statement: '/v1/wallet/statement',
   },

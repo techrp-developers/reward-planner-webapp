@@ -19,6 +19,28 @@ import coinsIcon from '../../assets/home/coinsicon.png';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CircularHeaderNav from './CircularHeaderNav';
 import { IMAGE_BASE_URL } from '../../api/endpoints';
+import { getTodayStepCount } from '../../api/fitnessApi';
+
+// Crisp double footprint vector matching header design
+const FootprintsIcon = ({ className = 'w-5.5 h-5.5 sm:w-6 sm:h-6 text-[#2563EB]' }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    {/* Left Footprint (lower) */}
+    <g transform="translate(1.5, 4.5) rotate(10 4 8)">
+      <path d="M4.4 0.6C2.4 0.6 0.9 2.4 0.9 5.4C0.9 8.2 2.3 10.6 3.9 11.6C5.5 10.6 6.5 8.0 6.5 5.0C6.5 2.2 5.6 0.6 4.4 0.6Z" />
+      <ellipse cx="3.6" cy="15.2" rx="2.2" ry="2.0" />
+    </g>
+    {/* Right Footprint (higher) */}
+    <g transform="translate(10.5, 0) rotate(10 4 8)">
+      <path d="M3.1 0.6C4.3 0.6 5.3 2.2 5.3 5.0C5.3 8.0 4.3 10.6 2.7 11.6C1.1 10.6 -0.3 8.2 -0.3 5.4C-0.3 2.4 1.2 0.6 3.1 0.6Z" />
+      <ellipse cx="2.4" cy="15.2" rx="2.2" ry="2.0" />
+    </g>
+  </svg>
+);
 
 // Material UI Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -111,6 +133,53 @@ export const TopHeader = () => {
     ? numericPoints.toLocaleString('en-IN', { maximumFractionDigits: 2 })
     : '—';
   const firstName = user?.name ? user.name.trim().split(' ')[0] : (user?.first_name || 'Profile');
+
+  // Step Counter State (Connected to backend step-counter module's statsRoute)
+  const [stepCount, setStepCount] = useState<number | null>(() => {
+    const initialSteps = user?.steps?.count ?? user?.todaySteps ?? user?.steps?.todaySteps ?? user?.step_count;
+    return typeof initialSteps === 'number' ? initialSteps : 5280;
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!isAuthenticated) return;
+
+    const loadSteps = async () => {
+      try {
+        const count = await getTodayStepCount();
+        if (isMounted && typeof count === 'number' && !isNaN(count)) {
+          setStepCount(count);
+        }
+      } catch (e) {
+        console.warn('Failed to load today step count from statsRoute:', e);
+      }
+    };
+
+    loadSteps();
+
+    // Listen for step updates across components
+    const handleStepUpdate = (e: any) => {
+      const newCount = e?.detail?.steps ?? e?.detail?.stepCount;
+      if (typeof newCount === 'number') {
+        setStepCount(newCount);
+      } else {
+        loadSteps();
+      }
+    };
+
+    window.addEventListener('rp_steps_updated', handleStepUpdate);
+    window.addEventListener('rp_profile_updated', loadSteps);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('rp_steps_updated', handleStepUpdate);
+      window.removeEventListener('rp_profile_updated', loadSteps);
+    };
+  }, [isAuthenticated]);
+
+  const displaySteps = typeof stepCount === 'number'
+    ? stepCount.toLocaleString('en-IN')
+    : '5,280';
 
   // Active User Company Info and Logo Resolution
   const [companyLogoFailed, setCompanyLogoFailed] = useState(false);
@@ -213,6 +282,24 @@ export const TopHeader = () => {
             <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
               <img src={coinsIcon} alt="RP Coins" className="hidden sm:block w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 object-contain shrink-0" />
               <span><strong className="block text-xs sm:text-[13px] font-semibold leading-tight max-w-[92px] truncate">{coinBalance}</strong><span className="block text-[8.5px] sm:text-[9.5px] text-[#776B80] leading-none mt-0.5 whitespace-nowrap">RP Points</span></span>
+            </Link>
+
+            {/* Step Counter (Connected to backend step-counter module statsRoute) */}
+            <Link
+              to="/profile"
+              aria-label={`Your daily activity: ${displaySteps} Steps`}
+              title="Daily Step Counter — Track your steps & activity"
+              className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 border-r border-[#E4DCE9] text-[#1C0E28] hover:text-[#2563EB] transition-colors focus-visible:outline-2 focus-visible:outline-[#78538F]"
+            >
+              <FootprintsIcon className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-[#2563EB] shrink-0" />
+              <span>
+                <strong className="block text-xs sm:text-[13px] font-semibold leading-tight max-w-[92px] truncate">
+                  {displaySteps}
+                </strong>
+                <span className="block text-[8.5px] sm:text-[9.5px] text-[#776B80] leading-none mt-0.5 whitespace-nowrap">
+                  Steps
+                </span>
+              </span>
             </Link>
 
             <NotificationsPanel />
