@@ -38,12 +38,6 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
-import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
-import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import AddIcon from '@mui/icons-material/Add';
 import whatsappDoodle from '../../assets/home/whatsapp_doodle.png';
 import { useAuth } from '../../context/AuthContext';
 import './HomePage.css';
@@ -66,9 +60,6 @@ export const HomePage = () => {
 
   // Top Performers month filter
   const [activeMonth, setActiveMonth] = useState('July');
-
-  // Dashboard Section Tabs (Segmented Control matching executive design)
-  const [activeDashboardTab, setActiveDashboardTab] = useState<'todo' | 'performers' | 'announcements'>('todo');
 
   // Announcements Carousel state
   const [announcementIndex, setAnnouncementIndex] = useState(0);
@@ -94,83 +85,73 @@ export const HomePage = () => {
   // Helper to map an appropriate icon based on task title/context
   const getTaskIcon = (title?: string) => {
     const t = (title || '').toLowerCase();
-    if (t.includes('standup') || t.includes('team') || t.includes('meeting') || t.includes('sync') || t.includes('1-on-1')) return PeopleOutlinedIcon;
-    if (t.includes('report') || t.includes('monthly') || t.includes('doc')) return DescriptionOutlinedIcon;
-    if (t.includes('health') || t.includes('checkup') || t.includes('booking') || t.includes('doctor') || t.includes('heart')) return FavoriteBorderOutlinedIcon;
     if (t.includes('interview') || t.includes('desktop') || t.includes('laptop')) return DesktopWindowsOutlinedIcon;
+    if (t.includes('team') || t.includes('meeting') || t.includes('sync') || t.includes('1-on-1')) return PeopleOutlinedIcon;
     if (t.includes('chat') || t.includes('discuss') || t.includes('talk')) return ChatBubbleOutlineOutlinedIcon;
     if (t.includes('security') || t.includes('compliance')) return ShieldOutlinedIcon;
     if (t.includes('setup') || t.includes('work') || t.includes('dev')) return BusinessCenterOutlinedIcon;
+    if (t.includes('goal') || t.includes('review') || t.includes('plan')) return StraightenIcon;
+    if (t.includes('policy') || t.includes('link')) return LinkIcon;
     if (t.includes('fast') || t.includes('urgent') || t.includes('electric')) return BoltIcon;
     return AssignmentTurnedInOutlinedIcon;
   };
 
-  // Helper to map an appropriate theme (icon, background, text color) based on task context
-  const getTaskTheme = (task: any, index: number = 0) => {
-    if (task.color === 'purple') {
-      return { icon: PeopleOutlinedIcon, bg: 'bg-[#EDE9FE]', text: 'text-[#6D28D9]' };
-    }
-    if (task.color === 'blue') {
-      return { icon: DescriptionOutlinedIcon, bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' };
-    }
-    if (task.color === 'rose') {
-      return { icon: FavoriteBorderOutlinedIcon, bg: 'bg-[#FFE4E6]', text: 'text-[#E11D48]' };
-    }
-
-    const t = (task.title || '').toLowerCase();
-    if (t.includes('standup') || t.includes('team') || t.includes('meeting') || t.includes('sync') || t.includes('people') || t.includes('1-on-1')) {
-      return { icon: PeopleOutlinedIcon, bg: 'bg-[#EDE9FE]', text: 'text-[#6D28D9]' };
-    }
-    if (t.includes('report') || t.includes('monthly') || t.includes('document') || t.includes('file') || t.includes('review') || t.includes('summary')) {
-      return { icon: DescriptionOutlinedIcon, bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' };
-    }
-    if (t.includes('health') || t.includes('checkup') || t.includes('booking') || t.includes('doctor') || t.includes('medical') || t.includes('heart')) {
-      return { icon: FavoriteBorderOutlinedIcon, bg: 'bg-[#FFE4E6]', text: 'text-[#E11D48]' };
-    }
-    if (t.includes('urgent') || t.includes('bolt') || t.includes('priority')) {
-      return { icon: BoltIcon, bg: 'bg-[#FEF3C7]', text: 'text-[#D97706]' };
-    }
-    if (t.includes('chat') || t.includes('call') || t.includes('discuss')) {
-      return { icon: ChatBubbleOutlineOutlinedIcon, bg: 'bg-[#E0E7FF]', text: 'text-[#4F46E5]' };
-    }
-    if (t.includes('security') || t.includes('compliance')) {
-      return { icon: ShieldOutlinedIcon, bg: 'bg-[#DCFCE7]', text: 'text-[#16A34A]' };
-    }
-
-    const palettes = [
-      { icon: PeopleOutlinedIcon, bg: 'bg-[#EDE9FE]', text: 'text-[#6D28D9]' },
-      { icon: DescriptionOutlinedIcon, bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' },
-      { icon: FavoriteBorderOutlinedIcon, bg: 'bg-[#FFE4E6]', text: 'text-[#E11D48]' },
-      { icon: AssignmentTurnedInOutlinedIcon, bg: 'bg-[#DCFCE7]', text: 'text-[#16A34A]' },
-      { icon: BoltIcon, bg: 'bg-[#FEF3C7]', text: 'text-[#D97706]' },
-    ];
-    return palettes[index % palettes.length];
-  };
-
-  // Initial Tasks state matching exact reference design (Image 2)
+  // Initial Onboarding Tasks state matching reference design
   const initialFallbackTasks = [
     {
       id: '1',
-      title: 'Team Standup Meeting',
-      time: '10:00 AM – 10:30 AM',
-      icon: PeopleOutlinedIcon,
-      color: 'purple',
-      completed: false
+      title: 'Interview',
+      time: 'Sep 13, 08:30',
+      icon: DesktopWindowsOutlinedIcon,
+      completed: true
     },
     {
       id: '2',
-      title: 'Complete Monthly Report',
-      time: '01:00 PM – 02:00 PM',
-      icon: DescriptionOutlinedIcon,
-      color: 'blue',
-      completed: false
+      title: 'Team Meeting',
+      time: 'Sep 13, 10:30',
+      icon: BoltIcon,
+      completed: true
     },
     {
       id: '3',
-      title: 'Health Checkup Booking',
-      time: '03:00 PM – 03:30 PM',
-      icon: FavoriteBorderOutlinedIcon,
-      color: 'rose',
+      title: 'Project Update',
+      time: 'Sep 13, 13:00',
+      icon: ChatBubbleOutlineOutlinedIcon,
+      completed: false
+    },
+    {
+      id: '4',
+      title: 'Discuss Q3 Goals',
+      time: 'Sep 13, 14:45',
+      icon: StraightenIcon,
+      completed: false
+    },
+    {
+      id: '5',
+      title: 'HR Policy Review',
+      time: 'Sep 13, 16:30',
+      icon: LinkIcon,
+      completed: false
+    },
+    {
+      id: '6',
+      title: 'Security Compliance',
+      time: 'Sep 14, 11:00',
+      icon: ShieldOutlinedIcon,
+      completed: false
+    },
+    {
+      id: '7',
+      title: 'Development Setup',
+      time: 'Sep 14, 14:00',
+      icon: BusinessCenterOutlinedIcon,
+      completed: false
+    },
+    {
+      id: '8',
+      title: 'Manager 1-on-1 Sync',
+      time: 'Sep 15, 10:00',
+      icon: PeopleOutlinedIcon,
       completed: false
     }
   ];
@@ -590,69 +571,13 @@ export const HomePage = () => {
         {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
         <BenefitHighlights />
 
-        {/* ── 2. EXECUTIVE ENGAGEMENT SECTION (SEGMENTED TAB SWITCHER & FULL-WIDTH CARDS) ── */}
+        {/* ── 2. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
         <ServiceShortcuts />
 
-        <section className="engagement-tabs-section w-full mb-16 sm:mb-20">
-          {/* Segmented Tab Pill Control (Exact match to Image 2) */}
-          <div className="flex justify-center mb-6 sm:mb-7">
-            <div className="bg-white rounded-full p-1.5 shadow-[0_2px_14px_rgba(0,0,0,0.06)] border border-slate-200/80 inline-flex items-center gap-1 sm:gap-2">
-              {/* Tab 1: My to-do list */}
-              <button
-                type="button"
-                onClick={() => setActiveDashboardTab('todo')}
-                className={`px-5 sm:px-6 py-2.5 rounded-full flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeDashboardTab === 'todo'
-                    ? 'bg-[#2E186A] text-white shadow-xs'
-                    : 'text-[#1E293B] hover:bg-slate-100/70 hover:text-[#0F172A]'
-                }`}
-              >
-                <EventAvailableOutlinedIcon
-                  sx={{ fontSize: 18 }}
-                  className={activeDashboardTab === 'todo' ? 'text-white' : 'text-[#2E186A]'}
-                />
-                <span>My to-do list</span>
-              </button>
-
-              {/* Tab 2: Top Performers */}
-              <button
-                type="button"
-                onClick={() => setActiveDashboardTab('performers')}
-                className={`px-5 sm:px-6 py-2.5 rounded-full flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeDashboardTab === 'performers'
-                    ? 'bg-[#2E186A] text-white shadow-xs'
-                    : 'text-[#1E293B] hover:bg-slate-100/70 hover:text-[#0F172A]'
-                }`}
-              >
-                <EmojiEventsOutlinedIcon
-                  sx={{ fontSize: 18 }}
-                  className={activeDashboardTab === 'performers' ? 'text-white' : 'text-[#6D28D9]'}
-                />
-                <span>Top Performers</span>
-              </button>
-
-              {/* Tab 3: Announcements */}
-              <button
-                type="button"
-                onClick={() => setActiveDashboardTab('announcements')}
-                className={`px-5 sm:px-6 py-2.5 rounded-full flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeDashboardTab === 'announcements'
-                    ? 'bg-[#2E186A] text-white shadow-xs'
-                    : 'text-[#1E293B] hover:bg-slate-100/70 hover:text-[#0F172A]'
-                }`}
-              >
-                <CampaignOutlinedIcon
-                  sx={{ fontSize: 18 }}
-                  className={activeDashboardTab === 'announcements' ? 'text-white' : 'text-[#E11D48]'}
-                />
-                <span>Announcements</span>
-              </button>
-            </div>
-          </div>
-
+        <section className="engagement-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch mb-16 sm:mb-20">
+          
           {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
-          {activeDashboardTab === 'performers' && (
-            <div className="w-full max-w-5xl mx-auto rounded-[28px] sm:rounded-[32px] p-6 sm:p-7 shadow-[0_10px_35px_-5px_rgba(36,22,47,0.08)] transition-all flex flex-col justify-between bg-[#E0C3F2] border border-[#C79FE0] text-[#24162F]">
+          <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all flex flex-col justify-between bg-[#E0C3F2] border border-[#C79FE0] text-[#24162F]">
             <div>
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-[#C79FE0]/70">
@@ -818,11 +743,9 @@ export const HomePage = () => {
               </span>
             </div>
           </div>
-          )}
 
           {/* Card 2: Ultra-Premium Announcements & Spotlights */}
-          {activeDashboardTab === 'announcements' && (
-            <div className="w-full max-w-5xl mx-auto rounded-[28px] sm:rounded-[32px] p-6 sm:p-7 shadow-[0_10px_35px_-5px_rgba(233,172,133,0.12)] transition-all flex flex-col justify-between bg-[#FCD7BD] border border-[#E9AC85]">
+          <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all duration-300 flex flex-col justify-between bg-[#FCD7BD] border border-[#E9AC85]">
             <div>
               {/* Header with Category & Carousel Controls */}
               <div className="flex items-center justify-between pb-4 border-b border-[#E9AC85]/70">
@@ -1063,271 +986,284 @@ export const HomePage = () => {
               </div>
             </div>
           </div>
-          )}
 
-          {/* ── Active Tab 1: My to-do list (Exact replica of Image 2) ── */}
-          {activeDashboardTab === 'todo' && (
-            <div className="w-full max-w-5xl mx-auto rounded-[28px] sm:rounded-[32px] overflow-hidden border border-slate-200/90 shadow-[0_10px_35px_-5px_rgba(0,0,0,0.06)] bg-[#F8F7F4] transition-all">
-              {/* Emerald Green Header Banner */}
-              <div className="bg-[#00875A] px-5 py-4 sm:px-8 sm:py-5 flex items-center justify-between text-white">
-                <div className="flex items-center gap-3.5 sm:gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-white border border-white/25 shadow-xs shrink-0">
-                    <EventAvailableOutlinedIcon sx={{ fontSize: 26 }} />
+          {/* Card 3: WhatsApp Chat Screen Theme for To-Do List */}
+          <div
+            className="rounded-[24px] overflow-hidden border border-[#D1D7DB] shadow-[0_4px_24px_-2px_rgba(20,34,25,0.08)] hover:shadow-md transition-all duration-300 flex flex-col justify-between md:col-span-2 xl:col-span-1 relative select-none"
+            style={{
+              backgroundColor: '#EFEAE2',
+              backgroundImage: `url(${whatsappDoodle})`,
+              backgroundRepeat: 'repeat',
+              backgroundSize: '360px',
+            }}
+          >
+            <div>
+              {/* WhatsApp App Bar Header */}
+              <div className="bg-[#008069] text-white px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between border-b border-black/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white border border-white/20 shadow-xs shrink-0">
+                    <AssignmentTurnedInOutlinedIcon sx={{ fontSize: 20 }} />
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+                    <h3 className="text-[15px] sm:text-base font-semibold text-white tracking-tight leading-tight">
                       My to-do list
                     </h3>
-                    <p className="text-xs sm:text-sm text-emerald-100 font-normal mt-0.5 leading-tight">
+                    <span className="text-[11px] text-[#D1EBE7] font-normal leading-tight block">
                       Your daily tasks and reminders
-                    </p>
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <span className="inline-flex items-center justify-center bg-[#006644]/90 text-white font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full border border-white/20 shadow-xs tracking-wide">
+                <div className="text-right">
+                  <span className="inline-flex items-center gap-1 bg-[#006653] text-[#D9FDD3] border border-white/15 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wider shadow-inner">
                     {tasks.filter((t) => t.completed).length}/{tasks.length}
                   </span>
                 </div>
               </div>
 
-              {/* Body */}
-              <div className="p-4 sm:p-6 lg:p-7">
-                {/* Centered TODAY Pill */}
-                <div className="flex justify-center mb-4">
-                  <span className="bg-white text-slate-600 font-bold text-[11px] sm:text-xs tracking-wider px-6 py-1 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.05)] border border-slate-200/80 uppercase">
+              {/* WhatsApp Progress Indicator Line */}
+              <div className="w-full bg-[#005E4D] h-1.5 overflow-hidden">
+                <div
+                  className="bg-[#25D366] h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(37,211,102,0.7)]"
+                  style={{
+                    width: `${tasks.length > 0 ? (tasks.filter((t) => t.completed).length / tasks.length) * 100 : 0}%`
+                  }}
+                />
+              </div>
+
+              {/* Chat Content Body */}
+              <div className="p-4 sm:p-5">
+                {/* WhatsApp Chat Date Chip */}
+                <div className="flex justify-center mb-3">
+                  <span className="bg-white/85 backdrop-blur-xs text-[#54656F] text-[10.5px] font-semibold px-3 py-0.5 rounded-md shadow-[0_1px_0.5px_rgba(11,20,26,0.12)] uppercase tracking-wider">
                     Today
                   </span>
                 </div>
 
-                {/* Inner White Container */}
-                <div className="bg-white rounded-[24px] border border-slate-200/80 p-3.5 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col gap-3">
-                  {/* Add task bar */}
-                  {!isAddingTask ? (
-                    <div
-                      onClick={() => setIsAddingTask(true)}
-                      className="border border-slate-200/80 rounded-2xl p-2 sm:p-2.5 flex items-center justify-between bg-white hover:border-slate-300 transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#D7F5E8] text-[#00875A] flex items-center justify-center font-bold text-xl group-hover:bg-[#c2f0dc] transition-colors shrink-0 shadow-2xs">
-                          <AddIcon sx={{ fontSize: 22 }} />
-                        </div>
-                        <span className="text-slate-400 group-hover:text-slate-500 font-medium text-sm sm:text-[15px] select-none">
-                          Add a new task...
-                        </span>
-                      </div>
-                      <span className="text-[#00875A] font-semibold text-xs sm:text-sm group-hover:text-[#006644] transition-colors px-2 py-1">
-                        + Add task
-                      </span>
+                {/* Add Task Button / Composer Toggle */}
+                <button
+                  type="button"
+                  className="todo-wa-add-toggle"
+                  onClick={() => setIsAddingTask(value => !value)}
+                  aria-expanded={isAddingTask}
+                  aria-controls="add-task-form"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#00A884]/15 text-[#00A884] flex items-center justify-center font-bold text-xs leading-none">
+                      {isAddingTask ? '×' : '+'}
+                    </span>
+                    <span>{isAddingTask ? 'Cancel' : 'Add a new task...'}</span>
+                  </span>
+                  <span className="text-[11px] text-[#008069] font-semibold">
+                    {isAddingTask ? 'Close' : '+ Add task'}
+                  </span>
+                </button>
+
+                {isAddingTask && (
+                  <form id="add-task-form" className="todo-wa-add-form" onSubmit={addTask}>
+                    <label htmlFor="task-title">Task name</label>
+                    <input
+                      id="task-title"
+                      autoFocus
+                      value={taskTitle}
+                      onChange={event => setTaskTitle(event.target.value)}
+                      placeholder="What would you like to do?"
+                      maxLength={120}
+                      required
+                    />
+                    <label htmlFor="task-date">Due date <span>(optional)</span></label>
+                    <input
+                      id="task-date"
+                      type="datetime-local"
+                      value={taskDate}
+                      onChange={event => setTaskDate(event.target.value)}
+                    />
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        type="submit"
+                        disabled={!taskTitle.trim()}
+                        className="flex-1 py-2 px-3.5 bg-[#00A884] hover:bg-[#008069] text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                      >
+                        Add to my list
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingTask(false)}
+                        className="py-2 px-3 bg-[#F0F2F5] hover:bg-[#E9EDEF] text-[#54656F] text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
                     </div>
-                  ) : (
-                    <form
-                      onSubmit={addTask}
-                      className="border border-emerald-400/80 rounded-2xl p-4 bg-emerald-50/20 shadow-xs flex flex-col gap-3"
-                    >
-                      <div className="flex items-center justify-between text-xs font-semibold text-[#00875A]">
-                        <span className="flex items-center gap-1.5">
-                          <AddIcon sx={{ fontSize: 18 }} />
-                          <span>Create New Task</span>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingTask(false)}
-                          className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                        >
-                          <CloseIcon sx={{ fontSize: 18 }} />
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        autoFocus
-                        value={taskTitle}
-                        onChange={(e) => setTaskTitle(e.target.value)}
-                        placeholder="What would you like to do? (e.g., Client sync meeting)"
-                        maxLength={120}
-                        required
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#00875A] focus:ring-1 focus:ring-[#00875A]"
-                      />
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <input
-                          type="datetime-local"
-                          value={taskDate}
-                          onChange={(e) => setTaskDate(e.target.value)}
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-700 focus:outline-none focus:border-[#00875A]"
-                        />
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="submit"
-                            disabled={!taskTitle.trim()}
-                            className="px-4 py-2 bg-[#00875A] hover:bg-[#00704A] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-                          >
-                            Add to my list
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setIsAddingTask(false)}
-                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  )}
+                    <p className="text-[10.5px] text-[#667781] mt-0.5">Tasks are saved to your account.</p>
+                  </form>
+                )}
 
-                  {/* Task List Items */}
-                  <div className="space-y-3">
-                    {(showAllTasks ? tasks : tasks.slice(0, 5)).map((task, index) => {
-                      const isEditing = editingTaskId === String(task.id);
-                      const theme = getTaskTheme(task, index);
-                      const IconComp = theme.icon;
+                {/* Task list with WhatsApp Message Bubbles */}
+                <div className="space-y-2 pt-1">
+                  {(showAllTasks ? tasks : tasks.slice(0, 5)).map((task) => {
+                    const IconComponent = task.icon || AssignmentTurnedInOutlinedIcon;
+                    const isEditing = editingTaskId === String(task.id);
 
-                      if (isEditing) {
-                        return (
-                          <form
-                            key={task.id}
-                            onSubmit={(e) => saveEditTask(e, task.id)}
-                            className="border border-emerald-400/80 rounded-2xl p-3.5 bg-emerald-50/20 shadow-xs flex flex-col gap-2.5"
-                          >
-                            <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
-                              <span>Edit Task</span>
-                              <button
-                                type="button"
-                                onClick={cancelEditing}
-                                className="text-slate-400 hover:text-slate-700 cursor-pointer"
-                              >
-                                <CloseIcon sx={{ fontSize: 16 }} />
-                              </button>
-                            </div>
-                            <input
-                              type="text"
-                              value={editTitle}
-                              onChange={(e) => setEditTitle(e.target.value)}
-                              maxLength={120}
-                              placeholder="Task title"
-                              autoFocus
-                              required
-                              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-[#00875A]"
-                            />
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="datetime-local"
-                                value={editDate}
-                                onChange={(e) => setEditDate(e.target.value)}
-                                className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:border-[#00875A]"
-                              />
-                              <button
-                                type="submit"
-                                disabled={!editTitle.trim() || isSubmittingEdit}
-                                className="px-3.5 py-1.5 bg-[#00875A] hover:bg-[#00704A] text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
-                              >
-                                {isSubmittingEdit ? 'Saving...' : 'Save'}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={cancelEditing}
-                                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </form>
-                        );
-                      }
-
+                    if (isEditing) {
                       return (
-                        <div
+                        <form
                           key={task.id}
-                          className="border border-slate-200/80 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between bg-white hover:border-slate-300 hover:shadow-xs transition-all group"
+                          onSubmit={(e) => saveEditTask(e, task.id)}
+                          className="todo-wa-edit-box"
                         >
-                          {/* Left: Checkbox + Squircle Icon + Title & Time */}
-                          <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                            {/* Circular Outline Checkbox */}
+                          <div className="flex items-center justify-between text-[11px] text-[#54656F] font-semibold px-0.5">
+                            <span>Edit Task</span>
                             <button
                               type="button"
-                              onClick={() => toggleTask(task.id)}
-                              title={task.completed ? 'Mark pending' : 'Mark completed'}
-                              aria-label={task.completed ? 'Mark pending' : 'Mark completed'}
-                              className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
+                              onClick={cancelEditing}
+                              className="text-[#8696A0] hover:text-[#111B21] transition-colors cursor-pointer"
+                              title="Cancel editing"
+                            >
+                              <CloseIcon sx={{ fontSize: 15 }} />
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            maxLength={120}
+                            placeholder="Task name"
+                            autoFocus
+                            required
+                          />
+                          <div className="flex items-center gap-2 pt-0.5">
+                            <input
+                              type="datetime-local"
+                              value={editDate}
+                              onChange={(e) => setEditDate(e.target.value)}
+                            />
+                            <button
+                              type="submit"
+                              disabled={!editTitle.trim() || isSubmittingEdit}
+                              className="todo-wa-edit-btn-save"
+                            >
+                              {isSubmittingEdit ? 'Saving...' : 'Save'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={cancelEditing}
+                              className="todo-wa-edit-btn-cancel"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={task.id}
+                        className={`w-full text-left flex items-center justify-between gap-2 p-2.5 rounded-2xl transition-all group border shadow-[0_1px_1px_rgba(11,20,26,0.12)] ${
+                          task.completed
+                            ? 'bg-[#D9FDD3] border-[#B7E4C7]/70 rounded-tr-sm'
+                            : 'bg-white border-[#E9EDEF] rounded-tl-sm hover:border-[#D1D7DB]'
+                        }`}
+                      >
+                        {/* Left: Icon circle + Title & Timestamp (clickable to toggle completion) */}
+                        <button
+                          type="button"
+                          onClick={() => toggleTask(task.id)}
+                          className="flex items-center gap-3 flex-1 text-left min-w-0 bg-transparent border-none p-0 cursor-pointer"
+                        >
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                              task.completed
+                                ? 'bg-[#C2EBB8] text-[#008069]'
+                                : 'bg-[#EFEAE2] text-[#008069] group-hover:scale-105'
+                            }`}
+                          >
+                            <IconComponent sx={{ fontSize: 18 }} />
+                          </div>
+
+                          <div className="min-w-0 pr-1">
+                            <div
+                              className={`text-xs sm:text-[13px] truncate transition-colors ${
                                 task.completed
-                                  ? 'bg-[#00875A] border-2 border-[#00875A] text-white shadow-2xs'
-                                  : 'border-2 border-slate-300 hover:border-[#00875A] bg-white'
+                                  ? 'font-medium text-[#54656F] line-through decoration-[#54656F]/60'
+                                  : 'font-semibold text-[#111B21]'
+                              }`}
+                            >
+                              {task.title}
+                            </div>
+                            <div
+                              className={`text-[11px] mt-0.5 flex items-center gap-1 ${
+                                task.completed ? 'text-[#008069] font-medium' : 'text-[#667781]'
                               }`}
                             >
                               {task.completed && (
-                                <CheckIcon sx={{ fontSize: 15 }} className="text-white" />
+                                <DoneAllIcon sx={{ fontSize: 14 }} className="text-[#53BDEB]" titleAccess="Completed" />
                               )}
-                            </button>
-
-                            {/* Squircle Colored Icon */}
-                            <div
-                              className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${theme.bg} ${theme.text}`}
-                            >
-                              <IconComp sx={{ fontSize: 22 }} />
-                            </div>
-
-                            {/* Task Text & Time */}
-                            <div className="min-w-0 pr-2">
-                              <h4
-                                className={`text-sm sm:text-base font-bold tracking-tight transition-colors ${
-                                  task.completed
-                                  ? 'line-through text-slate-400 font-medium'
-                                  : 'text-[#1E293B]'
-                                }`}
-                              >
-                                {task.title}
-                              </h4>
-                              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-500 font-medium">
-                                <AccessTimeOutlinedIcon sx={{ fontSize: 15 }} className="text-slate-400" />
-                                <span>{task.time}</span>
-                              </div>
+                              <span>{task.time}</span>
                             </div>
                           </div>
+                        </button>
 
-                          {/* Right: Edit & Delete Action Buttons */}
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              type="button"
-                              onClick={(e) => startEditingTask(task, e)}
-                              title="Edit task"
-                              aria-label={`Edit ${task.title}`}
-                              className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
-                            >
-                              <EditOutlinedIcon sx={{ fontSize: 18 }} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => deleteTask(task.id, e)}
-                              title="Delete task"
-                              aria-label={`Delete ${task.title}`}
-                              className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
-                            >
-                              <DeleteOutlineOutlinedIcon sx={{ fontSize: 19 }} />
-                            </button>
-                          </div>
+                        {/* Right: Actions (Edit, Delete, Checkmark) */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => startEditingTask(task, e)}
+                            title="Edit task"
+                            aria-label={`Edit ${task.title}`}
+                            className="todo-wa-action-btn edit"
+                          >
+                            <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => deleteTask(task.id, e)}
+                            title="Delete task"
+                            aria-label={`Delete ${task.title}`}
+                            className="todo-wa-action-btn delete"
+                          >
+                            <DeleteOutlineOutlinedIcon sx={{ fontSize: 16 }} />
+                          </button>
+
+                          {/* Checkmark Badge */}
+                          <button
+                            type="button"
+                            onClick={() => toggleTask(task.id)}
+                            title={task.completed ? 'Mark pending' : 'Mark completed'}
+                            aria-label={task.completed ? 'Mark pending' : 'Mark completed'}
+                            aria-pressed={task.completed}
+                            className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                              task.completed
+                                ? 'bg-[#00A884] text-white shadow-xs'
+                                : 'bg-white hover:bg-gray-50 border border-[#8696A0]'
+                            }`}
+                          >
+                            {task.completed && (
+                              <CheckIcon sx={{ fontSize: 14 }} className="text-white" />
+                            )}
+                          </button>
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* View all toggle if more than 3 tasks */}
-                  {tasks.length > 3 && (
-                    <div className="flex items-center justify-between pt-2 px-1 text-xs text-slate-500">
-                      <button
-                        type="button"
-                        onClick={() => setShowAllTasks(!showAllTasks)}
-                        className="text-[#00875A] hover:text-[#006644] font-semibold text-xs hover:underline cursor-pointer"
-                      >
-                        {showAllTasks ? 'Show fewer tasks' : `View all (${tasks.length}) tasks`}
-                      </button>
-                      <span className="text-[11px] text-slate-400">
-                        {tasks.filter((t) => t.completed).length} of {tasks.length} completed
-                      </span>
-                    </div>
-                  )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Card Footer: View All toggle */}
+            <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 border-t border-black/[0.06] flex items-center justify-between text-[11px] bg-white/40 backdrop-blur-2xs">
+              <button
+                type="button"
+                onClick={() => setShowAllTasks(!showAllTasks)}
+                className="bg-white/90 hover:bg-white text-[#008069] hover:text-[#006653] font-semibold text-xs px-3 py-1 rounded-full shadow-[0_1px_1px_rgba(11,20,26,0.08)] border border-[#E9EDEF] transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <span>{showAllTasks ? 'Show fewer tasks' : `View all (${tasks.length}) tasks`}</span>
+              </button>
+              <span className="text-[10px] text-[#667781] font-medium flex items-center gap-1">
+                🔒 Saved locally
+              </span>
+            </div>
+          </div>
 
         </section>
 
