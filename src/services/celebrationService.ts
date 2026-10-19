@@ -98,6 +98,7 @@ export const isCompanyMatch = (compA, compB) => {
 
   if (cleanA === cleanB) return true;
   if (cleanA.includes(cleanB) || cleanB.includes(cleanA)) return true;
+  if ((cleanA.includes('mps') || cleanA.includes('pranaam')) && (cleanB.includes('mps') || cleanB.includes('pranaam'))) return true;
 
   return false;
 };

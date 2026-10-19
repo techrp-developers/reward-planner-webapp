@@ -153,3 +153,35 @@ export const fetchUserAddresses = async () => {
     return { success: false, data: [] };
   }
 };
+
+export const fetchCompanyBirthdays = async () => {
+  try {
+    const res = await api.get(ENDPOINTS.auth.birthdays);
+    return res.data?.data || res.data;
+  } catch (err) {
+    console.warn('Could not fetch company birthdays from endpoint:', err);
+    return null;
+  }
+};
+
+export const sendBirthdayWishApi = async ({
+  employeeId,
+  recipientUserId,
+  message,
+}: {
+  employeeId?: string | number;
+  recipientUserId?: string | number;
+  message?: string;
+}) => {
+  try {
+    const res = await api.post(ENDPOINTS.auth.sendBirthdayWish, {
+      employeeId,
+      recipientUserId,
+      message,
+    });
+    return res.data;
+  } catch (err) {
+    console.warn('Could not post birthday wish to endpoint:', err);
+    return { success: false };
+  }
+};

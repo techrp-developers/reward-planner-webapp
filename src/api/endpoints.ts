@@ -24,6 +24,8 @@ export const ENDPOINTS = {
     addressById: (id: ApiId) => `/v1/auth/address/${id}`,
     countries: '/v1/auth/countries',
     states: (countryId: ApiId) => `/v1/auth/states/${countryId}`,
+    birthdays: '/v1/auth/birthdays',
+    sendBirthdayWish: '/v1/auth/birthdays/wish',
   },
   terms: {
     status: '/v1/terms/status',

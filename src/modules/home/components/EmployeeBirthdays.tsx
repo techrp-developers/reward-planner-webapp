@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import CheckIcon from '@mui/icons-material/Check';
 import birthdayBgBubbles from '../../../assets/home/birthday_bg_bubbles.png';
+import { useAuth } from '../../../context/AuthContext';
+import { fetchCompanyBirthdays, sendBirthdayWishApi } from '../../../api/authApi';
+import {
+  hasWishedColleague,
+  recordBirthdayWish,
+  isCompanyMatch,
+  isBirthdayToday,
+} from '../../../services/celebrationService';
+import { INITIAL_COMPANY_EMPLOYEES } from '../../../data/companyEmployeesData';
 
 export interface BirthdayPerson {
   id: string | number;
@@ -12,57 +21,182 @@ export interface BirthdayPerson {
   avatar: string;
   isToday: boolean;
   dateStr: string;
+  employeeId?: string | number;
+  userId?: string | number;
 }
 
-const BIRTHDAY_PROFILES: BirthdayPerson[] = [
-  {
-    id: 'nina',
-    name: 'Nina Patel',
-    role: 'Finance Partner',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-    isToday: true,
-    dateStr: 'Birthday today',
-  },
-  {
-    id: 'aarav',
-    name: 'Aarav Mehta',
-    role: 'Product Designer',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    isToday: false,
-    dateStr: 'Oct 18',
-  },
-  {
-    id: 'sana',
-    name: 'Sana Khan',
-    role: 'Customer Success',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
-    isToday: false,
-    dateStr: 'Oct 21',
-  },
-  {
-    id: 'leah',
-    name: 'Leah Thomas',
-    role: 'Marketing Lead',
-    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&q=80',
-    isToday: false,
-    dateStr: 'Oct 24',
-  },
-  {
-    id: 'vikram',
-    name: 'Vikram Malhotra',
-    role: 'Cloud Architect',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-    isToday: false,
-    dateStr: 'Oct 29',
-  },
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
+const formatBirthdayDate = (dob: string | Date | undefined, isToday: boolean): string => {
+  if (isToday) return 'Birthday today';
+  if (!dob) return 'Upcoming';
+
+  const str = String(dob).trim();
+  const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (match) {
+    const m = parseInt(match[2], 10);
+    const d = parseInt(match[3], 10);
+    if (m >= 1 && m <= 12) {
+      return `${MONTH_NAMES[m - 1]} ${d}`;
+    }
+  }
+
+  try {
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime())) {
+      return `${MONTH_NAMES[parsed.getMonth()]} ${parsed.getDate()}`;
+    }
+  } catch {}
+
+  return 'Upcoming';
+};
+
 export default function EmployeeBirthdays() {
+  const { user } = useAuth();
+  const [backendBirthdays, setBackendBirthdays] = useState<any[] | null>(null);
   const [wishedIds, setWishedIds] = useState<Set<string | number>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const handleSendWish = (person: BirthdayPerson) => {
+  // Fetch dynamic birthdays from backend API on mount
+  useEffect(() => {
+    let isMounted = true;
+    const loadBirthdays = async () => {
+      try {
+        const res = await fetchCompanyBirthdays();
+        if (isMounted && res) {
+          const list = Array.isArray(res) ? res : (res.all || res.today || []);
+          if (Array.isArray(list) && list.length > 0) {
+            setBackendBirthdays(list);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load dynamic birthdays:', err);
+      }
+    };
+
+    loadBirthdays();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Compute the combined dynamic birthday list
+  const birthdayList = useMemo<BirthdayPerson[]>(() => {
+    // 1. Identify active company name
+    const companyName =
+      user?.company?.name ||
+      user?.company_name ||
+      (typeof user?.company === 'string' ? user?.company : '') ||
+      user?.employeeInfo?.company ||
+      user?.employer?.name ||
+      'MPS Global';
+
+    // 2. Check if backend provided dynamic birthdays (from dedicated endpoint or user session)
+    const rawBackendList = backendBirthdays?.length
+      ? backendBirthdays
+      : (Array.isArray(user?.birthday_employees) && user.birthday_employees.length > 0
+          ? user.birthday_employees
+          : null);
+
+    const dynamicList: BirthdayPerson[] = [];
+    const seenIds = new Set<string | number>();
+
+    if (rawBackendList && rawBackendList.length > 0) {
+      rawBackendList.forEach((emp: any) => {
+        const id = emp.id || emp.employeeId || emp.userId;
+        if (!id || seenIds.has(id)) return;
+        seenIds.add(id);
+
+        const isToday = Boolean(emp.isToday ?? isBirthdayToday(emp.dob));
+        const dateStr = emp.dateStr || formatBirthdayDate(emp.dob, isToday);
+
+        dynamicList.push({
+          id,
+          name: emp.name || 'Valued Colleague',
+          role: emp.role || emp.department || 'Team Member',
+          avatar:
+            emp.avatar ||
+            emp.image ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name || 'RP')}&background=FCE7F3&color=E11D48&bold=true`,
+          isToday,
+          dateStr,
+          employeeId: emp.employeeId || id,
+          userId: emp.userId,
+        });
+      });
+    }
+
+    // 3. Fallback or augment with corporate directory colleagues for current company if fewer than 2 cards
+    if (dynamicList.length < 2) {
+      const companyMatches = INITIAL_COMPANY_EMPLOYEES.filter((emp) =>
+        isCompanyMatch(emp.company, companyName)
+      );
+
+      const fallbackPool = companyMatches.length > 0 ? companyMatches : INITIAL_COMPANY_EMPLOYEES.slice(0, 5);
+
+      fallbackPool.forEach((emp) => {
+        if (seenIds.has(emp.id)) return;
+        seenIds.add(emp.id);
+
+        const isToday = isBirthdayToday(emp.dob);
+        const dateStr = formatBirthdayDate(emp.dob, isToday);
+
+        dynamicList.push({
+          id: emp.id,
+          name: emp.name,
+          role: emp.role || emp.department || 'Colleague',
+          avatar:
+            emp.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}&background=FCE7F3&color=E11D48&bold=true`,
+          isToday,
+          dateStr,
+          employeeId: emp.id,
+        });
+      });
+    }
+
+    // Sort: Today's birthdays first, then upcoming birthdays
+    return dynamicList.sort((a, b) => {
+      if (a.isToday && !b.isToday) return -1;
+      if (!a.isToday && b.isToday) return 1;
+      return 0;
+    });
+  }, [user, backendBirthdays]);
+
+  // Synchronize wish states from local storage so wishes survive refreshes
+  useEffect(() => {
+    const wishedSet = new Set<string | number>();
+    birthdayList.forEach((person) => {
+      if (hasWishedColleague(person.id)) {
+        wishedSet.add(person.id);
+      }
+    });
+    setWishedIds(wishedSet);
+  }, [birthdayList]);
+
+  // Dynamic Counts
+  const todayCount = useMemo(() => birthdayList.filter((p) => p.isToday).length, [birthdayList]);
+  const upcomingCount = useMemo(() => birthdayList.filter((p) => !p.isToday).length, [birthdayList]);
+
+  const handleSendWish = async (person: BirthdayPerson) => {
     setWishedIds((prev) => new Set(prev).add(person.id));
+    recordBirthdayWish(person.id, person.isToday ? 'Happy Birthday!' : 'Happy Early Birthday!');
+
+    try {
+      await sendBirthdayWishApi({
+        employeeId: person.employeeId || person.id,
+        recipientUserId: person.userId,
+        message: person.isToday
+          ? `Warm birthday wishes sent to ${person.name}! 🎂🎉`
+          : `Early birthday greetings sent to ${person.name}! 🎈`,
+      });
+    } catch (err) {
+      console.warn('Could not send birthday wish via API:', err);
+    }
+
     setToastMessage(
       person.isToday
         ? `Warm birthday wishes sent to ${person.name}! 🎂🎉`
@@ -106,13 +240,13 @@ export default function EmployeeBirthdays() {
           </div>
           <span className="text-[11px] font-semibold text-[#E11D48] bg-white/90 px-2.5 py-0.5 rounded-full border border-rose-200/80 shadow-2xs flex items-center gap-1.5 backdrop-blur-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] animate-pulse" />
-            1 Today
+            {todayCount > 0 ? `${todayCount} Today` : `${upcomingCount} Upcoming`}
           </span>
         </div>
 
         {/* Birthday Cards Track - First Today's Birthday, Then Upcoming */}
         <div className="relative z-10 flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
-          {BIRTHDAY_PROFILES.map((person) => {
+          {birthdayList.map((person) => {
             const isToday = person.isToday;
             const isWished = wishedIds.has(person.id);
 
@@ -141,6 +275,10 @@ export default function EmployeeBirthdays() {
                           <img
                             src={person.avatar}
                             alt={person.name}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=FCE7F3&color=E11D48&bold=true`;
+                            }}
                             className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover"
                             loading="lazy"
                           />
@@ -289,6 +427,10 @@ export default function EmployeeBirthdays() {
                       <img
                         src={person.avatar}
                         alt={person.name}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=FCE7F3&color=E11D48&bold=true`;
+                        }}
                         className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover border border-slate-100"
                         loading="lazy"
                       />
