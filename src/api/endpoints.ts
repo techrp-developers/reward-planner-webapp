@@ -197,5 +197,32 @@ export const ENDPOINTS = {
   cms: {
     contentProducts: (id: ApiId) => `/v1/cms/content/${id}/products`,
   },
+  status: {
+    feed: '/v1/status/feed',
+    mine: '/v1/status/mine',
+    audienceOptions: '/v1/status/audience-options',
+    create: '/v1/status',
+    view: (id: ApiId) => `/v1/status/${id}/view`,
+    views: (id: ApiId) => `/v1/status/${id}/views`,
+    like: (id: ApiId) => `/v1/status/${id}/like`,
+    likes: (id: ApiId) => `/v1/status/${id}/likes`,
+    comments: (id: ApiId) => `/v1/status/${id}/comments`,
+    deleteComment: (statusId: ApiId, commentId: ApiId) => `/v1/status/${statusId}/comments/${commentId}`,
+    delete: (id: ApiId) => `/v1/status/${id}`,
+  },
+  games: {
+    quiz: {
+      leaderboard: '/v1/quiz/leaderboard',
+      sessions: '/v1/quiz/sessions',
+      sessionById: (id: ApiId) => `/v1/quiz/sessions/${id}`,
+      answer: (id: ApiId) => `/v1/quiz/sessions/${id}/answer`,
+      next: (id: ApiId) => `/v1/quiz/sessions/${id}/next`,
+    },
+    sudoku: {
+      start: '/v1/sudoku/start',
+      complete: '/v1/sudoku/complete',
+      leaderboard: '/v1/sudoku/leaderboard',
+    },
+  },
 };
 

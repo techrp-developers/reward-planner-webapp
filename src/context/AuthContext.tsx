@@ -55,9 +55,9 @@ export const AuthProvider = ({ children }) => {
       // Set auth header in client
       api.defaults.headers.common.Authorization = `Bearer ${storedToken}`;
 
-      // 3.5-second timeout for session hydration to avoid hanging on cold/slow API
+      // 15-second timeout for session hydration to allow live database queries to complete reliably
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Session hydration timeout')), 3500)
+        setTimeout(() => reject(new Error('Session hydration timeout')), 15000)
       );
       const res = await Promise.race([fetchUserInfo(), timeoutPromise]);
 

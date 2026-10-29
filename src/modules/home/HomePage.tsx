@@ -28,7 +28,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
-import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
@@ -39,7 +38,10 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import whatsappDoodle from '../../assets/home/whatsapp_doodle.png';
+import gameIcon from '../../assets/home/Gameicon.png';
+import chatIcon from '../../assets/home/Chaticon.png';
 import { useAuth } from '../../context/AuthContext';
+import { resolveAvatarUrl } from '../../api/client';
 import './HomePage.css';
 import OccasionCalendar from './components/OccasionCalendar';
 import BenefitHighlights from './components/BenefitHighlights';
@@ -52,7 +54,7 @@ export const HomePage = () => {
   const { user, isAuthenticated, openAuth } = useAuth();
   const rawName = user?.name || user?.first_name;
   const name = rawName && !/^\d+$/.test(String(rawName).trim()) ? String(rawName).trim().split(' ')[0] : 'Sylas';
-  const avatar = user?.userImage || user?.avatar;
+  const avatar = resolveAvatarUrl(user?.userImage || user?.user_image || user?.avatar || user?.photo);
 
 
   // Toast notification state
@@ -80,6 +82,14 @@ export const HomePage = () => {
   const handleReaction = (type) => {
     setReactionCounts(prev => ({ ...prev, [type]: prev[type] + 1 }));
     showToast(`Reaction added! Thank you for celebrating our team members! 🎉`);
+  };
+
+  const handleGameClick = () => {
+    navigate('/games');
+  };
+
+  const handleChatClick = () => {
+    navigate('/chat');
   };
 
   // Helper to map an appropriate icon based on task title/context
@@ -524,19 +534,6 @@ export const HomePage = () => {
       actionType: 'toast',
       icon: WorkspacePremiumIcon,
       color: 'from-amber-500/10 to-yellow-500/10'
-    },
-    {
-      id: 4,
-      type: 'townhall',
-      name: 'All-Hands Townhall',
-      title: 'All-Hands Townhall',
-      badge: 'Quarterly Meetup',
-      person: 'Executive Team',
-      desc: 'Join our quarterly company townhall this Friday at 4:00 PM for vision updates, recognition awards and live Q&A.',
-      cta: 'RSVP Now',
-      actionType: 'toast',
-      icon: CelebrationOutlinedIcon,
-      color: 'from-blue-500/10 to-indigo-500/10'
     }
   ];
 
@@ -568,12 +565,7 @@ export const HomePage = () => {
         {/* ── 0.5. TEAM BIRTHDAYS SECTION (First Today's Birthday, Then Upcoming) ── */}
         <EmployeeBirthdays />
 
-        {/* ── 1. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
-        <BenefitHighlights />
-
-        {/* ── 2. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
-        <ServiceShortcuts />
-
+        {/* ── 1. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
         <section className="engagement-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch mb-16 sm:mb-20">
           
           {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
@@ -786,13 +778,12 @@ export const HomePage = () => {
                 </div>
               </div>
 
-              {/* Category Quick Pills in responsive 4-col grid (avoids horizontal truncation e.g. Townhall) */}
-              <div className="grid grid-cols-4 gap-2 pt-4 pb-4">
+              {/* Category Quick Pills in responsive 3-col grid */}
+              <div className="grid grid-cols-3 gap-2.5 pt-4 pb-4">
                 {[
                   { label: 'Spotlight', icon: EmojiEventsIcon, index: 0 },
                   { label: 'Birthday', icon: CakeOutlinedIcon, index: 1 },
-                  { label: 'Milestone', icon: WorkspacePremiumIcon, index: 2 },
-                  { label: 'Townhall', icon: RocketLaunchOutlinedIcon, index: 3 }
+                  { label: 'Milestone', icon: WorkspacePremiumIcon, index: 2 }
                 ].map((cat) => {
                   const CatIcon = cat.icon;
                   const isActive = announcementIndex === cat.index;
@@ -801,7 +792,7 @@ export const HomePage = () => {
                       key={cat.index}
                       type="button"
                       onClick={() => setAnnouncementIndex(cat.index)}
-                      className={`inline-flex items-center justify-center gap-1 py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer truncate ${
+                      className={`inline-flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer truncate ${
                         isActive
                           ? 'bg-[#1C0E28] text-white shadow-xs scale-[1.02]'
                           : 'bg-white/70 border border-[#E9AC85] text-[#776B80] hover:bg-white'
@@ -1267,11 +1258,67 @@ export const HomePage = () => {
 
         </section>
 
-        {/* ── 2. OCCASION CALENDAR SECTION (FULL-WIDTH) ── */}
+        {/* ── 2. YOUR BENEFIT HIGHLIGHTS SECTION ── */}
+        <BenefitHighlights />
+
+        {/* ── 3. SERVICE SHORTCUTS ── */}
+        <ServiceShortcuts />
+
+        {/* ── 4. OCCASION CALENDAR SECTION (FULL-WIDTH) ── */}
         <OccasionCalendar />
 
         <ServiceDiscovery />
       </div>
+
+      {/* Floating Sticky Actions: Game & Chat in Right Corner */}
+      <aside
+        className="fixed right-4 sm:right-6 md:right-8 bottom-24 sm:bottom-8 z-40 flex flex-col items-center gap-3 sm:gap-3.5 select-none"
+        aria-label="Floating Shortcuts"
+      >
+        {/* Game Icon Floating Button */}
+        <button
+          type="button"
+          onClick={handleGameClick}
+          className="group relative w-12 h-12 sm:w-14 sm:h-14 md:w-[60px] md:h-[60px] rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-hidden cursor-pointer"
+          aria-label="Games & Challenges"
+        >
+          {/* Tooltip on hover (desktop) */}
+          <span className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-xl bg-[#1C0E28] text-white text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 border border-purple-400/20 hidden sm:flex items-center">
+            Games & Challenges
+            <span className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-[#1C0E28]" />
+          </span>
+
+          <img
+            src={gameIcon}
+            alt="Games & Challenges"
+            className="w-full h-full object-contain filter drop-shadow-[0_8px_18px_rgba(107,33,168,0.38)] group-hover:drop-shadow-[0_12px_26px_rgba(107,33,168,0.6)] transition-all pointer-events-none"
+            loading="eager"
+            draggable={false}
+          />
+        </button>
+
+        {/* Chat Icon Floating Button */}
+        <button
+          type="button"
+          onClick={handleChatClick}
+          className="group relative w-12 h-12 sm:w-14 sm:h-14 md:w-[60px] md:h-[60px] rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-hidden cursor-pointer"
+          aria-label="Customer Support & Chat"
+        >
+          {/* Tooltip on hover (desktop) */}
+          <span className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-xl bg-[#1C0E28] text-white text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 border border-purple-400/20 hidden sm:flex items-center">
+            Support & Chat
+            <span className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-[#1C0E28]" />
+          </span>
+
+          <img
+            src={chatIcon}
+            alt="Support & Chat"
+            className="w-full h-full object-contain filter drop-shadow-[0_8px_18px_rgba(147,51,234,0.38)] group-hover:drop-shadow-[0_12px_26px_rgba(147,51,234,0.6)] transition-all pointer-events-none"
+            loading="eager"
+            draggable={false}
+          />
+        </button>
+      </aside>
 
       {/* Mobile Navigation Bar */}
       <nav className="dashboard-mobile-nav" aria-label="Dashboard navigation">

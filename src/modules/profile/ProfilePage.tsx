@@ -17,6 +17,7 @@ import userAvatarPlaceholder from '../../assets/home/user-avatar.png';
 import profileCardBg from '../../assets/home/profilecardbg.png';
 import mpsLogo from '../../assets/mps_logo.svg';
 import { IMAGE_BASE_URL } from '../../api/endpoints';
+import { resolveAvatarUrl } from '../../api/client';
 
 // Material UI Icons
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
@@ -277,7 +278,8 @@ export const ProfilePage = () => {
   const memberSinceDisplay = activeUser?.created_at ? formatDate(activeUser.created_at) : '17 March 2025';
   const rewardPointsNumber = activeUser?.rewardPoints ?? activeUser?.wallet_points ?? activeUser?.points ?? 2964;
   const rewardPointsFormatted = Number(rewardPointsNumber).toLocaleString('en-IN');
-  const userAvatar = avatarUri || activeUser?.userImage || activeUser?.avatar || userAvatarPlaceholder;
+  const rawAvatar = avatarUri || activeUser?.userImage || activeUser?.user_image || activeUser?.avatar || activeUser?.photo;
+  const userAvatar = resolveAvatarUrl(rawAvatar) || userAvatarPlaceholder;
 
   if (loading) {
     return (

@@ -15,7 +15,7 @@ import { queryClient } from './queryClient';
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AuthProvider>
           <LocationProvider>
             <CartProvider>

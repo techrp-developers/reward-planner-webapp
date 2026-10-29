@@ -4,6 +4,7 @@ import { Avatar, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useAuth } from '../../context/AuthContext';
+import { resolveAvatarUrl } from '../../api/client';
 
 export default function AccountMenu() {
   const { user, logout } = useAuth();
@@ -12,7 +13,7 @@ export default function AccountMenu() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState('');
   const name = user?.name || user?.full_name || user?.first_name || 'Your account';
-  const avatar = user?.userImage || user?.avatar;
+  const avatar = resolveAvatarUrl(user?.userImage || user?.user_image || user?.avatar || user?.photo);
   const close = () => setAnchor(null);
 
   const handleLogout = async () => {

@@ -1,18 +1,118 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import CheckIcon from '@mui/icons-material/Check';
-import birthdayBgBubbles from '../../../assets/home/birthday_bg_bubbles.png';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import bdyBgCard from '../../../assets/home/birthday-banner.png';
+import './EmployeeBirthdays.css';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchCompanyBirthdays, sendBirthdayWishApi } from '../../../api/authApi';
+import { resolveAvatarUrl } from '../../../api/client';
 import {
   hasWishedColleague,
   recordBirthdayWish,
   isCompanyMatch,
-  isBirthdayToday,
+  getCompanyFromUser,
 } from '../../../services/celebrationService';
-import { INITIAL_COMPANY_EMPLOYEES } from '../../../data/companyEmployeesData';
+import {
+  INITIAL_COMPANY_EMPLOYEES,
+  findEmployeeDirectoryInfo,
+  getDeterministicUpcomingDob,
+} from '../../../data/companyEmployeesData';
+
+/**
+ * Confetti Crown graphic that sits directly above upcoming colleague avatars
+ * matching the user's reference mockup.
+ */
+const ConfettiCrown: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 64 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`w-12 h-5 pointer-events-none select-none ${className}`}
+  >
+    <circle cx="8" cy="18" r="2" fill="#F43F5E" />
+    <circle cx="16" cy="11" r="2.2" fill="#FBBF24" />
+    <circle cx="25" cy="6" r="2" fill="#EC4899" />
+    <circle cx="32" cy="4" r="2.5" fill="#8B5CF6" />
+    <circle cx="39" cy="6" r="2" fill="#3B82F6" />
+    <circle cx="48" cy="11" r="2.2" fill="#F59E0B" />
+    <circle cx="56" cy="18" r="2" fill="#10B981" />
+    <path d="M20 18 L21.5 20 L20 22 L18.5 20 Z" fill="#F472B6" />
+    <path d="M44 18 L45.5 20 L44 22 L42.5 20 Z" fill="#FBBF24" />
+    <path d="M31 12 L32.5 14 L31 16 L29.5 14 Z" fill="#A855F7" />
+    <path d="M12 7 L14 8 L13 10 L11 9 Z" fill="#38BDF8" />
+    <path d="M51 7 L53 9 L51 10 L49 8 Z" fill="#FB7185" />
+  </svg>
+);
+
+/**
+ * Elegant default placeholder for when no colleague has a birthday today.
+ * Renders a crisp vector silhouette of a user profile with soft neutral styling.
+ */
+const EmptyProfileAvatar: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <div
+    className={`w-full h-full flex items-center justify-center bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] select-none ${className}`}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className="w-[58%] h-[58%]"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="7.5" r="4.2" fill="#94A3B8" />
+      <path
+        d="M12 13.5C8 13.5 4.8 15.9 4.8 19V20.5H19.2V19C19.2 15.9 16 13.5 12 13.5Z"
+        fill="#94A3B8"
+      />
+    </svg>
+  </div>
+);
+
+/**
+ * Avatar component that renders the real photo, or gracefully falls back
+ * to a styled circular badge showing the first letter of the first name.
+ */
+interface UserAvatarProps {
+  name: string;
+  avatar?: string;
+  className?: string;
+  isToday?: boolean;
+}
+
+const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '' }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const firstLetter = useMemo(() => {
+    if (!name) return 'U';
+    const clean = name.trim();
+    const firstName = clean.split(/\s+/)[0] || clean;
+    return firstName.charAt(0).toUpperCase() || 'U';
+  }, [name]);
+
+  const resolvedAvatar = useMemo(() => resolveAvatarUrl(avatar), [avatar]);
+  const hasValidAvatar = Boolean(resolvedAvatar && !imgFailed);
+
+  return (
+    <div className={`relative shrink-0 overflow-hidden rounded-full ${className}`}>
+      {hasValidAvatar ? (
+        <img
+          src={resolvedAvatar}
+          alt={name}
+          onError={() => setImgFailed(true)}
+          className="w-full h-full object-cover rounded-full"
+          loading="lazy"
+        />
+      ) : (
+        <div
+          className="w-full h-full flex items-center justify-center font-black bg-gradient-to-tr from-[#D946EF] via-[#EC4899] to-[#F43F5E] text-white select-none uppercase tracking-tight shadow-inner"
+        >
+          {firstLetter}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export interface BirthdayPerson {
   id: string | number;
@@ -20,7 +120,13 @@ export interface BirthdayPerson {
   role: string;
   avatar: string;
   isToday: boolean;
+  daysUntil?: number;
   dateStr: string;
+  formattedDate: string;
+  dob?: string;
+  department?: string;
+  email?: string;
+  phone?: string;
   employeeId?: string | number;
   userId?: string | number;
 }
@@ -30,46 +136,209 @@ const MONTH_NAMES = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
-const formatBirthdayDate = (dob: string | Date | undefined, isToday: boolean): string => {
-  if (isToday) return 'Birthday today';
-  if (!dob) return 'Upcoming';
+/**
+ * Parses employee personal birth date and calculates birthday status,
+ * days remaining until the next birthday, and human-readable date string.
+ */
+const getBirthdayMeta = (dob: string | Date | undefined, dateStrHint?: string) => {
+  if (!dob && !dateStrHint) {
+    return {
+      isToday: false,
+      daysUntil: 9999,
+      dateStr: 'Upcoming',
+      formattedDate: '',
+      month: 0,
+      day: 0,
+      isCurrentMonth: false,
+      isUpcomingThisMonth: false,
+    };
+  }
 
-  const str = String(dob).trim();
-  const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-  if (match) {
-    const m = parseInt(match[2], 10);
-    const d = parseInt(match[3], 10);
-    if (m >= 1 && m <= 12) {
-      return `${MONTH_NAMES[m - 1]} ${d}`;
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-12
+  const currentDay = now.getDate(); // 1-31
+  const currentYear = now.getFullYear();
+
+  let m = 0;
+  let d = 0;
+
+  if (dob instanceof Date && !isNaN(dob.getTime())) {
+    m = dob.getMonth() + 1;
+    d = dob.getDate();
+  } else {
+    const str = String(dob || dateStrHint || '').trim();
+
+    // 1. Check YYYY-MM-DD or YYYY/MM/DD
+    const ymd = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (ymd) {
+      m = parseInt(ymd[2], 10);
+      d = parseInt(ymd[3], 10);
+    } else {
+      // 2. Check DD-MM-YYYY or DD/MM/YYYY
+      const dmy = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      if (dmy) {
+        d = parseInt(dmy[1], 10);
+        m = parseInt(dmy[2], 10);
+      } else {
+        // 3. Check MM-DD or MM/DD
+        const mmdd = str.match(/^(\d{1,2})[-/](\d{1,2})$/);
+        if (mmdd) {
+          m = parseInt(mmdd[1], 10);
+          d = parseInt(mmdd[2], 10);
+        } else {
+          // 4. Textual month names
+          const monthMap: Record<string, number> = {
+            jan: 1, january: 1,
+            feb: 2, february: 2,
+            mar: 3, march: 3,
+            apr: 4, april: 4,
+            may: 5,
+            jun: 6, june: 6,
+            jul: 7, july: 7,
+            aug: 8, august: 8,
+            sep: 9, september: 9,
+            oct: 10, october: 10,
+            nov: 11, november: 11,
+            dec: 12, december: 12,
+          };
+
+          const monthNameMatch = str.match(/(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)/i);
+          const dayMatch = str.match(/\b([1-9]|[12]\d|3[01])(?:st|nd|rd|th)?\b/i);
+
+          if (monthNameMatch && dayMatch) {
+            m = monthMap[monthNameMatch[1].toLowerCase()] || 0;
+            d = parseInt(dayMatch[1], 10);
+          } else {
+            try {
+              const parsed = new Date(str);
+              if (!isNaN(parsed.getTime())) {
+                m = parsed.getMonth() + 1;
+                d = parsed.getDate();
+              }
+            } catch {}
+          }
+        }
+      }
+    }
+
+    if (str.includes('T')) {
+      try {
+        const isoParsed = new Date(str);
+        if (!isNaN(isoParsed.getTime())) {
+          const isoM = isoParsed.getMonth() + 1;
+          const isoD = isoParsed.getDate();
+          if (isoM === currentMonth && isoD === currentDay) {
+            m = isoM;
+            d = isoD;
+          }
+        }
+      } catch {}
     }
   }
 
-  try {
-    const parsed = new Date(str);
-    if (!isNaN(parsed.getTime())) {
-      return `${MONTH_NAMES[parsed.getMonth()]} ${parsed.getDate()}`;
-    }
-  } catch {}
+  if (!m || !d || m < 1 || m > 12) {
+    return {
+      isToday: false,
+      daysUntil: 9999,
+      dateStr: 'Upcoming',
+      formattedDate: '',
+      month: 0,
+      day: 0,
+      isCurrentMonth: false,
+      isUpcomingThisMonth: false,
+    };
+  }
 
-  return 'Upcoming';
+  const todayMidnight = new Date(currentYear, currentMonth - 1, currentDay, 0, 0, 0, 0);
+  const isCurrentMonth = m === currentMonth;
+  const isToday = isCurrentMonth && d === currentDay;
+  const isUpcomingThisMonth = isCurrentMonth && d > currentDay;
+
+  let nextBday = new Date(currentYear, m - 1, d, 0, 0, 0, 0);
+  if (nextBday.getTime() < todayMidnight.getTime()) {
+    nextBday = new Date(currentYear + 1, m - 1, d, 0, 0, 0, 0);
+  }
+  const diffMs = nextBday.getTime() - todayMidnight.getTime();
+  const daysUntil = isToday
+    ? 0
+    : Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+
+  const formattedDate = `${MONTH_NAMES[m - 1]} ${d}`;
+  const dateStr = isToday ? `Today, ${formattedDate}` : formattedDate;
+
+  return {
+    isToday,
+    daysUntil,
+    dateStr,
+    formattedDate,
+    month: m,
+    day: d,
+    isCurrentMonth,
+    isUpcomingThisMonth,
+  };
 };
 
 export default function EmployeeBirthdays() {
   const { user } = useAuth();
   const [backendBirthdays, setBackendBirthdays] = useState<any[] | null>(null);
+  const [backendCompanyName, setBackendCompanyName] = useState<string | null>(null);
   const [wishedIds, setWishedIds] = useState<Set<string | number>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeCelebrantIndex, setActiveCelebrantIndex] = useState(0);
+  const [upcomingPage, setUpcomingPage] = useState(0);
 
-  // Fetch dynamic birthdays from backend API on mount
+  // Retrieve cached user profile from session/local storage for instant hydration
+  const cachedUser = useMemo(() => {
+    try {
+      const stored = sessionStorage.getItem('rp_user_profile') || localStorage.getItem('rp_user_profile');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const activeUser = user || cachedUser;
+
+  const userId =
+    activeUser?.userId ||
+    activeUser?.user_id ||
+    activeUser?.id ||
+    activeUser?.customer_id ||
+    '';
+  const companyId =
+    activeUser?.company_id ||
+    activeUser?.companyId ||
+    activeUser?.company?.company_id ||
+    activeUser?.company?.id ||
+    activeUser?.employeeInfo?.company_id ||
+    '';
+
+  // Fetch all employees of that company using userId & company_id
   useEffect(() => {
     let isMounted = true;
     const loadBirthdays = async () => {
       try {
-        const res = await fetchCompanyBirthdays();
+        const targetCompanyName = getCompanyFromUser(activeUser) || '';
+        const res = await fetchCompanyBirthdays({
+          company_id: companyId,
+          user_id: userId,
+          companyId,
+          userId,
+          company_name: targetCompanyName,
+          companyName: targetCompanyName,
+        });
+
         if (isMounted && res) {
-          const list = Array.isArray(res) ? res : (res.all || res.today || []);
+          const list = Array.isArray(res)
+            ? res
+            : (Array.isArray(res.all) && res.all.length > 0
+              ? res.all
+              : [...(res.today || []), ...(res.upcoming || [])]);
           if (Array.isArray(list) && list.length > 0) {
             setBackendBirthdays(list);
+          }
+          if (res.companyName) {
+            setBackendCompanyName(res.companyName);
           }
         }
       } catch (err) {
@@ -81,90 +350,212 @@ export default function EmployeeBirthdays() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [userId, companyId, activeUser]);
 
-  // Compute the combined dynamic birthday list
+  // Compute the combined dynamic birthday list strictly for current user's company ONLY
   const birthdayList = useMemo<BirthdayPerson[]>(() => {
-    // 1. Identify active company name
-    const companyName =
-      user?.company?.name ||
-      user?.company_name ||
-      (typeof user?.company === 'string' ? user?.company : '') ||
-      user?.employeeInfo?.company ||
-      user?.employer?.name ||
-      'MPS Global';
+    const activeCompanyName =
+      getCompanyFromUser(activeUser) ||
+      backendCompanyName ||
+      (activeUser ? '' : 'MPS Global');
 
-    // 2. Check if backend provided dynamic birthdays (from dedicated endpoint or user session)
-    const rawBackendList = backendBirthdays?.length
-      ? backendBirthdays
-      : (Array.isArray(user?.birthday_employees) && user.birthday_employees.length > 0
-          ? user.birthday_employees
-          : null);
+    let candidatePool: any[] = [];
+
+    if (backendBirthdays && backendBirthdays.length > 0) {
+      backendBirthdays.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.birthday_employees) && activeUser.birthday_employees.length > 0) {
+      activeUser.birthday_employees.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.today_birthdays) && activeUser.today_birthdays.length > 0) {
+      activeUser.today_birthdays.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true, isToday: true }));
+    }
+    if (Array.isArray(activeUser?.upcoming_birthdays) && activeUser.upcoming_birthdays.length > 0) {
+      activeUser.upcoming_birthdays.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.company?.employees) && activeUser.company.employees.length > 0) {
+      activeUser.company.employees.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.company_users) && activeUser.company_users.length > 0) {
+      activeUser.company_users.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.employees) && activeUser.employees.length > 0) {
+      activeUser.employees.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.colleagues) && activeUser.colleagues.length > 0) {
+      activeUser.colleagues.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+    if (Array.isArray(activeUser?.team) && activeUser.team.length > 0) {
+      activeUser.team.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
+    }
+
+    try {
+      localStorage.removeItem('rp_custom_company_employees');
+      localStorage.removeItem('rp_company_employees');
+      const safeComp = (companyId || activeCompanyName || 'company').toString().replace(/[^a-z0-9]/gi, '_');
+      const sessionStored = sessionStorage.getItem(`rp_company_employees_${safeComp}`);
+      if (sessionStored) {
+        const parsed = JSON.parse(sessionStored);
+        if (Array.isArray(parsed) && parsed.length > 0) candidatePool.push(...parsed);
+      }
+    } catch {}
+
+    // Only fallback to mock employees if no backend company employees were found
+    if (candidatePool.length === 0) {
+      const targetMatchName = activeCompanyName || 'MPS Global';
+      const companyMatches = INITIAL_COMPANY_EMPLOYEES.filter((emp) =>
+        isCompanyMatch(emp.company, targetMatchName)
+      );
+      candidatePool.push(...(companyMatches.length > 0 ? companyMatches : INITIAL_COMPANY_EMPLOYEES));
+    }
 
     const dynamicList: BirthdayPerson[] = [];
     const seenIds = new Set<string | number>();
+    const seenNames = new Set<string>();
 
-    if (rawBackendList && rawBackendList.length > 0) {
-      rawBackendList.forEach((emp: any) => {
-        const id = emp.id || emp.employeeId || emp.userId;
-        if (!id || seenIds.has(id)) return;
-        seenIds.add(id);
+    candidatePool.forEach((emp: any) => {
+      if (!emp) return;
 
-        const isToday = Boolean(emp.isToday ?? isBirthdayToday(emp.dob));
-        const dateStr = emp.dateStr || formatBirthdayDate(emp.dob, isToday);
+      const isLiveBackend = Boolean(emp.fromLiveBackend);
 
-        dynamicList.push({
-          id,
-          name: emp.name || 'Valued Colleague',
-          role: emp.role || emp.department || 'Team Member',
-          avatar:
-            emp.avatar ||
-            emp.image ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name || 'RP')}&background=FCE7F3&color=E11D48&bold=true`,
-          isToday,
-          dateStr,
-          employeeId: emp.employeeId || id,
-          userId: emp.userId,
-        });
-      });
-    }
+      if (!isLiveBackend) {
+        const empCompanyId = emp.company_id || emp.companyId || emp.company?.id;
+        if (companyId && empCompanyId && String(empCompanyId) !== String(companyId)) {
+          return;
+        }
 
-    // 3. Fallback or augment with corporate directory colleagues for current company if fewer than 2 cards
-    if (dynamicList.length < 2) {
-      const companyMatches = INITIAL_COMPANY_EMPLOYEES.filter((emp) =>
-        isCompanyMatch(emp.company, companyName)
+        const empCompany =
+          getCompanyFromUser(emp) ||
+          (typeof emp.company === 'string' ? emp.company : emp.company?.name) ||
+          emp.companyName ||
+          emp.employer ||
+          emp.company_name;
+
+        if (activeCompanyName && empCompany && !isCompanyMatch(empCompany, activeCompanyName)) {
+          return;
+        }
+
+        if (!empCompany && !empCompanyId && activeCompanyName) {
+          return;
+        }
+      }
+
+      const id = emp.id || emp.employee_id || emp.employeeId || emp.userId;
+      const cleanName = (emp.name || emp.fullName || '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+      if (id && seenIds.has(id)) return;
+      if (cleanName && seenNames.has(cleanName)) return;
+
+      if (id) seenIds.add(id);
+      if (cleanName) seenNames.add(cleanName);
+
+      const dirMatch = findEmployeeDirectoryInfo(id, emp.name);
+
+      let dob =
+        emp.dob ||
+        emp.date_of_birth ||
+        emp.birthday ||
+        emp.birth_date ||
+        emp.employeeInfo?.date_of_birth ||
+        dirMatch?.dob;
+
+      if (!dob && !isLiveBackend) {
+        dob = getDeterministicUpcomingDob(id || emp.name);
+      }
+
+      const meta = getBirthdayMeta(dob, emp.dateStr);
+
+      const isToday = Boolean(
+        emp.isToday === true ||
+        emp.isToday === 1 ||
+        emp.isToday === '1' ||
+        emp.is_today === 1 ||
+        emp.is_today === true ||
+        meta.isToday
       );
 
-      const fallbackPool = companyMatches.length > 0 ? companyMatches : INITIAL_COMPANY_EMPLOYEES.slice(0, 5);
+      let daysUntil = 9999;
+      if (isToday) {
+        daysUntil = 0;
+      } else if (typeof emp.daysUntil === 'number' && emp.daysUntil >= 0) {
+        daysUntil = emp.daysUntil;
+      } else if (meta.daysUntil !== 9999) {
+        daysUntil = meta.daysUntil;
+      }
 
-      fallbackPool.forEach((emp) => {
-        if (seenIds.has(emp.id)) return;
-        seenIds.add(emp.id);
+      if (!isToday && daysUntil === 9999 && !isLiveBackend) {
+        return;
+      }
 
-        const isToday = isBirthdayToday(emp.dob);
-        const dateStr = formatBirthdayDate(emp.dob, isToday);
+      const now = new Date();
+      const currentMonthName = MONTH_NAMES[now.getMonth()];
+      const currentDayNum = now.getDate();
+      const todayFormatted = `${currentMonthName} ${currentDayNum}`;
 
-        dynamicList.push({
-          id: emp.id,
-          name: emp.name,
-          role: emp.role || emp.department || 'Colleague',
-          avatar:
-            emp.avatar ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}&background=FCE7F3&color=E11D48&bold=true`,
-          isToday,
-          dateStr,
-          employeeId: emp.id,
-        });
+      let formattedDate = '';
+      if (emp.dateStr && emp.dateStr !== 'Upcoming' && emp.dateStr !== 'Birthday today') {
+        formattedDate = emp.dateStr;
+      } else if (meta.formattedDate) {
+        formattedDate = meta.formattedDate;
+      } else if (meta.month && meta.day) {
+        formattedDate = `${MONTH_NAMES[meta.month - 1]} ${meta.day}`;
+      } else if (isToday) {
+        formattedDate = todayFormatted;
+      } else if (emp.dateStr === 'Upcoming') {
+        formattedDate = 'Upcoming';
+      } else if (typeof daysUntil === 'number' && daysUntil < 365) {
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + daysUntil);
+        formattedDate = `${MONTH_NAMES[targetDate.getMonth()]} ${targetDate.getDate()}`;
+      } else {
+        formattedDate = 'Upcoming';
+      }
+
+      const dateStr = isToday ? `Today • ${formattedDate}` : formattedDate;
+
+      let role = emp.role || emp.designation || emp.title || dirMatch?.role || '';
+      if (!role || role === 'Team Member') {
+        role = dirMatch?.role || emp.department || dirMatch?.department || 'Team Member';
+      }
+
+      const department = emp.department || dirMatch?.department || '';
+
+      const rawAvatar =
+        emp.avatar ||
+        emp.image ||
+        emp.photo ||
+        emp.userImage ||
+        emp.user_image ||
+        dirMatch?.avatar ||
+        '';
+      const cleanAvatar = resolveAvatarUrl(rawAvatar);
+
+      dynamicList.push({
+        id,
+        name: emp.name || emp.fullName || dirMatch?.name || 'Colleague',
+        role,
+        department,
+        email: emp.email || dirMatch?.email || '',
+        phone: emp.phone || emp.contact || '',
+        dob,
+        avatar: cleanAvatar,
+        isToday,
+        daysUntil,
+        dateStr,
+        formattedDate,
+        employeeId: emp.employeeId || emp.employee_id || id,
+        userId: emp.userId || emp.recipient_user_id,
       });
-    }
+    });
 
-    // Sort: Today's birthdays first, then upcoming birthdays
     return dynamicList.sort((a, b) => {
       if (a.isToday && !b.isToday) return -1;
       if (!a.isToday && b.isToday) return 1;
-      return 0;
+      const diff = (a.daysUntil ?? 9999) - (b.daysUntil ?? 9999);
+      if (diff !== 0) return diff;
+      return (a.name || '').localeCompare(b.name || '');
     });
-  }, [user, backendBirthdays]);
+  }, [activeUser, backendBirthdays, backendCompanyName, companyId]);
 
   // Synchronize wish states from local storage so wishes survive refreshes
   useEffect(() => {
@@ -177,21 +568,49 @@ export default function EmployeeBirthdays() {
     setWishedIds(wishedSet);
   }, [birthdayList]);
 
-  // Dynamic Counts
-  const todayCount = useMemo(() => birthdayList.filter((p) => p.isToday).length, [birthdayList]);
-  const upcomingCount = useMemo(() => birthdayList.filter((p) => !p.isToday).length, [birthdayList]);
+  // Partition into today celebrants and upcoming celebrants
+  const todayCelebrants = useMemo(() => birthdayList.filter((p) => p.isToday), [birthdayList]);
+  const upcomingCelebrants = useMemo(() => birthdayList.filter((p) => !p.isToday), [birthdayList]);
+
+  // Active featured person: If there are today's birthdays, feature them (with carousel if > 1);
+  // otherwise null so that today's birthday section displays in its empty state with profile photo
+  const featuredPerson = useMemo<BirthdayPerson | null>(() => {
+    if (todayCelebrants.length > 0) {
+      const idx = activeCelebrantIndex % todayCelebrants.length;
+      return todayCelebrants[idx] || todayCelebrants[0];
+    }
+    return null;
+  }, [todayCelebrants, activeCelebrantIndex]);
+
+  // Upcoming 3-column pagination
+  const totalUpcomingPages = Math.max(1, Math.ceil(upcomingCelebrants.length / 3));
+
+  const handleNextUpcoming = () => {
+    setUpcomingPage((prev) => (prev + 1) % totalUpcomingPages);
+  };
+
+  const handlePrevUpcoming = () => {
+    setUpcomingPage((prev) => (prev - 1 + totalUpcomingPages) % totalUpcomingPages);
+  };
+
+  const visibleUpcoming = useMemo(() => {
+    const start = (upcomingPage % totalUpcomingPages) * 3;
+    return upcomingCelebrants.slice(start, start + 3);
+  }, [upcomingCelebrants, upcomingPage, totalUpcomingPages]);
 
   const handleSendWish = async (person: BirthdayPerson) => {
+    if (!person) return;
     setWishedIds((prev) => new Set(prev).add(person.id));
-    recordBirthdayWish(person.id, person.isToday ? 'Happy Birthday!' : 'Happy Early Birthday!');
+    const wishMsg = person.isToday
+      ? `Warm birthday wishes to ${person.name}! 🎂🎉`
+      : `Happy early birthday to ${person.name}! 🎈`;
+    recordBirthdayWish(person.id, wishMsg);
 
     try {
       await sendBirthdayWishApi({
         employeeId: person.employeeId || person.id,
         recipientUserId: person.userId,
-        message: person.isToday
-          ? `Warm birthday wishes sent to ${person.name}! 🎂🎉`
-          : `Early birthday greetings sent to ${person.name}! 🎈`,
+        message: wishMsg,
       });
     } catch (err) {
       console.warn('Could not send birthday wish via API:', err);
@@ -199,293 +618,106 @@ export default function EmployeeBirthdays() {
 
     setToastMessage(
       person.isToday
-        ? `Warm birthday wishes sent to ${person.name}! 🎂🎉`
-        : `Early birthday greetings sent to ${person.name}! 🎈`
+        ? `Birthday wishes sent to ${person.name}! 🎂🎉`
+        : `Early birthday greeting sent to ${person.name}! 🎈`
     );
-    setTimeout(() => setToastMessage(null), 3200);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
+  if (birthdayList.length === 0 && !backendBirthdays && !activeUser) return null;
+
+  const isFeaturedWished = featuredPerson ? wishedIds.has(featuredPerson.id) : false;
+
   return (
-    <section className="w-full mb-9 sm:mb-11 select-none" aria-label="Team Birthdays">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 bg-[#1C0E28] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs sm:text-sm animate-fadeIn border border-purple-400/20">
-          <CheckIcon sx={{ fontSize: 18 }} className="text-emerald-400" />
-          <span>{toastMessage}</span>
+    <section className="birthday-section" aria-label="Team Birthday Celebration">
+      {toastMessage && <div className="birthday-toast" role="status"><CheckIcon fontSize="small" />{toastMessage}</div>}
+      <div className="birthday-banner" style={{ '--birthday-art': `url(${bdyBgCard})` } as React.CSSProperties}>
+        <div className="birthday-art" aria-hidden="true" />
+        <div className="birthday-intro">
+          <h3><span className="birthday-heading-icon"><CalendarTodayOutlinedIcon /></span>Birthdays</h3>
         </div>
-      )}
-
-      {/* Birthday Section Background Card (Matching Uploaded Bubble Layout) */}
-      <div
-        className="relative rounded-[22px] sm:rounded-[24px] p-4 sm:p-5 overflow-hidden transition-all duration-300 border border-[#F3E8FF] shadow-[0_12px_36px_-6px_rgba(236,72,153,0.09),0_2px_10px_-2px_rgba(139,92,246,0.05),inset_0_1px_2px_rgba(255,255,255,0.95)]"
-        style={{
-          backgroundImage: `url(${birthdayBgBubbles})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        {/* Subtle Glossy Specular Sheen Sweep */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-transparent pointer-events-none rounded-[inherit]" />
-
-        {/* Small Title Header */}
-        <div className="relative z-10 flex items-center justify-between mb-3.5 sm:mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-white/90 border border-rose-200/80 shadow-2xs flex items-center justify-center text-[#E11D48] shrink-0">
-              <CakeOutlinedIcon sx={{ fontSize: 16 }} className="text-[#E11D48]" />
-            </div>
-            <h3 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight">
-              Birthdays
-            </h3>
-          </div>
-          <span className="text-[11px] font-semibold text-[#E11D48] bg-white/90 px-2.5 py-0.5 rounded-full border border-rose-200/80 shadow-2xs flex items-center gap-1.5 backdrop-blur-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] animate-pulse" />
-            {todayCount > 0 ? `${todayCount} Today` : `${upcomingCount} Upcoming`}
-          </span>
-        </div>
-
-        {/* Birthday Cards Track - First Today's Birthday, Then Upcoming */}
-        <div className="relative z-10 flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar py-1">
-          {birthdayList.map((person) => {
-            const isToday = person.isToday;
-            const isWished = wishedIds.has(person.id);
-
-            return (
-              <div
-                key={person.id}
-                className={`min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:flex-1 rounded-[18px] sm:rounded-[20px] transition-all relative flex flex-col justify-between overflow-hidden ${
-                  isToday
-                    ? 'bg-white border border-[#FECDD3] shadow-[0_4px_16px_-4px_rgba(244,63,94,0.10)]'
-                    : 'bg-white border border-[#E2E8F0] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.04)] hover:shadow-sm'
-                }`}
+        <div className="birthday-feature">
+          {featuredPerson ? (
+            <>
+              <button
+                type="button"
+                className="birthday-feature-photo"
+                onClick={() => handleSendWish(featuredPerson)}
+                disabled={isFeaturedWished}
+                aria-label={
+                  isFeaturedWished
+                    ? `Wishes sent to ${featuredPerson.name}`
+                    : `Send birthday wishes to ${featuredPerson.name}`
+                }
               >
-                {/* Today's Card Specific Top-Right Pink Blush */}
-                {isToday && (
-                  <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-gradient-to-br from-pink-200/55 via-rose-100/30 to-transparent pointer-events-none" />
+                <UserAvatar
+                  name={featuredPerson.name}
+                  avatar={featuredPerson.avatar}
+                  className="w-full h-full"
+                  isToday={true}
+                />
+              </button>
+              <span className="birthday-ribbon">&#9733; Today's Birthday &#9733;</span>
+              <div className="birthday-feature-details">
+                <h4 title={featuredPerson.name}>{featuredPerson.name}</h4>
+                <p title={featuredPerson.role}>{featuredPerson.role}</p>
+                {isFeaturedWished && (
+                  <span className="birthday-wished">
+                    <CheckIcon fontSize="inherit" /> Wishes sent
+                  </span>
                 )}
-
-                {/* Card Main Body */}
-                {isToday ? (
-                  /* TODAY'S BIRTHDAY CARD: Avatar + Info + 3D Cake (Matching Screenshot) */
-                  <div className="py-3 px-3.5 sm:py-3.5 sm:px-4 flex items-center justify-between gap-2.5 relative z-10">
-                    {/* Avatar with soft halo border */}
-                    <div className="relative shrink-0">
-                      <div className="p-[2px] rounded-full bg-gradient-to-tr from-rose-200 via-pink-100 to-rose-200 shadow-2xs">
-                        <div className="p-[1.5px] rounded-full bg-white">
-                          <img
-                            src={person.avatar}
-                            alt={person.name}
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=FCE7F3&color=E11D48&bold=true`;
-                            }}
-                            className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Middle Info: Tag above name */}
-                    <div className="flex-1 min-w-0 pr-1">
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bold tracking-wider text-[#E11D48] uppercase mb-0.5">
-                        <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#E11D48]" />
-                        <span>BIRTHDAY TODAY</span>
-                      </div>
-
-                      <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
-                        {person.name}
-                      </h4>
-                      <p className="text-[11px] sm:text-xs text-[#776B80] font-normal truncate mt-0.5">
-                        {person.role}
-                      </p>
-                    </div>
-
-                    {/* Right Illustration: 3D Birthday Cake with Candle & Confetti */}
-                    <div className="shrink-0 relative">
-                      <svg
-                        width="64"
-                        height="62"
-                        viewBox="0 0 92 88"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="select-none pointer-events-none"
-                      >
-                        <defs>
-                          <linearGradient id="standGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#FBBF24" />
-                            <stop offset="100%" stopColor="#D97706" />
-                          </linearGradient>
-                          <linearGradient id="cakeBody" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#F472B6" />
-                            <stop offset="50%" stopColor="#FDA4AF" />
-                            <stop offset="100%" stopColor="#F43F5E" />
-                          </linearGradient>
-                          <linearGradient id="frostingCream" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#FFF1F2" />
-                            <stop offset="60%" stopColor="#FECDD3" />
-                            <stop offset="100%" stopColor="#FDA4AF" />
-                          </linearGradient>
-                          <linearGradient id="candleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#FB7185" />
-                            <stop offset="50%" stopColor="#FFF1F2" />
-                            <stop offset="100%" stopColor="#F43F5E" />
-                          </linearGradient>
-                          <radialGradient id="flameGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#FEF08A" />
-                            <stop offset="50%" stopColor="#F59E0B" />
-                            <stop offset="100%" stopColor="#EA580C" />
-                          </radialGradient>
-                        </defs>
-
-                        {/* Streamer Left (Yellow) */}
-                        <path
-                          d="M14 46 C10 44, 12 39, 16 37 C20 35, 17 30, 21 28"
-                          stroke="#F59E0B"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          fill="none"
-                        />
-
-                        {/* Streamer Right (Pink) */}
-                        <path
-                          d="M78 44 C82 42, 80 37, 76 35 C72 33, 75 28, 71 26"
-                          stroke="#EC4899"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          fill="none"
-                        />
-
-                        {/* Floating Pink Heart Top-Left */}
-                        <path
-                          d="M22 23 C22 20.5 20 18.5 17.5 18.5 C15.5 18.5 14 19.8 13.5 21 C13 19.8 11.5 18.5 9.5 18.5 C7 18.5 5 20.5 5 23 C5 26.5 10 30.5 13.5 32 C17 30.5 22 26.5 22 23 Z"
-                          fill="#F472B6"
-                          transform="scale(0.55) translate(22, 10)"
-                        />
-
-                        {/* 4-Point Pink Sparkle Top-Right */}
-                        <path
-                          d="M58 17 L59.5 21 L63.5 22.5 L59.5 24 L58 28 L56.5 24 L52.5 22.5 L56.5 21 Z"
-                          fill="#F472B6"
-                        />
-
-                        {/* Confetti dots */}
-                        <circle cx="75" cy="21" r="2" fill="#FBBF24" />
-                        <circle cx="78" cy="46" r="1.5" fill="#F472B6" />
-
-                        {/* Stand */}
-                        <ellipse cx="48" cy="74" rx="27" ry="7" fill="url(#standGrad)" />
-                        <ellipse cx="48" cy="72" rx="25" ry="6" fill="#FDE68A" />
-
-                        {/* Cake Body */}
-                        <path
-                          d="M24 57 C24 57 24 68 26 70 C30 73 66 73 70 70 C72 68 72 57 72 57 Z"
-                          fill="url(#cakeBody)"
-                        />
-                        <ellipse cx="48" cy="57" rx="24" ry="7" fill="#F43F5E" />
-
-                        {/* Scalloped Dripping Frosting */}
-                        <path
-                          d="M24 53
-                             C24 53, 25 61, 28 61 C31 61, 31 53, 34 53
-                             C37 53, 37 63, 40 63 C43 63, 43 53, 46 53
-                             C49 53, 49 64, 52 64 C55 64, 55 53, 58 53
-                             C61 53, 61 62, 64 62 C67 62, 68 53, 72 53
-                             C72 53, 72 46, 72 46
-                             C72 46, 24 46, 24 46 Z"
-                          fill="url(#frostingCream)"
-                        />
-                        <ellipse cx="48" cy="46" rx="24" ry="7" fill="url(#frostingCream)" />
-
-                        {/* Frosting puffs */}
-                        <circle cx="27" cy="45" r="3" fill="#FFF1F2" />
-                        <circle cx="34" cy="48" r="3.2" fill="#FFF1F2" />
-                        <circle cx="42" cy="50" r="3.5" fill="#FFF1F2" />
-                        <circle cx="50" cy="50" r="3.5" fill="#FFF1F2" />
-                        <circle cx="58" cy="48" r="3.2" fill="#FFF1F2" />
-                        <circle cx="66" cy="46" r="3" fill="#FFF1F2" />
-
-                        {/* Candle */}
-                        <rect x="46" y="24" width="4" height="20" rx="2" fill="url(#candleGrad)" />
-                        <path d="M46 27 L50 25 M46 32 L50 30 M46 37 L50 35 M46 42 L50 40" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" />
-                        <line x1="48" y1="24" x2="48" y2="21" stroke="#374151" strokeWidth="1" />
-
-                        {/* Glowing flame */}
-                        <path
-                          d="M48 9 C51 14 52 18 50 21 C49 22.5 47 22.5 46 21 C44 18 45 14 48 9 Z"
-                          fill="url(#flameGlow)"
-                        />
-                        <ellipse cx="48" cy="18" rx="1.5" ry="2.5" fill="#FEF08A" />
-                      </svg>
-                    </div>
-                  </div>
-                ) : (
-                  /* UPCOMING BIRTHDAY CARD: Avatar + Info */
-                  <div className="py-3 px-3.5 sm:py-3.5 sm:px-4 flex items-center gap-3 relative z-10">
-                    {/* Circular Avatar */}
-                    <div className="relative shrink-0">
-                      <img
-                        src={person.avatar}
-                        alt={person.name}
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=FCE7F3&color=E11D48&bold=true`;
-                        }}
-                        className="w-12 h-12 sm:w-[50px] sm:h-[50px] rounded-full object-cover border border-slate-100"
-                        loading="lazy"
-                      />
-                    </div>
-
-                    {/* Information */}
-                    <div className="flex-1 min-w-0">
-                      {/* Red Upcoming Label */}
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bold tracking-wider text-[#E11D48] uppercase mb-0.5">
-                        <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#E11D48]" />
-                        <span>UPCOMING</span>
-                      </div>
-
-                      <h4 className="text-sm sm:text-base font-bold text-[#1C0E28] tracking-tight truncate leading-tight">
-                        {person.name}
-                      </h4>
-                      <p className="text-[11px] sm:text-xs text-[#776B80] font-normal truncate mt-0.5">
-                        {person.role}
-                      </p>
-                      <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-[#64748B] font-medium mt-1">
-                        <CalendarTodayOutlinedIcon sx={{ fontSize: 12 }} className="text-[#94A3B8]" />
-                        <span>{person.dateStr}</span>
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bottom Action Section with Divider */}
-                <div className="border-t border-[#F1F5F9] w-full relative z-10">
-                  <button
-                    type="button"
-                    onClick={() => handleSendWish(person)}
-                    className={`w-full py-2 px-3 flex items-center justify-center gap-1.5 text-xs sm:text-[13px] font-bold transition-colors cursor-pointer ${
-                      isToday
-                        ? 'text-[#E11D48] hover:text-[#BE123C]'
-                        : 'text-[#7C3AED] hover:text-[#6D28D9]'
-                    }`}
-                    aria-label={`Send birthday wishes to ${person.name}`}
-                  >
-                    {isWished ? (
-                      <>
-                        <CheckIcon sx={{ fontSize: 15 }} className="text-emerald-500" />
-                        <span className="text-emerald-600 font-bold">Wishes sent</span>
-                      </>
-                    ) : (
-                      <>
-                        <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
-                        <span>Send wishes</span>
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
-            );
-          })}
+              {todayCelebrants.length > 1 && (
+                <button
+                  type="button"
+                  className="birthday-feature-next"
+                  onClick={() => setActiveCelebrantIndex((index) => index + 1)}
+                  aria-label="Show next featured birthday"
+                >
+                  <ChevronRightIcon />
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <div
+                className="birthday-feature-photo birthday-feature-photo--empty"
+                aria-label="No birthdays today"
+              >
+                <EmptyProfileAvatar className="w-full h-full" />
+              </div>
+              <span className="birthday-ribbon">&#9733; Today's Birthday &#9733;</span>
+              <div className="birthday-feature-details">
+                <h4>No Birthday Today</h4>
+                <p>No celebrations today</p>
+              </div>
+            </>
+          )}
+        </div>
+        <div className="birthday-upcoming">
+          <div className="birthday-toolbar">
+            <span className="birthday-count"><i />{todayCelebrants.length} Today <span aria-hidden="true">&bull;</span> {upcomingCelebrants.length} Upcoming</span>
+            <div className="birthday-navigation">
+              <button type="button" onClick={handlePrevUpcoming} disabled={totalUpcomingPages <= 1} aria-label="Previous upcoming birthdays"><ChevronLeftIcon /></button>
+              <button type="button" onClick={handleNextUpcoming} disabled={totalUpcomingPages <= 1} aria-label="Next upcoming birthdays"><ChevronRightIcon /></button>
+            </div>
+          </div>
+          <h4 className="birthday-upcoming-title"><CalendarTodayOutlinedIcon />Upcoming Birthdays</h4>
+          <div className="birthday-colleagues" aria-live="polite">
+            {visibleUpcoming.map(colleague => (
+              <button type="button" key={colleague.id} className="birthday-colleague" onClick={() => handleSendWish(colleague)} disabled={wishedIds.has(colleague.id)}
+                aria-label={`${colleague.name}, ${colleague.formattedDate}${wishedIds.has(colleague.id) ? ', wishes sent' : ', send early birthday wishes'}`}>
+                <div className="birthday-colleague-portrait">
+                  <ConfettiCrown className="birthday-confetti" />
+                  <UserAvatar name={colleague.name} avatar={colleague.avatar} className="birthday-colleague-avatar" />
+                </div>
+                <h5 title={colleague.name}>{colleague.name}</h5>
+                <p title={colleague.role}>{colleague.role}</p>
+                <span className="birthday-date"><CalendarTodayOutlinedIcon />{colleague.formattedDate}{wishedIds.has(colleague.id) && <CheckIcon />}</span>
+              </button>
+            ))}
+            {!visibleUpcoming.length && <p className="birthday-empty">More celebrations are on the way. Stay tuned!</p>}
+          </div>
         </div>
       </div>
     </section>

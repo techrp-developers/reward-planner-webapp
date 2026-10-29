@@ -7,10 +7,16 @@ export default defineConfig({
   base: '/employee-login/',
   plugins: [react(), tailwindcss()],
   server: {
+    open: true,
     watch: { ignored: ['**/.*-validation/**'] },
     port: 5173,
-    strictPort: true,
+    strictPort: false,
     proxy: {
+      '/v1': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
       '/api/policyplanner': {
         target: 'https://policyplanner.com',
         changeOrigin: true,
@@ -22,7 +28,7 @@ export default defineConfig({
         },
       },
       '/api/crm': {
-        target: 'https://rewardplanners.com',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },

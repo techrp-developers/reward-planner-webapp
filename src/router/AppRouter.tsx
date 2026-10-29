@@ -29,6 +29,11 @@ import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
 import NotificationsPage from '../modules/notifications/NotificationsPage';
+import GamesHomePage from '../modules/games/GamesHomePage';
+import QuizGamePage from '../modules/games/QuizGamePage';
+import SudokuGamePage from '../modules/games/SudokuGamePage';
+import GamesLeaderboardPage from '../modules/games/GamesLeaderboardPage';
+import ChatPage from '../modules/chat/ChatPage';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -77,6 +82,9 @@ export const AppRouter = () => {
     location.pathname.startsWith('/product') ||
     location.pathname.startsWith('/navratri');
 
+  const isGamesPage = location.pathname.startsWith('/games');
+  const isChatPage = location.pathname.startsWith('/chat');
+
   // 1. Initial Session Hydration Screen
   if (loading) {
     return (
@@ -108,6 +116,8 @@ export const AppRouter = () => {
           <Route path="/customer-support" element={<CustomerSupportPage />} />
           <Route path="/support" element={<CustomerSupportPage />} />
           <Route path="/help" element={<CustomerSupportPage />} />
+          <Route path="/chat" element={<LoginPage />} />
+          <Route path="/chat/:chatId" element={<LoginPage />} />
           <Route path="/policies/:policyId" element={<PolicyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -117,16 +127,16 @@ export const AppRouter = () => {
 
   // 3. Authenticated Experience: Full Web App with Home Screen on root
   return (
-    <div className={`min-h-screen flex flex-col bg-white text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
+    <div className={`min-h-screen flex flex-col ${isGamesPage ? 'bg-[#020F28] games-layout no-scrollbar' : isChatPage ? 'h-screen overflow-hidden bg-white' : 'bg-white'} text-[#111827] font-['Plus_Jakarta_Sans',sans-serif] overflow-x-hidden ${isFixedLayout ? 'h-screen overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:h-dvh lg:min-h-0 lg:overflow-hidden' : ''}`}>
       {/* AUTO SCROLL TO TOP ON ALL NAVIGATIONS */}
       <ScrollToTop />
 
       {/* TWO-TIER FULL-WIDTH HEADER (NO SIGN IN BUTTON) */}
-      <TopHeader />
-      <MegaMenuStrip />
+      {!isGamesPage && !isChatPage && <TopHeader />}
+      {!isGamesPage && !isChatPage && <MegaMenuStrip />}
 
       {/* FULL-WIDTH MAIN CONTENT OUTLET */}
-      <main className={`flex-1 w-full bg-white overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-5rem)] lg:h-[calc(100vh-3.75rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
+      <main className={`flex-1 w-full ${isGamesPage ? 'bg-[#020F28] games-layout no-scrollbar' : isChatPage ? 'h-screen overflow-hidden' : 'bg-white'} overflow-x-hidden ${isFixedLayout ? 'h-[calc(100vh-5rem)] lg:h-[calc(100vh-3.75rem)] overflow-hidden' : ''} ${isServicePurchasePage ? 'lg:min-h-0 lg:overflow-hidden' : ''}`}>
         <Suspense fallback={<div role="status" className="p-8 text-center text-sm text-gray-500">Loading page...</div>}>
         {isStageRoute ? (
           <CinematicModuleStage />
@@ -177,12 +187,23 @@ export const AppRouter = () => {
             <Route path="/policies/:policyId" element={<PolicyPage />} />
 
             <Route path="/fitness" element={<Navigate to="/" replace />} />
-            <Route path="/coming-soon" element={<Navigate to="/" replace />} />
-            
+            {/* GAMES & CHALLENGES MODULE */}
+            <Route path="/games" element={<GamesHomePage />} />
+            <Route path="/games/quiz" element={<QuizGamePage />} />
+            <Route path="/games/sudoku" element={<SudokuGamePage />} />
+            <Route path="/games/leaderboard" element={<GamesLeaderboardPage />} />
+            <Route path="/games/quiz/leaderboard" element={<GamesLeaderboardPage defaultTab="quiz" />} />
+            <Route path="/games/sudoku/leaderboard" element={<GamesLeaderboardPage defaultTab="sudoku" />} />
+            <Route path="/games/*" element={<GamesHomePage />} />
+
             {/* CUSTOMER SUPPORT & HELP DESK */}
             <Route path="/customer-support" element={<CustomerSupportPage />} />
             <Route path="/support" element={<CustomerSupportPage />} />
             <Route path="/help" element={<CustomerSupportPage />} />
+
+            {/* WHATSAPP CHAT MODULE */}
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/chat/:chatId" element={<ChatPage />} />
 
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/orders" element={<ProfilePage />} />
@@ -202,7 +223,7 @@ export const AppRouter = () => {
       <AuthModal />
 
 
-      <MobileBottomBar />
+      {!isGamesPage && !isChatPage && <MobileBottomBar />}
     </div>
   );
 };

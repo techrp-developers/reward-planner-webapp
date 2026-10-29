@@ -213,7 +213,7 @@ export const BirthdayCelebrationModal = ({
                     {/* Quick Birthday Badge */}
                     <div className="text-right shrink-0">
                       <span className="text-[11px] font-bold text-violet-700 bg-violet-100/70 px-2.5 py-1 rounded-full border border-violet-200/80 inline-block">
-                        Today 🎉
+                        Today • {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} 🎉
                       </span>
                     </div>
                   </div>

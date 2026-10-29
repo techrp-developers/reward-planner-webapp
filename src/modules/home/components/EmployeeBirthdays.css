@@ -1,0 +1,129 @@
+.birthday-section { width: 100%; margin-bottom: 32px; color: #101644; container-type: inline-size; }
+.birthday-banner { position: relative; isolation: isolate; aspect-ratio: 4.3; border-radius: 24px; overflow: hidden; background: #fff0df; box-shadow: 0 7px 22px #e735b329; }
+/* The supplied PNG includes transparent space above and below the artwork. */
+.birthday-art { position: absolute; z-index: -1; inset: 0; background-image: var(--birthday-art); background-size: 100% 148%; background-position: center 45%; pointer-events: none; }
+.birthday-intro { position: absolute; inset: 7% auto auto 2.5%; width: 21%; }
+.birthday-intro h3 { color: #000; display: flex; align-items: center; gap: .9cqw; margin: 0; font-size: 1.7cqw; font-weight: 800; letter-spacing: -.04em; }
+.birthday-heading-icon { display: grid; place-items: center; width: 3.4cqw; height: 3.4cqw; background: #fff; color: #f60090; border-radius: 1.1cqw; box-shadow: 0 2px 3px #d953a329; }
+.birthday-heading-icon svg { width: 1.9cqw; height: 1.9cqw; }
+.birthday-greeting { margin: 2cqw 0 0 1.6cqw; }
+.birthday-banner .birthday-greeting > span { font-family: 'Dancing Script', 'Caveat', 'Freestyle Script', cursive !important; display: inline-block; white-space: nowrap; font-size: 3cqw; line-height: 1.2; font-weight: 700; letter-spacing: -.05em; background: linear-gradient(90deg, #7C3AED 0%, #D946EF 50%, #F43F5E 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; color: transparent !important; transform: rotate(-5deg); }
+.birthday-greeting p { color: #000; margin: .75cqw 0 0; font-size: 1.08cqw; font-weight: 500; line-height: 1.5; }
+.birthday-feature { position: absolute; inset: 0; pointer-events: none; }
+.birthday-feature::after { content: ''; position: absolute; z-index: 1; inset: 0; background-image: var(--birthday-art); background-size: 100% 148%; background-position: center 45%; clip-path: polygon(23% 57%, 43% 57%, 43% 100%, 23% 100%); pointer-events: none; }
+.birthday-feature-photo { position: absolute; z-index: 0; left: 27.85%; top: 25%; width: 9.95%; height: auto; aspect-ratio: 1 / 1; padding: 0; border: 2px solid #ffd66b; border-radius: 50%; clip-path: circle(50%); box-sizing: border-box; overflow: hidden; pointer-events: auto; cursor: pointer; font-size: 5cqw; }
+.birthday-feature-photo > div { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
+.birthday-feature-photo img { display: block; width: 100%; height: 100%; max-width: none; aspect-ratio: 1; object-fit: cover; object-position: center 25%; border-radius: 50%; }
+.birthday-ribbon { position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; height: 7%; line-height: 1; white-space: nowrap; left: 24.7%; top: 58%; width: 16%; text-align: center; color: #000; font-size: 1.05cqw; font-weight: 800; letter-spacing: -.04em; transform: rotate(-1deg); }
+.birthday-feature-details { position: absolute; z-index: 2; left: 24.5%; top: 69%; width: 16.6%; text-align: center; color: #fff; }
+.birthday-feature-details h4 { margin: 0; font-size: 1.25cqw; font-weight: 800; line-height: 1.15; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.birthday-feature-details p { margin: .25cqw 0 0; color: #fff; font-size: .78cqw; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.birthday-wished { display: inline-flex; gap: 2px; align-items: center; color: #fff3ad; font-size: .7cqw; }
+.birthday-wished svg { width: .9cqw; height: .9cqw; }
+.birthday-feature-next { position: absolute; z-index: 3; left: 41.2%; top: 47%; pointer-events: auto; width: 1.9cqw; height: 1.9cqw; display: grid; place-items: center; border: 0; border-radius: 50%; background: #fffdf1; color: #620d8e; cursor: pointer; }
+.birthday-feature-next svg { width: 1.5cqw; height: 1.5cqw; }
+.birthday-upcoming { position: absolute; left: 54%; right: 2%; top: 7%; bottom: 13%; border-left: 1px solid #f68ac273; padding-left: 2%; }
+.birthday-toolbar { display: flex; justify-content: flex-end; gap: .9cqw; align-items: center; }
+.birthday-count { display: inline-flex; align-items: center; gap: .3cqw; white-space: nowrap; border-radius: 30px; padding: .55cqw .9cqw; background: #fff5f5e8; color: #f50082; font-size: .9cqw; font-weight: 800; box-shadow: 0 2px 3px #dc6c8e38; }
+.birthday-count i { width: .55cqw; height: .55cqw; background: currentColor; border-radius: 50%; }
+.birthday-navigation { display: flex; gap: .5cqw; }
+.birthday-navigation button { display: grid; place-items: center; width: 2.6cqw; height: 2.6cqw; border-radius: 50%; background: #fff; color: #5c1288; border: 0; box-shadow: 0 2px 4px #d66b952e; cursor: pointer; }
+.birthday-navigation svg { width: 1.9cqw; height: 1.9cqw; }
+.birthday-navigation button:disabled { opacity: .5; cursor: default; }
+.birthday-upcoming-title { color: #000; display: flex; align-items: center; gap: .65cqw; margin: -.7cqw 0 0; font-size: 1.45cqw; font-weight: 800; letter-spacing: -.045em; }
+.birthday-upcoming-title svg { color: #fa0087; width: 1.85cqw; height: 1.85cqw; }
+.birthday-colleagues { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 2.4cqw; }
+.birthday-colleague { min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 .6cqw; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.birthday-colleague + .birthday-colleague { border-left: 1px solid #eb90c34f; }
+.birthday-colleague-portrait { position: relative; }
+.birthday-colleague-avatar { width: 4.6cqw; height: 4.6cqw; font-size: 2.2cqw; }
+.birthday-confetti { position: absolute; bottom: 84%; left: -16%; width: 132%; height: 45%; }
+.birthday-colleague h5 { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin: .5cqw 0 .1cqw; font-size: 1.02cqw; font-weight: 800; letter-spacing: -.04em; }
+.birthday-colleague p { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin: 0; color: #47618b; font-size: .85cqw; }
+.birthday-date { display: inline-flex; align-items: center; gap: .3cqw; margin-top: .4cqw; font-size: .95cqw; font-weight: 800; color: #f50082; }
+.birthday-date svg { width: 1cqw; height: 1cqw; }
+.birthday-empty { grid-column: 1 / -1; text-align: center; font-size: 1.1cqw; color: #47618b; }
+.birthday-toast { position: fixed; top: 85px; right: 24px; z-index: 100; max-width: calc(100vw - 48px); display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 14px; background: #3b1057; color: white; font-size: 13px; box-shadow: 0 4px 20px #39115133; }
+.birthday-banner button:focus-visible { outline: 3px solid #6e16bd; outline-offset: 4px; }
+@container (max-width: 900px) {
+  .birthday-banner { aspect-ratio: auto; height: 570px; border-radius: 20px; background: linear-gradient(#fff2e6, #fff6fc); }
+  .birthday-art { top: 105px; left: 50%; right: auto; bottom: auto; width: 1072px; height: 245px; transform: translateX(-32.7%); background-size: 100% 148%; background-position: center 45%; }
+  .birthday-intro { inset: 16px 16px auto; width: auto; }
+  .birthday-intro h3 { color: #000; font-size: 20px; gap: 8px; }
+  .birthday-heading-icon { width: 34px; height: 34px; border-radius: 10px; }
+  .birthday-heading-icon svg { width: 23px; height: 23px; }
+  .birthday-greeting { position: absolute; top: 40px; left: 0; right: 0; margin: 0; text-align: center; }
+  .birthday-banner .birthday-greeting > span { font-family: 'Dancing Script', 'Caveat', 'Freestyle Script', cursive !important; font-size: 30px; }
+  .birthday-greeting p { color: #000; display: none; }
+  .birthday-feature { top: 105px; left: 50%; width: 1072px; height: 245px; transform: translateX(-32.7%); }
+  .birthday-feature-photo { top: 25%; font-size: 56px; }
+  .birthday-ribbon { font-size: 12px; }
+  .birthday-feature-details h4 { font-size: 14px; }
+  .birthday-feature-details p { font-size: 10px; }
+  .birthday-wished { font-size: 9px; }
+  .birthday-wished svg { width: 10px; height: 10px; }
+  .birthday-feature-next { width: 25px; height: 25px; }
+  .birthday-feature-next svg { width: 20px; height: 20px; }
+  .birthday-upcoming { left: 0; right: 0; top: 350px; bottom: 0; padding: 15px 12px; border-left: 0; background: #fff7fbd9; border-top: 1px solid #f4c9e4; }
+  .birthday-toolbar { justify-content: space-between; gap: 8px; }
+  .birthday-count { font-size: 10px; padding: 6px 9px; gap: 4px; }
+  .birthday-count i { width: 5px; height: 5px; }
+  .birthday-navigation { gap: 6px; }
+  .birthday-navigation button { width: 28px; height: 28px; }
+  .birthday-navigation svg { width: 21px; height: 21px; }
+  .birthday-upcoming-title { color: #000; font-size: 16px; gap: 6px; margin: 9px 0 0; }
+  .birthday-upcoming-title svg { width: 20px; height: 20px; }
+  .birthday-colleagues { margin-top: 21px; }
+  .birthday-colleague { padding: 0 5px; }
+  .birthday-colleague-avatar { width: 48px; height: 48px; font-size: 24px; }
+  .birthday-colleague h5 { font-size: 10px; margin-top: 6px; }
+  .birthday-colleague p { font-size: 9px; }
+  .birthday-date { font-size: 10px; gap: 3px; margin-top: 5px; }
+  .birthday-date svg { width: 12px; height: 12px; }
+  .birthday-empty { font-size: 13px; }
+}
+
+
+.birthday-feature-photo--empty {
+  cursor: default !important;
+  pointer-events: none;
+}
+
+/* All birthday card content in black text color as requested */
+.birthday-banner,
+.birthday-banner h3,
+.birthday-banner h4,
+.birthday-banner h5,
+.birthday-banner p,
+.birthday-banner .birthday-greeting > span,
+.birthday-ribbon,
+.birthday-feature-details h4,
+.birthday-feature-details p,
+.birthday-wished,
+.birthday-count,
+.birthday-date,
+.birthday-colleague h5,
+.birthday-colleague p,
+.birthday-upcoming-title,
+.birthday-empty {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+.birthday-banner .birthday-greeting > span {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+.birthday-count i {
+  background: #000000 !important;
+}
+
+.birthday-heading-icon svg,
+.birthday-upcoming-title svg,
+.birthday-date svg,
+.birthday-navigation button svg {
+  color: #000000 !important;
+}
+

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Caveat:wght@700&family=Pacifico&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -79,6 +79,16 @@ header, footer, article, form, figcaption, figure, blockquote, small {
   font-family: 'Material Icons' !important;
 }
 
+span.font-celebrate-script,
+div.font-celebrate-script,
+h1.font-celebrate-script,
+h2.font-celebrate-script,
+h3.font-celebrate-script,
+p.font-celebrate-script,
+.font-celebrate-script {
+  font-family: 'Dancing Script', 'Caveat', 'Pacifico', cursive !important;
+}
+
 /* Visible scrollbars in page content and vertical panels */
 ::-webkit-scrollbar {
   width: 10px;
@@ -112,6 +122,40 @@ header, footer, article, form, figcaption, figure, blockquote, small {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+/* Hide vertical and horizontal scrollbars in Game Module */
+html.in-games-module,
+body.in-games-module,
+html:has(.games-layout),
+body:has(.games-layout),
+html.in-games-module *,
+body.in-games-module *,
+html:has(.games-layout) *,
+body:has(.games-layout) * {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+html.in-games-module::-webkit-scrollbar,
+body.in-games-module::-webkit-scrollbar,
+html:has(.games-layout)::-webkit-scrollbar,
+body:has(.games-layout)::-webkit-scrollbar,
+html.in-games-module *::-webkit-scrollbar,
+body.in-games-module *::-webkit-scrollbar,
+html:has(.games-layout) *::-webkit-scrollbar,
+body:has(.games-layout) *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html.in-games-module,
+body.in-games-module,
+html:has(.games-layout),
+body:has(.games-layout) {
+  background-color: #020F28 !important;
 }
 
 /* Visible Custom Scrollbar class for modal and scrollable dialogs */

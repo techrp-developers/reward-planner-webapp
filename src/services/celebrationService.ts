@@ -1,7 +1,6 @@
 // src/services/celebrationService.js
 // Service for corporate employee birthdays, company filtering, and celebrations
 
-import { INITIAL_COMPANY_EMPLOYEES } from '../data/companyEmployeesData';
 
 /**
  * Checks if a given date of birth (DOB) matches today's date (month & day)
@@ -54,8 +53,8 @@ export const isBirthdayToday = (dob) => {
  * @param {object|string} user
  * @returns {string}
  */
-export const getCompanyFromUser = (user) => {
-  if (!user) return 'TechCorp Global';
+export const getCompanyFromUser = (user: any): string => {
+  if (!user) return '';
   if (typeof user === 'string' && user.trim()) return user.trim();
 
   if (typeof user.company === 'string' && user.company.trim()) {
@@ -63,6 +62,15 @@ export const getCompanyFromUser = (user) => {
   }
   if (user.company?.name && typeof user.company.name === 'string' && user.company.name.trim()) {
     return user.company.name.trim();
+  }
+  if (user.company?.company_name && typeof user.company.company_name === 'string' && user.company.company_name.trim()) {
+    return user.company.company_name.trim();
+  }
+  if (user.company?.companyName && typeof user.company.companyName === 'string' && user.company.companyName.trim()) {
+    return user.company.companyName.trim();
+  }
+  if (user.companyName && typeof user.companyName === 'string' && user.companyName.trim()) {
+    return user.companyName.trim();
   }
   if (user.company_name && typeof user.company_name === 'string' && user.company_name.trim()) {
     return user.company_name.trim();
@@ -79,8 +87,39 @@ export const getCompanyFromUser = (user) => {
   if (user.employeeInfo?.company && typeof user.employeeInfo.company === 'string' && user.employeeInfo.company.trim()) {
     return user.employeeInfo.company.trim();
   }
+  if (user.employeeInfo?.company_name && typeof user.employeeInfo.company_name === 'string' && user.employeeInfo.company_name.trim()) {
+    return user.employeeInfo.company_name.trim();
+  }
+  if (user.employeeInfo?.companyName && typeof user.employeeInfo.companyName === 'string' && user.employeeInfo.companyName.trim()) {
+    return user.employeeInfo.companyName.trim();
+  }
 
-  return 'TechCorp Global';
+  return '';
+};
+
+/**
+ * Extracts company ID from a user or employee object
+ */
+export const getCompanyIdFromUser = (user: any): string | number => {
+  if (!user) return '';
+  return (
+    user.company_id ||
+    user.companyId ||
+    user.company?.id ||
+    user.company?.company_id ||
+    user.company_user?.company_id ||
+    user.employeeInfo?.company_id ||
+    user.employeeInfo?.companyId ||
+    user.birthday_employees?.[0]?.companyId ||
+    user.birthday_employees?.[0]?.company_id ||
+    user.today_birthdays?.[0]?.companyId ||
+    user.today_birthdays?.[0]?.company_id ||
+    user.upcoming_birthdays?.[0]?.companyId ||
+    user.upcoming_birthdays?.[0]?.company_id ||
+    user.company_users?.[0]?.company_id ||
+    user.company_users?.[0]?.companyId ||
+    ''
+  );
 };
 
 /**
@@ -92,13 +131,47 @@ export const getCompanyFromUser = (user) => {
  */
 export const isCompanyMatch = (compA, compB) => {
   if (!compA || !compB) return false;
-  const cleanA = String(compA).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const cleanB = String(compB).toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (!cleanA || !cleanB) return false;
+  const rawA = String(compA).toLowerCase();
+  const rawB = String(compB).toLowerCase();
 
-  if (cleanA === cleanB) return true;
-  if (cleanA.includes(cleanB) || cleanB.includes(cleanA)) return true;
-  if ((cleanA.includes('mps') || cleanA.includes('pranaam')) && (cleanB.includes('mps') || cleanB.includes('pranaam'))) return true;
+  // Strip generic corporate suffixes to get core company brand name
+  const normalize = (str) =>
+    str
+      .toLowerCase()
+      .replace(/\b(private\s+limited|pvt\s+ltd|pvt|ltd|limited|llc|inc|corp|corporation|company)\b/gi, '')
+      .replace(/[^a-z0-9]/g, '');
+
+  const normA = normalize(rawA);
+  const normB = normalize(rawB);
+  if (!normA || !normB) return false;
+
+  if (normA === normB) return true;
+
+  // Specific brand aliases
+  const isMpsA = normA.includes('mps') || normA.includes('pranaam');
+  const isMpsB = normB.includes('mps') || normB.includes('pranaam');
+  if (isMpsA && isMpsB) return true;
+  if (isMpsA || isMpsB) return false;
+
+  const isTcsA = normA.includes('tcs') || normA.includes('tataconsultancy');
+  const isTcsB = normB.includes('tcs') || normB.includes('tataconsultancy');
+  if (isTcsA && isTcsB) return true;
+  if (isTcsA || isTcsB) return false;
+
+  const isRpA = normA.includes('rewardplanner');
+  const isRpB = normB.includes('rewardplanner');
+  if (isRpA && isRpB) return true;
+  if (isRpA || isRpB) return false;
+
+  const isPpA = normA.includes('policyplanner');
+  const isPpB = normB.includes('policyplanner');
+  if (isPpA && isPpB) return true;
+  if (isPpA || isPpB) return false;
+
+  // Guard against generic short substrings: only match if substantial length
+  if (Math.min(normA.length, normB.length) >= 6) {
+    if (normA.includes(normB) || normB.includes(normA)) return true;
+  }
 
   return false;
 };
@@ -110,7 +183,8 @@ export const isCompanyMatch = (compA, compB) => {
  * @returns {Array} List of celebrating employees
  */
 export const getTodayCelebrations = (companyName, userEmployees = []) => {
-  const targetCompany = companyName || 'TechCorp Global';
+  const targetCompany = companyName || '';
+  if (!targetCompany) return [];
 
   // Read any custom corporate employees saved in localStorage
   let cachedCustom = [];
@@ -124,11 +198,11 @@ export const getTodayCelebrations = (companyName, userEmployees = []) => {
 
   const liveList = Array.isArray(userEmployees) ? userEmployees : [];
 
-  // Combine all employee sources: live list + custom cached + initial directory
-  const combined = [...liveList, ...cachedCustom, ...INITIAL_COMPANY_EMPLOYEES];
+  // Combine all employee sources: live list + custom cached
+  const combined = [...liveList, ...cachedCustom];
 
   // Filter:
-  // 1. Employee belongs to target company
+  // 1. Employee belongs to target company strictly
   // 2. Employee birthday is today
   const matches = combined.filter((emp) => {
     if (!emp) return false;
@@ -157,32 +231,6 @@ export const getTodayCelebrations = (companyName, userEmployees = []) => {
         dob: emp.dob || emp.birthday || emp.date_of_birth,
       });
     }
-  }
-
-  // If target company has no explicit match in the directory, provide default celebrating colleagues for that company
-  if (deduped.length === 0) {
-    return [
-      {
-        id: `emp-default-1-${targetCompany.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-        name: 'Priya Sharma',
-        department: 'Engineering',
-        role: 'Lead Cloud Architect',
-        company: targetCompany,
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-        email: 'priya.s@corporate.com',
-        dob: new Date().toISOString().slice(0, 10),
-      },
-      {
-        id: `emp-default-2-${targetCompany.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-        name: 'Rahul Verma',
-        department: 'Sales & Ops',
-        role: 'Enterprise Operations Manager',
-        company: targetCompany,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        email: 'rahul.v@corporate.com',
-        dob: new Date().toISOString().slice(0, 10),
-      },
-    ];
   }
 
   return deduped;

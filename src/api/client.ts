@@ -110,4 +110,32 @@ export const getImageUrl = (imagePath: unknown): string => {
   return `${IMAGE_BASE_URL}/${encodeURI(clean)}`;
 };
 
+/**
+ * Normalizes an avatar or profile image to a full CDN URL.
+ * Automatically resolves R2 storage keys (e.g. public/customers/10/profile-xxx.jpg)
+ * to https://cdn.rewardplanners.com/public/customers/10/profile-xxx.jpg.
+ * Strips invalid/null/undefined/ui-avatars so consumers can render clean initial badges.
+ */
+export const resolveAvatarUrl = (avatar?: unknown): string => {
+  if (!avatar || typeof avatar !== 'string') return '';
+  const trimmed = avatar.trim();
+  if (
+    !trimmed ||
+    trimmed === 'null' ||
+    trimmed === 'undefined' ||
+    trimmed.includes('undefined') ||
+    trimmed.includes('null') ||
+    trimmed.includes('ui-avatars.com') ||
+    trimmed === '/placeholder.svg'
+  ) {
+    return '';
+  }
+  if (/^(https?|blob|data):/i.test(trimmed)) {
+    return trimmed;
+  }
+  const clean = trimmed.replace(/^\/+/, '');
+  return `${IMAGE_BASE_URL}/${encodeURI(clean)}`;
+};
+
 export default api;
+
