@@ -224,5 +224,21 @@ export const ENDPOINTS = {
       leaderboard: '/v1/sudoku/leaderboard',
     },
   },
+  bus: {
+    cities: '/api/busbooking/cities',
+    popularRoutes: '/api/busbooking/popular-routes',
+    search: '/api/busbooking/search',
+    seatLayout: '/api/busbooking/seat-layout',
+    boardingDroppingPoints: '/api/busbooking/boarding-dropping-points',
+    block: '/api/busbooking/block',
+    createOrder: '/api/busbooking/create-order',
+    verifyPayment: '/api/busbooking/verify-payment',
+    book: '/api/busbooking/book',
+    bookingDetails: '/api/busbooking/booking-details',
+    cancellationStatus: '/api/busbooking/cancellation-status',
+    orders: '/api/busbooking/orders',
+    orderDetail: (orderRef: ApiId) => `/api/busbooking/orders/${orderRef}`,
+    cancel: '/api/busbooking/cancel',
+  },
 };
 

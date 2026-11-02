@@ -25,6 +25,10 @@ const MutualFundPage = lazy(() => import('../modules/services/MutualFundPage'));
 const ServiceBundlePage = lazy(() => import('../modules/services/ServiceBundlePage'));
 const InsuranceQuotePage = lazy(() => import('../modules/services/insurance/InsuranceQuotePageFlow'));
 const InsuranceProductsPage = lazy(() => import('../modules/services/insurance/InsuranceProductsPage'));
+const BusHomePage = lazy(() => import('../modules/bus/BusHomePage'));
+const BusResultsPage = lazy(() => import('../modules/bus/BusResultsPage'));
+const BusBookingPage = lazy(() => import('../modules/bus/BusBookingPage'));
+const BusConfirmationPage = lazy(() => import('../modules/bus/BusConfirmationPage'));
 import ProfilePage from '../modules/profile/ProfilePage';
 import PolicyPage from '../modules/policies/PolicyPage';
 import CustomerSupportPage from '../modules/support/CustomerSupportPage';
@@ -84,6 +88,8 @@ export const AppRouter = () => {
 
   const isGamesPage = location.pathname.startsWith('/games');
   const isChatPage = location.pathname.startsWith('/chat');
+  // Booking flow renders its own sticky action bar on mobile
+  const isBusBookingFlow = location.pathname.startsWith('/bus/trip/');
 
   // 1. Initial Session Hydration Screen
   if (loading) {
@@ -196,6 +202,13 @@ export const AppRouter = () => {
             <Route path="/games/sudoku/leaderboard" element={<GamesLeaderboardPage defaultTab="sudoku" />} />
             <Route path="/games/*" element={<GamesHomePage />} />
 
+            {/* BUS BOOKING */}
+            <Route path="/bus" element={<BusHomePage />} />
+            <Route path="/bus/results" element={<BusResultsPage />} />
+            <Route path="/bus/trip/:tripId" element={<BusBookingPage />} />
+            <Route path="/bus/confirmation" element={<BusConfirmationPage />} />
+            <Route path="/bus/*" element={<Navigate to="/bus" replace />} />
+
             {/* CUSTOMER SUPPORT & HELP DESK */}
             <Route path="/customer-support" element={<CustomerSupportPage />} />
             <Route path="/support" element={<CustomerSupportPage />} />
@@ -223,7 +236,7 @@ export const AppRouter = () => {
       <AuthModal />
 
 
-      {!isGamesPage && !isChatPage && <MobileBottomBar />}
+      {!isGamesPage && !isChatPage && !isBusBookingFlow && <MobileBottomBar />}
     </div>
   );
 };

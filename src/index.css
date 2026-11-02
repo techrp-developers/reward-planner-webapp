@@ -55,6 +55,38 @@
   h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea, div, label, table, th, td, ul, ol, li, strong, b, em, i, section, main, aside, nav, header, footer, article, form, figcaption, figure, blockquote, small {
     font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
+
+  /* Tailwind v4 leaves buttons on the default cursor; show the hand on everything clickable */
+  a[href],
+  button,
+  summary,
+  select,
+  [role='button'],
+  [role='tab'],
+  [role='radio'],
+  [role='switch'],
+  [role='checkbox'],
+  [role='menuitem'],
+  [role='option'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset'],
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='range'],
+  input[type='file'],
+  input[type='color'],
+  label:has(> input[type='checkbox'], > input[type='radio']),
+  label[for]:has(+ input[type='checkbox'], + input[type='radio']) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  input:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
 }
 
 /* Universal modern Plus Jakarta Sans font enforcement across all content and elements */

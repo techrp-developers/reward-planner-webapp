@@ -1,0 +1,280 @@
+/* src/modules/bus/bus.css
+   "Sunset coach" design language for Bus Booking. Colours are taken from the hero banner:
+   midnight plum for structure, ember for action, champagne for rewards. */
+
+.bus-page {
+  background:
+    radial-gradient(900px 420px at 88% -80px, rgba(232, 74, 60, 0.07), transparent 70%),
+    radial-gradient(800px 420px at 0% 240px, rgba(105, 82, 198, 0.06), transparent 70%),
+    #fbf8f6;
+}
+
+/* Surfaces */
+.bus-card {
+  border: 1px solid rgba(45, 24, 62, 0.08);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(28, 14, 40, 0.04), 0 14px 34px -18px rgba(28, 14, 40, 0.16);
+}
+
+.bus-lift {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, border-color 220ms ease;
+}
+
+@media (hover: hover) {
+  .bus-lift:hover {
+    transform: translateY(-3px);
+    border-color: rgba(214, 48, 49, 0.28);
+    box-shadow: 0 2px 4px rgba(28, 14, 40, 0.05), 0 26px 46px -22px rgba(120, 24, 40, 0.34);
+  }
+}
+
+.bus-eyebrow {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a8c9f;
+}
+
+.bus-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Actions */
+.bus-cta {
+  background: linear-gradient(135deg, #f0534a 0%, #d62839 52%, #a50f3c 100%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 12px 26px -10px rgba(198, 32, 56, 0.7);
+  transition: transform 160ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+
+.bus-cta:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 16px 32px -10px rgba(198, 32, 56, 0.85);
+}
+
+.bus-cta:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.bus-cta:disabled {
+  background: #e9dfe4;
+  color: #a596a8;
+  box-shadow: none;
+}
+
+.bus-focus:focus-visible {
+  outline: 2px solid #d62839;
+  outline-offset: 2px;
+}
+
+/* Dark journey band */
+.bus-band {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(115deg, #170b22 0%, #24123a 48%, #3a1538 78%, #5c1a35 100%);
+}
+
+.bus-band::before,
+.bus-band::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(70px);
+}
+
+.bus-band::before {
+  top: -120px;
+  right: -40px;
+  width: 340px;
+  height: 260px;
+  background: rgba(240, 83, 74, 0.42);
+}
+
+.bus-band::after {
+  bottom: -150px;
+  left: 18%;
+  width: 360px;
+  height: 240px;
+  background: rgba(105, 82, 198, 0.34);
+}
+
+.bus-glass {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+/* Ticket perforation: round bites on a dashed edge */
+.bus-perf-x,
+.bus-perf-y {
+  position: relative;
+}
+
+.bus-perf-x::before,
+.bus-perf-x::after,
+.bus-perf-y::before,
+.bus-perf-y::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--bus-notch, #fbf8f6);
+  box-shadow: inset 0 0 0 1px rgba(45, 24, 62, 0.08);
+}
+
+.bus-perf-x {
+  border-top: 2px dashed rgba(45, 24, 62, 0.13);
+}
+
+.bus-perf-x::before {
+  top: -11px;
+  left: -11px;
+}
+
+.bus-perf-x::after {
+  top: -11px;
+  right: -11px;
+}
+
+.bus-perf-y {
+  border-left: 2px dashed rgba(45, 24, 62, 0.13);
+}
+
+.bus-perf-y::before {
+  top: -11px;
+  left: -11px;
+}
+
+.bus-perf-y::after {
+  bottom: -11px;
+  left: -11px;
+}
+
+/* Seat map */
+.bus-coach {
+  border: 1.5px solid rgba(45, 24, 62, 0.14);
+  border-radius: 54px 54px 24px 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf7fa 100%);
+  box-shadow: inset 0 0 0 5px #f6f0f5, 0 22px 44px -28px rgba(28, 14, 40, 0.4);
+}
+
+.bus-coach-upper {
+  border-radius: 28px 28px 24px 24px;
+}
+
+.bus-seat-sold {
+  background-image: repeating-linear-gradient(135deg, #f1ecf2 0 5px, #e8e1ea 5px 10px);
+}
+
+.bus-seat-selected {
+  background: linear-gradient(150deg, #f0534a, #b3123a);
+  box-shadow: 0 10px 20px -8px rgba(198, 32, 56, 0.8);
+  animation: bus-seat-pop 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bus-seat-women {
+  background: linear-gradient(160deg, #fde4ea, #f8c6d3);
+}
+
+/* Rewards */
+.bus-gold {
+  background: linear-gradient(120deg, #fff8e8 0%, #fdeec9 55%, #f7dea4 100%);
+  border: 1px solid #efd79e;
+}
+
+/* Motion */
+.bus-rise {
+  animation: bus-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bus-fade {
+  animation: bus-fade 180ms ease-out both;
+}
+
+.bus-sheet {
+  animation: bus-rise 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bus-confetti {
+  position: absolute;
+  top: -14px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: bus-confetti 2.6s cubic-bezier(0.3, 0.6, 0.5, 1) both;
+}
+
+@keyframes bus-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bus-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bus-seat-pop {
+  from {
+    transform: scale(0.86);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes bus-confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(240px) rotate(540deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bus-rise,
+  .bus-fade,
+  .bus-sheet,
+  .bus-seat-selected {
+    animation: none;
+  }
+
+  .bus-confetti {
+    display: none;
+  }
+
+  .bus-lift {
+    transition: none;
+  }
+}
+
+@media print {
+  .bus-band,
+  .bus-page {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

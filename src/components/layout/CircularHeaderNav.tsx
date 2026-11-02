@@ -13,6 +13,7 @@ export const HEADER_MODULES: HeaderModule[] = [
   { id: 'services', label: 'Services', path: '/services' },
   { id: 'products', label: 'Products', path: '/store' },
   { id: 'payments', label: 'Payments', path: '/bbps' },
+  { id: 'bus', label: 'Bus Booking', path: '/bus' },
 ];
 
 export const getModuleIndexFromPath = (path: string): number => {
@@ -20,16 +21,17 @@ export const getModuleIndexFromPath = (path: string): number => {
   if (path.startsWith('/services') || path === '/insurance' || path === '/tax') return 1;
   if (path.startsWith('/store') || path.startsWith('/deals') || path.startsWith('/product')) return 2;
   if (path.startsWith('/bbps')) return 3;
+  if (path === '/bus' || path.startsWith('/bus/')) return 4;
   return -1;
 };
 
-const N = HEADER_MODULES.length; // 4 modules
+const N = HEADER_MODULES.length; // 5 modules
 const VISIBLE_SLOTS = 3; // 3 visible modules in the carousel viewport
-const REPEAT = 8; // 8 sets of 4 = 32 persistent items
-const TOTAL_ITEMS = N * REPEAT; // 32 items total
-const BASE_SET = 3; // Middle set starts at index 12 (Set 3: indices 12..15)
+const REPEAT = 8; // 8 sets of N persistent items
+const TOTAL_ITEMS = N * REPEAT;
+const BASE_SET = 3; // Middle set starts at index BASE_SET * N
 
-// 32 persistent items so DOM elements never get re-created or re-mounted
+// Persistent items so DOM elements never get re-created or re-mounted
 const RIBBON_ITEMS: { ribbonIndex: number; module: HeaderModule }[] = Array.from(
   { length: TOTAL_ITEMS },
   (_, idx) => ({
