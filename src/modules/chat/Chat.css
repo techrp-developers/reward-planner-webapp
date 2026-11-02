@@ -1,36 +1,38 @@
 /* src/modules/chat/Chat.css */
-/* Exact WhatsApp Web Styling & Theme */
+/* Authentic WhatsApp light theme with signature doodle wallpaper matching user reference */
 
 .chat-wallpaper-bg {
   background-color: #EFEAE2;
-  background-image: url('../../assets/chat/whatsapp_bg_tile.png');
+  background-image: url('../../assets/chat/whatsapp_chat_bg.png');
   background-repeat: repeat;
-  background-size: 220px auto;
+  background-size: 458px auto;
   position: relative;
 }
 
 .chat-wallpaper-dark {
   background-color: #0B141A;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
-  background-size: 24px 24px;
+  background-image: url('../../assets/chat/whatsapp_chat_bg.png');
+  background-repeat: repeat;
+  background-size: 458px auto;
   position: relative;
 }
 
-.chat-bubble-incoming-dark {
-  background-color: #202C33;
-  color: #E9EDEF;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+.chat-bubble-incoming {
+  background-color: #FFFFFF;
+  color: #111B21;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
 }
 
-.chat-bubble-outgoing-dark {
-  background-color: #005C4B;
-  color: #E9EDEF;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+.chat-bubble-outgoing {
+  background-color: #D9FDD3;
+  color: #111B21;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
 }
 
+/* Light Theme Scrollbars */
 .chat-custom-scroll::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 .chat-custom-scroll::-webkit-scrollbar-track {
@@ -38,12 +40,20 @@
 }
 
 .chat-custom-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(11, 20, 26, 0.2);
   border-radius: 9999px;
 }
 
 .chat-custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(11, 20, 26, 0.35);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Calling animation pulse */

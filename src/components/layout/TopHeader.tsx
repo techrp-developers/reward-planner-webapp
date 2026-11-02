@@ -12,8 +12,8 @@ import { fetchGlobalSearchSuggestions } from '../../api/productApi';
 import LocationModal from './LocationModal';
 import AccountMenu from './AccountMenu';
 import NotificationsPanel from './NotificationsPanel';
+import StickyNotesHeaderButton from '../stickyNotes/StickyNotesHeaderButton';
 import RPpriceBadge from '../ui/RPpriceBadge';
-import rpLogo from '../../assets/rp_logo_crisp.png';
 import mpsLogo from '../../assets/mps_logo.svg';
 import coinsIcon from '../../assets/home/coinsicon.png';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
@@ -68,7 +68,9 @@ export const TopHeader = () => {
   const { serviceCartCount } = useServiceCart();
   const navigate = useNavigate();
   const routerLocation = useRouterLocation();
-  const isServicesPath = routerLocation.pathname.startsWith('/services');
+  const isServicesPath =
+    routerLocation.pathname.startsWith('/services') ||
+    routerLocation.pathname.startsWith('/insurance');
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -262,22 +264,6 @@ export const TopHeader = () => {
 
           {/* Right Group: RP Coins + Notifications + Menu + RP Logo Circle (in right corner) */}
           <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 shrink-0 z-10">
-            {isServicesPath && (
-              <Link
-                to="/services/cart"
-                aria-label={`Services cart, ${serviceCartCount} ${serviceCartCount === 1 ? 'item' : 'items'}`}
-                title="View Services Cart"
-                className="relative flex h-9.5 w-9.5 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full border border-[#E4DCE9] bg-white text-[#1C0E28] hover:bg-[#ECE7FF] focus-visible:outline-2 focus-visible:outline-[#78538F]"
-              >
-                <ShoppingCartOutlinedIcon aria-hidden="true" sx={{ fontSize: 20 }} />
-                {serviceCartCount > 0 && (
-                  <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#7C3AED] px-1 text-[9px] font-bold text-white">
-                    {serviceCartCount > 99 ? '99+' : serviceCartCount}
-                  </span>
-                )}
-              </Link>
-            )}
-
             {/* RP Coins */}
             <Link to="/profile" aria-label={`Your rewards: ${coinBalance === '—' ? 'balance unavailable' : `${coinBalance} RP Points`}`} title={coinBalance === '—' ? 'Points balance unavailable' : 'View your rewards'} className="flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 border-r border-[#E4DCE9] text-[#1C0E28] rounded-l-xl focus-visible:outline-2 focus-visible:outline-[#78538F]">
               <img src={coinsIcon} alt="RP Coins" className="hidden sm:block w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 object-contain shrink-0" />
@@ -302,22 +288,36 @@ export const TopHeader = () => {
               </span>
             </Link>
 
+            {/* Services Cart Icon (Properly aligned with notifications, sticky notes, and account menu) */}
+            {isServicesPath && (
+              <Link
+                to="/services/cart"
+                aria-label={`Services cart, ${serviceCartCount} ${serviceCartCount === 1 ? 'item' : 'items'}`}
+                title="View Services Cart"
+                className="relative group w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white hover:bg-[#F6F2F8] border border-[#E4DCE9] hover:border-[#D1C2DC] flex items-center justify-center cursor-pointer shrink-0 text-[#1C0E28] transition-all duration-200 active:scale-95 shadow-2xs hover:shadow-xs focus:outline-none focus:ring-2 focus:ring-[#78538F]/30"
+              >
+                <ShoppingCartOutlinedIcon
+                  className="transition-transform group-hover:scale-110 duration-200 text-[#1C0E28]"
+                  sx={{ fontSize: 20 }}
+                />
+                {serviceCartCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#78538F] text-white font-extrabold text-[9px] shadow-xs border border-white"
+                  >
+                    {serviceCartCount > 99 ? '99+' : serviceCartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             <NotificationsPanel />
 
-            <AccountMenu />
+            {/* Desktop Sticky Notes Launcher (Notebook & Pen Icon) */}
+            <StickyNotesHeaderButton />
 
-            {/* RP Logo Circle (in right corner) */}
-            <Link
-              to="/"
-              className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11.5 lg:h-11.5 rounded-full bg-white border border-[#E4DCE9] flex items-center justify-center shrink-0 shadow-xs hover:shadow-md transition-all group cursor-pointer"
-              title="Reward Planners Home"
-            >
-              <img
-                src={rpLogo}
-                alt="RewardPlanners"
-                className="w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 lg:w-7 lg:h-7 object-contain transition-transform duration-200 group-hover:scale-105"
-              />
-            </Link>
+            {/* RP Logo Circle (Right corner) with Account Menu: Profile & Logout */}
+            <AccountMenu />
           </div>
 
         </div>

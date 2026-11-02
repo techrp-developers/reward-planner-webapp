@@ -7,6 +7,10 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import CloseIcon from '@mui/icons-material/Close';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { useAuth } from '../../context/AuthContext';
 import {
   fetchQuizLeaderboard,
@@ -43,7 +47,6 @@ import pillarBadge1 from '../../assets/games/quiz/pillar_badge_1.png';
 import pillarBadge2 from '../../assets/games/quiz/pillar_badge_2.png';
 import pillarBadge3 from '../../assets/games/quiz/pillar_badge_3.png';
 import pillarBadge4 from '../../assets/games/quiz/pillar_badge_4.png';
-import quizBottomSectionHd from '../../assets/games/quiz/quiz_bottom_section_hd.png';
 
 
 // SVG Ribbon Medal for Ranks 1, 2, 3
@@ -126,6 +129,31 @@ const FALLBACK_QUESTIONS = [
     question: 'Which chemical element is represented by the symbol "Au"?',
     options: ['Silver', 'Copper', 'Gold', 'Platinum'],
     correct: 2,
+  },
+  {
+    question: 'What is the capital city of Australia?',
+    options: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'],
+    correct: 2,
+  },
+  {
+    question: 'Which is the largest organ in the human body?',
+    options: ['Heart', 'Skin', 'Liver', 'Brain'],
+    correct: 1,
+  },
+  {
+    question: 'What is the fastest land animal in the world?',
+    options: ['Lion', 'Cheetah', 'Falcon', 'Horse'],
+    correct: 1,
+  },
+  {
+    question: 'In computer science, what does "CPU" stand for?',
+    options: ['Central Processing Unit', 'Core Power Utility', 'Central Protocol Unit', 'Computer Process User'],
+    correct: 0,
+  },
+  {
+    question: 'Which gas do plants primarily absorb during photosynthesis?',
+    options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Helium'],
+    correct: 1,
   },
 ];
 
@@ -442,13 +470,6 @@ export const QuizGamePage: React.FC = () => {
     }
   };
 
-  // User Clicks "Try Again"
-  const handleTryAgain = () => {
-    playSound('click');
-    setQuestionFeedback('idle');
-    setSelectedOption(null);
-  };
-
   // User Clicks "Exit Quiz"
   const handleExitClick = () => {
     playSound('click');
@@ -499,7 +520,6 @@ export const QuizGamePage: React.FC = () => {
     if (session) {
       try {
         const updated = await nextQuizQuestion(session.id, session.index);
-        setSession(updated);
 
         if (updated.status === 'completed' || updated.index >= (session.total || 5)) {
           playSound('finish');
@@ -510,7 +530,13 @@ export const QuizGamePage: React.FC = () => {
           setIsCompleted(true);
           setView('score');
           loadLeaderboard();
-        } else if (updated.index > session.index) {
+        } else if (
+          updated.index > session.index &&
+          updated.question &&
+          updated.question.question !== session.question?.question
+        ) {
+          // Backend advanced cleanly with a new distinct question
+          setSession(updated);
           const nextSecs = updated.rules?.secondsPerQuestion || 15;
           setTimeLeft(nextSecs);
           setQuestionFeedback(updated.feedback || 'idle');
@@ -518,14 +544,20 @@ export const QuizGamePage: React.FC = () => {
           setWrongAttempts(updated.attempts || []);
           setCorrectOptionIndex(null);
         } else {
-          // When clicking Next after a wrong answer, advance question locally if backend held index
-          if (session.index < (session.total || 5) - 1) {
+          // If backend repeated the question or held the index, force-advance to the next distinct question!
+          const nextIdx = session.index + 1;
+          if (nextIdx < (session.total || 5)) {
+            const nextQ = FALLBACK_QUESTIONS[nextIdx % FALLBACK_QUESTIONS.length];
             setSession({
               ...session,
-              index: session.index + 1,
+              index: nextIdx,
               feedback: null,
               attempts: [],
               selected: null,
+              question: {
+                question: nextQ.question,
+                options: nextQ.options,
+              },
             });
             setTimeLeft(15);
             setQuestionFeedback('idle');
@@ -534,7 +566,7 @@ export const QuizGamePage: React.FC = () => {
             setCorrectOptionIndex(null);
           } else {
             playSound('finish');
-            const finalScore = session.score || 0;
+            const finalScore = typeof updated?.score === 'number' ? updated.score : session.score || 0;
             recordQuizGameScore(currentUserName, currentUserId, finalScore);
             const updatedList = getMergedQuizLeaderboard(undefined, currentUserName, currentUserId);
             setLeaderboard(updatedList);
@@ -545,13 +577,19 @@ export const QuizGamePage: React.FC = () => {
         }
       } catch (err) {
         console.error('Next question error:', err);
-        if (session.index < (session.total || 5) - 1) {
+        const nextIdx = session.index + 1;
+        if (nextIdx < (session.total || 5)) {
+          const nextQ = FALLBACK_QUESTIONS[nextIdx % FALLBACK_QUESTIONS.length];
           setSession({
             ...session,
-            index: session.index + 1,
+            index: nextIdx,
             feedback: null,
             attempts: [],
             selected: null,
+            question: {
+              question: nextQ.question,
+              options: nextQ.options,
+            },
           });
           setTimeLeft(15);
           setQuestionFeedback('idle');
@@ -623,7 +661,7 @@ export const QuizGamePage: React.FC = () => {
           SCREEN 1: QUIVIO QUIZ LOBBY (Pure Component UI, Dynamic-Ready)
       ────────────────────────────────────────────────────────── */}
       {view === 'lobby' && (
-        <div className="relative w-full h-full animate-fadeIn select-none overflow-hidden bg-[#02081E] flex flex-col justify-between text-white font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="relative w-full h-full animate-fadeIn overflow-y-auto bg-[#02081E] flex flex-col justify-between text-white font-['Plus_Jakarta_Sans',sans-serif]">
           
           {/* Ambient Lighting & Glows */}
           <div className="absolute inset-0 pointer-events-none select-none overflow-hidden z-0">
@@ -847,9 +885,14 @@ export const QuizGamePage: React.FC = () => {
                     alt="Trophy"
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow"
                   />
-                  <span className="font-bold text-white text-xs sm:text-sm md:text-base tracking-wide drop-shadow group-hover:text-amber-300 transition-colors">
-                    Leaderboard
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-white text-xs sm:text-sm md:text-base tracking-wide drop-shadow group-hover:text-amber-300 transition-colors leading-tight">
+                      Leaderboard
+                    </span>
+                    <span className="text-[9px] sm:text-[9.5px] text-slate-400 font-medium">
+                      Top employees of MPS Global
+                    </span>
+                  </div>
                   <img
                     src={trophyGolden}
                     alt="Trophy"
@@ -865,9 +908,10 @@ export const QuizGamePage: React.FC = () => {
               <div className="flex-1 rounded-2xl bg-[#040E2A]/75 border border-blue-500/30 p-2 sm:p-2.5 flex flex-col justify-between overflow-hidden shadow-inner mt-1">
                 {/* Table Header */}
                 <div className="flex items-center px-2 py-0.5 sm:py-1 border-b border-white/10 text-[10px] sm:text-[10.5px] font-semibold text-slate-400 shrink-0">
-                  <span className="w-10 sm:w-11 text-center">Rank</span>
-                  <span className="flex-1 text-left pl-3">Player</span>
-                  <span className="w-10 sm:w-11 text-right pr-2">Score</span>
+                  <span className="w-8 sm:w-9 text-center">Rank</span>
+                  <span className="flex-1 text-left pl-2.5">Player</span>
+                  <span className="w-14 sm:w-16 text-center">Streak</span>
+                  <span className="w-16 sm:w-18 text-right pr-2">Points</span>
                 </div>
 
                 {/* 10 Rows (Dynamic Synchronized Leaderboard) */}
@@ -888,7 +932,7 @@ export const QuizGamePage: React.FC = () => {
                         }`}
                       >
                         {/* Rank Column */}
-                        <div className="w-10 sm:w-11 flex items-center justify-center shrink-0">
+                        <div className="w-8 sm:w-9 flex items-center justify-center shrink-0">
                           {rank <= 3 ? (
                             <RibbonMedal rank={rank as 1 | 2 | 3} />
                           ) : (
@@ -897,7 +941,7 @@ export const QuizGamePage: React.FC = () => {
                         </div>
 
                         {/* Player Column */}
-                        <div className="flex-1 flex items-center gap-2 min-w-0 pl-3">
+                        <div className="flex-1 flex items-center gap-1.5 sm:gap-2 min-w-0 pl-2.5">
                           <div className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full ${isCurrentUser ? 'bg-cyan-600 border border-cyan-300 text-white font-black' : 'bg-[#1E3A8A]/70 border border-[#3B82F6]/60 text-[#BFDBFE] font-bold'} text-[9px] sm:text-[9.5px] flex items-center justify-center shrink-0 shadow-sm`}>
                             {initial}
                           </div>
@@ -911,9 +955,16 @@ export const QuizGamePage: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Score Column */}
-                        <div className={`w-10 sm:w-11 text-right pr-2 text-[10.5px] sm:text-xs ${isCurrentUser ? 'text-amber-300 font-black' : 'text-white font-semibold'} shrink-0`}>
-                          {player.score}
+                        {/* Streak Column */}
+                        <div className="w-14 sm:w-16 flex items-center justify-center shrink-0">
+                          <span className="text-[9px] sm:text-[9.5px] font-semibold text-amber-300/90 whitespace-nowrap">
+                            🔥 {player.streak || 0}d
+                          </span>
+                        </div>
+
+                        {/* Points Column */}
+                        <div className={`w-16 sm:w-18 text-right pr-2 text-[10.5px] sm:text-xs ${isCurrentUser ? 'text-amber-300 font-black' : 'text-white font-semibold'} shrink-0`}>
+                          {player.points ?? (player.score ? player.score * 10 : 0)} PTS
                         </div>
                       </div>
                     );
@@ -925,26 +976,35 @@ export const QuizGamePage: React.FC = () => {
           </div>
 
           {/* ────────── BOTTOM FEATURES SECTION (FULL WIDTH) ────────── */}
-          <div className="relative z-20 w-full shrink-0 flex flex-col items-center mt-auto pb-0 select-none overflow-hidden">
-            <img
-              src={quizBottomSectionHd}
-              alt="Quivio Features - Earn RP Points, Improve Your Knowledge, Fun for Everyone, Safe & Secure"
-              className="w-full h-auto object-cover object-bottom pointer-events-none select-none block"
-              draggable={false}
-            />
-            {/* Screen reader accessibility */}
-            <div className="sr-only">
-              <h3>Earn RP Points</h3>
-              <p>Play quizzes and earn exciting Reward Planner points.</p>
-              <h3>Improve Your Knowledge</h3>
-              <p>Learn new facts and challenge yourself daily.</p>
-              <h3>Fun for Everyone</h3>
-              <p>Quick, engaging and refreshing quizzes.</p>
-              <h3>Safe & Secure</h3>
-              <p>A fair and enjoyable experience with MPS Global.</p>
-              <p>Play • Learn • Earn</p>
-            </div>
-          </div>
+          <section
+            aria-label="Quiz benefits"
+            className="relative z-20 mt-auto w-full shrink-0 bg-bottom bg-no-repeat px-3 pb-5 pt-5 sm:px-6 lg:px-[6.5%]"
+            style={{ backgroundImage: `url(${gameWaveBg})`, backgroundSize: '100% 100%' }}
+          >
+            <ul className="grid grid-cols-1 gap-5 rounded-2xl border border-blue-500/60 bg-[#06152e]/95 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)] sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
+              {[
+                { title: 'Earn RP Points', description: 'Play quizzes and earn exciting Reward Planner points.', icon: EmojiEventsIcon, color: 'text-amber-300 border-amber-400/70 bg-amber-400/10' },
+                { title: 'Improve Your Knowledge', description: 'Learn new facts and challenge yourself daily.', icon: BarChartIcon, color: 'text-fuchsia-300 border-fuchsia-400/70 bg-fuchsia-400/10' },
+                { title: 'Fun for Everyone', description: 'Quick, engaging and refreshing quizzes.', icon: PeopleAltIcon, color: 'text-cyan-300 border-cyan-400/70 bg-cyan-400/10' },
+                { title: 'Safe & Secure', description: 'A fair and enjoyable experience with MPS Global.', icon: VerifiedUserIcon, color: 'text-teal-300 border-teal-400/70 bg-teal-400/10' },
+              ].map(({ title, description, icon: Icon, color }) => (
+                <li key={title} className="flex items-center gap-3 lg:px-4 lg:not-first:border-l lg:border-blue-400/25">
+                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border ${color}`}>
+                    <Icon aria-hidden="true" sx={{ fontSize: 28 }} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-[13px] font-bold leading-snug text-white">{title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-200">{description}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 flex items-center justify-center gap-3 text-xs font-semibold text-slate-100">
+              <span aria-hidden="true" className="text-amber-300">&#10022;</span>
+              Play <span aria-hidden="true" className="text-cyan-300">&#8226;</span> Learn <span aria-hidden="true" className="text-cyan-300">&#8226;</span> Earn
+              <span aria-hidden="true" className="text-amber-300">&#10022;</span>
+            </p>
+          </section>
         </div>
       )}
 
@@ -1072,13 +1132,11 @@ export const QuizGamePage: React.FC = () => {
               {questionFeedback === 'wrong' && (
                 <div className="flex flex-col items-center justify-center animate-shake w-full">
                   <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wide drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-amber-300 text-lg sm:text-xl">✨</span>
-                    <span className="text-[#38BDF8]">OOPS!</span>
-                    <span className="text-[#F43F5E] ml-1">TRY AGAIN!</span>
-                    <span className="text-amber-300 text-lg sm:text-xl">✨</span>
+                    <span className="text-rose-400 text-lg sm:text-xl">✕</span>
+                    <span className="text-rose-400">INCORRECT!</span>
                   </h2>
                   <p className="text-xs sm:text-sm text-cyan-200 mt-0.5 sm:mt-1 font-bold drop-shadow">
-                    That wasn't quite right. Give it another shot!
+                    That wasn't quite right.
                   </p>
                 </div>
               )}
@@ -1153,34 +1211,13 @@ export const QuizGamePage: React.FC = () => {
             )}
 
             {/* Action Buttons */}
-            {questionFeedback === 'wrong' && (
-              <div className="absolute left-[31%] w-[49%] top-[75.5%] h-[8%] flex items-center justify-center gap-3 z-30">
-                <button
-                  type="button"
-                  onClick={handleTryAgain}
-                  className="w-1/2 h-full rounded-full bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#F59E0B] text-[#1E1B4B] font-black text-xs sm:text-sm md:text-base flex items-center justify-center gap-1.5 shadow-[0_0_25px_rgba(251,191,36,0.8)] border-2 border-amber-200 active:scale-95 cursor-pointer hover:brightness-110 transition-all"
-                >
-                  <ReplayIcon sx={{ fontSize: 18 }} />
-                  <span>Try Again</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNextQuestion}
-                  className="w-1/2 h-full rounded-full bg-gradient-to-r from-[#0284C7] via-[#0EA5E9] to-[#38BDF8] text-slate-950 font-black text-xs sm:text-sm md:text-base flex items-center justify-center gap-1.5 shadow-[0_0_25px_rgba(56,189,248,0.8)] border-2 border-cyan-200 active:scale-95 cursor-pointer hover:brightness-110 transition-all"
-                >
-                  <span>{currentQuestionIndex < totalQuestions - 1 ? 'Next' : 'Finish Quiz'}</span>
-                  <span className="text-xl leading-none">›</span>
-                </button>
-              </div>
-            )}
-
-            {(questionFeedback === 'correct' || questionFeedback === 'timeout') && (
+            {(questionFeedback === 'correct' || questionFeedback === 'wrong' || questionFeedback === 'timeout') && (
               <button
                 type="button"
                 onClick={handleNextQuestion}
-                className="absolute left-[37%] top-[75.5%] w-[28%] h-[8%] rounded-full bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#F59E0B] text-[#1E1B4B] font-black text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(251,191,36,0.8)] border-2 border-amber-200 active:scale-95 cursor-pointer z-30 hover:brightness-110 transition-all"
+                className="absolute left-[36%] top-[75.5%] w-[28%] h-[8%] rounded-full bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#F59E0B] text-[#1E1B4B] font-black text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(251,191,36,0.8)] border-2 border-amber-200 active:scale-95 cursor-pointer z-30 hover:brightness-110 transition-all"
               >
-                <span>{currentQuestionIndex < totalQuestions - 1 ? 'Continue' : 'Finish Quiz'}</span>
+                <span>{currentQuestionIndex < totalQuestions - 1 ? 'Next Question' : 'Finish Quiz'}</span>
                 <span className="text-xl leading-none">›</span>
               </button>
             )}
@@ -1266,7 +1303,7 @@ export const QuizGamePage: React.FC = () => {
                 )}
                 {questionFeedback === 'wrong' && (
                   <div>
-                    <h2 className="text-base sm:text-lg font-black text-rose-400">OOPS! TRY AGAIN!</h2>
+                    <h2 className="text-base sm:text-lg font-black text-rose-400">INCORRECT!</h2>
                     <p className="text-xs text-slate-300 mt-0.5">That wasn't quite right.</p>
                   </div>
                 )}
@@ -1303,33 +1340,13 @@ export const QuizGamePage: React.FC = () => {
 
             {/* Bottom Action Button on Mobile */}
             <div className="pt-2 shrink-0">
-              {questionFeedback === 'wrong' && (
-                <div className="flex items-center gap-2.5 w-full">
-                  <button
-                    type="button"
-                    onClick={handleTryAgain}
-                    className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg active:scale-95 cursor-pointer border border-amber-200"
-                  >
-                    <ReplayIcon sx={{ fontSize: 18 }} />
-                    <span>Try Again</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextQuestion}
-                    className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#0284C7] via-[#0EA5E9] to-[#38BDF8] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg active:scale-95 cursor-pointer border border-cyan-200"
-                  >
-                    <span>{currentQuestionIndex < totalQuestions - 1 ? 'Next' : 'Finish Quiz'}</span>
-                    <span className="text-base font-bold leading-none">›</span>
-                  </button>
-                </div>
-              )}
-              {(questionFeedback === 'correct' || questionFeedback === 'timeout') && (
+              {(questionFeedback === 'correct' || questionFeedback === 'wrong' || questionFeedback === 'timeout') && (
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="w-full py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                  className="w-full py-3 rounded-full bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer hover:brightness-110 active:scale-95 transition-all"
                 >
-                  <span>{currentQuestionIndex < totalQuestions - 1 ? 'Continue' : 'Finish Quiz'}</span>
+                  <span>{currentQuestionIndex < totalQuestions - 1 ? 'Next Question' : 'Finish Quiz'}</span>
                   <span className="text-base font-bold">›</span>
                 </button>
               )}
@@ -1461,11 +1478,11 @@ export const QuizGamePage: React.FC = () => {
               <div className="w-full max-w-[420px] rounded-2xl border-2 border-[#38BDF8]/50 bg-gradient-to-b from-[#0B173B]/90 via-[#07102C]/90 to-[#040A1E]/95 backdrop-blur-md p-3.5 sm:p-4 mb-4 sm:mb-5 shadow-[0_0_25px_rgba(56,189,248,0.35)] space-y-2.5 sm:space-y-3">
                 <div className="flex items-center justify-between px-2">
                   <div className="flex flex-col text-left">
-                    <span className="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider">Final Score</span>
-                    <span className="text-[10px] text-cyan-300 font-bold">Rank #{userQuizStats.rank} • High: {userQuizStats.bestScore} PTS</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-300 uppercase tracking-wider">Total Points</span>
+                    <span className="text-[10px] text-cyan-300 font-bold">Rank #{userQuizStats.rank} • 🔥 {userQuizStats.streak} Day Streak</span>
                   </div>
                   <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(251,191,36,0.6)]">
-                    {currentScore} PTS
+                    {userQuizStats.points} PTS
                   </span>
                 </div>
 
@@ -1475,12 +1492,12 @@ export const QuizGamePage: React.FC = () => {
                     <span className="text-xs sm:text-sm font-extrabold text-emerald-400">{correctCount} / {totalQuestions}</span>
                   </div>
                   <div className="rounded-xl bg-white/5 p-1.5 sm:p-2 border border-white/5">
-                    <span className="block text-[10px] text-slate-400 font-medium">Wrong</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-rose-400">{wrongCount}</span>
+                    <span className="block text-[10px] text-slate-400 font-medium">Day Streak</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-amber-300">🔥 {userQuizStats.streak}d</span>
                   </div>
                   <div className="rounded-xl bg-white/5 p-1.5 sm:p-2 border border-white/5">
-                    <span className="block text-[10px] text-slate-400 font-medium">Earned</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-cyan-300">+{Math.max(0, currentScore * 5)} RP</span>
+                    <span className="block text-[10px] text-slate-400 font-medium">Round Earned</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-cyan-300">+{Math.max(0, currentScore * 20)} PTS</span>
                   </div>
                 </div>
               </div>
@@ -1542,11 +1559,11 @@ export const QuizGamePage: React.FC = () => {
             <div className="w-full rounded-2xl border-2 border-[#38BDF8]/50 bg-gradient-to-b from-[#0B173B]/95 to-[#040A1E]/95 p-4 mb-4 shadow-[0_0_25px_rgba(56,189,248,0.35)] space-y-3 shrink-0">
               <div className="flex items-center justify-between px-2">
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Final Score</span>
-                  <span className="text-[11px] text-cyan-300 font-bold">Rank #{userQuizStats.rank} • High: {userQuizStats.bestScore} PTS</span>
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Total Points</span>
+                  <span className="text-[11px] text-cyan-300 font-bold">Rank #{userQuizStats.rank} • 🔥 {userQuizStats.streak} Day Streak</span>
                 </div>
                 <span className="text-3xl font-black text-amber-300 drop-shadow">
-                  {currentScore} PTS
+                  {userQuizStats.points} PTS
                 </span>
               </div>
 
@@ -1556,12 +1573,12 @@ export const QuizGamePage: React.FC = () => {
                   <span className="text-sm font-extrabold text-emerald-400">{correctCount} / {totalQuestions}</span>
                 </div>
                 <div className="rounded-xl bg-white/5 p-2 border border-white/5">
-                  <span className="block text-[10px] text-slate-400 font-medium">Wrong</span>
-                  <span className="text-sm font-extrabold text-rose-400">{wrongCount}</span>
+                  <span className="block text-[10px] text-slate-400 font-medium">Day Streak</span>
+                  <span className="text-sm font-extrabold text-amber-300">🔥 {userQuizStats.streak}d</span>
                 </div>
                 <div className="rounded-xl bg-white/5 p-2 border border-white/5">
-                  <span className="block text-[10px] text-slate-400 font-medium">Earned</span>
-                  <span className="text-sm font-extrabold text-cyan-300">+{Math.max(0, currentScore * 5)} RP</span>
+                  <span className="block text-[10px] text-slate-400 font-medium">Round Earned</span>
+                  <span className="text-sm font-extrabold text-cyan-300">+{Math.max(0, currentScore * 20)} PTS</span>
                 </div>
               </div>
             </div>

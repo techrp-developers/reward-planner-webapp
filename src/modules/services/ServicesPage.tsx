@@ -11,12 +11,15 @@ import ServiceBannerCarousel, { getServiceBanner } from '../../components/servic
 import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
 import { getInsuranceQuotePath } from './insurance/insuranceProducts';
+import { useServiceCart } from '../../context/ServiceCartContext';
+import { useAuth } from '../../context/AuthContext';
 
 // Material UI Icons
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import StarIcon from '@mui/icons-material/Star';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
@@ -24,6 +27,10 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
 export const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { addToCart } = useServiceCart();
+  const { isAuthenticated, openAuth } = useAuth();
+  const [addingId, setAddingId] = useState<number | null>(null);
+
   const categoriesQuery = useServiceQuery('categories');
   const bundlesQuery = useServiceQuery('bundles');
   const servicesQuery = useServiceQuery('list');
@@ -32,6 +39,25 @@ export const ServicesPage: React.FC = () => {
   const services: any[] = servicesQuery.data || [];
   const [searchQuery, setSearchQuery] = useState('');
   const search = useDebouncedValue(searchQuery);
+
+  const handleQuickAddToCart = async (srv: any) => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    const sId = Number(srv.id);
+    setAddingId(sId);
+    try {
+      await addToCart({
+        service_id: sId,
+        variant_id: Number(srv.default_variant_id || 0),
+      });
+    } catch (e) {
+      console.warn('Failed to add service to cart:', e);
+    } finally {
+      setAddingId(null);
+    }
+  };
 
   const handleCategoryClick = (cat: any) => {
     const displayType = String(cat.display_type || 'list').toLowerCase();
@@ -276,10 +302,27 @@ export const ServicesPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#8b3ab5] bg-purple-50 hover:bg-purple-100 transition-colors cursor-pointer flex items-center gap-1">
-                      <span>Book Service</span>
-                      <ArrowForwardIcon sx={{ fontSize: 13 }} />
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleQuickAddToCart(srv);
+                        }}
+                        disabled={addingId === Number(srv.id)}
+                        aria-label={`Add ${srv.name} to cart`}
+                        title="Add to Services Cart"
+                        className="w-8 h-8 rounded-xl bg-purple-50 hover:bg-[#7C3AED] hover:text-white text-[#7C3AED] border border-purple-200/80 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-95 disabled:opacity-50"
+                      >
+                        <ShoppingCartOutlinedIcon sx={{ fontSize: 16 }} />
+                      </button>
+
+                      <span className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#8b3ab5] bg-purple-50 hover:bg-purple-100 transition-colors cursor-pointer flex items-center gap-1">
+                        <span>Book</span>
+                        <ArrowForwardIcon sx={{ fontSize: 13 }} />
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );

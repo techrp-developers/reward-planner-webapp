@@ -1,87 +1,111 @@
 // src/modules/chat/components/ChatNavigationRail.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  MessageSquare,
-  Phone,
-  CircleDot,
-  Users,
-  Compass,
-  Star,
-  Settings,
-  Sparkles
+  MessageCircleMore,
+  Aperture,
 } from 'lucide-react';
 import { RailTab } from '../chatTypes';
+import { getCurrentUserProfile, UserProfileData } from '../services/chatApi';
 
 interface ChatNavigationRailProps {
   activeTab: RailTab;
   onSelectTab: (tab: RailTab) => void;
   unreadCount?: number;
+  userProfile?: UserProfileData;
 }
-
-
 
 export const ChatNavigationRail: React.FC<ChatNavigationRailProps> = ({
   activeTab,
   onSelectTab,
-  unreadCount = 25,
+  unreadCount = 0,
+  userProfile: propProfile,
 }) => {
+  const [profile, setProfile] = useState<UserProfileData>(() => propProfile || getCurrentUserProfile());
+
+  useEffect(() => {
+    if (propProfile) {
+      setProfile(propProfile);
+    } else {
+      setProfile(getCurrentUserProfile());
+    }
+  }, [propProfile]);
+
+  const initials = profile.name
+    ? profile.name
+        .split(' ')
+        .map((p) => p[0])
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'SC';
+
   return (
-    <nav className="w-14 h-full bg-[#111B21] border-r border-[#202C33] flex flex-col items-center justify-between py-3 select-none shrink-0 z-30">
+    <nav className="w-14 h-full bg-gradient-to-b from-white to-[#D795F6] border-r border-[#CBD5E1] flex flex-col items-center justify-between py-3 select-none shrink-0 z-30 font-['Segoe_UI',Helvetica,Arial,sans-serif]">
       
-      {/* Top Icons: Only Chats Icon and Status Icon */}
-      <div className="flex flex-col items-center space-y-3 w-full pt-1">
-        {/* 1. Chats Tab with Green Notification Badge */}
+      {/* Top Icons: Only Chats and Status */}
+      <div className="flex flex-col items-center space-y-3 w-full pt-2">
+        {/* 1. Chats Tab */}
         <div className="relative">
           <button
             onClick={() => onSelectTab('chats')}
             title="Chats"
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer relative ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition cursor-pointer relative ${
               activeTab === 'chats'
-                ? 'bg-[#202C33] text-[#00A884]'
-                : 'text-[#8696A0] hover:text-[#E9EDEF] hover:bg-[#202C33]'
+                ? 'bg-[#EEF2FF] text-black'
+                : 'text-black hover:bg-[#F1F5F9]'
             }`}
           >
-            <MessageSquare className="w-5 h-5 stroke-[1.8]" />
-            {/* 25 Unread Badge matching screenshot */}
+            <MessageCircleMore className="w-[22px] h-[22px] stroke-[1.75]" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[#25D366] text-[#111B21] font-bold text-[10px] flex items-center justify-center shadow-xs">
-                {unreadCount}
+              <span className="absolute -top-1 -right-1.5 min-w-[18px] h-[16px] px-1 rounded-full bg-[#4F46E5] text-white font-bold text-[9px] flex items-center justify-center shadow-xs leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
           </button>
         </div>
 
         {/* 2. Status Tab */}
-        <button
-          onClick={() => onSelectTab('status')}
-          title="Status"
-          className={`w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer ${
-            activeTab === 'status'
-              ? 'bg-[#202C33] text-[#00A884]'
-              : 'text-[#8696A0] hover:text-[#E9EDEF] hover:bg-[#202C33]'
-          }`}
-        >
-          <CircleDot className="w-5 h-5 stroke-[1.8]" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => onSelectTab(activeTab === 'status' ? 'chats' : 'status')}
+            title="Status"
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition cursor-pointer relative ${
+              activeTab === 'status'
+                ? 'bg-[#EEF2FF] text-black'
+                : 'text-black hover:bg-[#F1F5F9]'
+            }`}
+          >
+            <Aperture className="w-[22px] h-[22px] stroke-[1.75]" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#25D366] border border-white" />
+          </button>
+        </div>
       </div>
 
-      {/* Bottom Icons */}
-      <div className="flex flex-col items-center space-y-2 w-full">
-        {/* Starred Messages */}
+      {/* Bottom Profile Icon: Dynamic Profile */}
+      <div className="flex flex-col items-center space-y-2 w-full pb-2">
         <button
-          title="Starred messages"
-          className="w-10 h-10 rounded-xl text-[#8696A0] hover:text-[#E9EDEF] hover:bg-[#202C33] flex items-center justify-center transition cursor-pointer"
+          onClick={() => onSelectTab(activeTab === 'profile' ? 'chats' : 'profile')}
+          title={profile.name ? `${profile.name} (Profile)` : 'Profile'}
+          className={`relative w-10 h-10 rounded-full bg-white shadow-sm transition cursor-pointer flex items-center justify-center ${
+            activeTab === 'profile'
+              ? 'ring-2 ring-[#B63EEE]'
+              : 'ring-2 ring-white hover:opacity-90'
+          }`}
         >
-          <Star className="w-5 h-5 stroke-[1.8]" />
+          {profile.userImage ? (
+            <img
+              src={profile.userImage}
+              alt={profile.name}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              <span>{initials}</span>
+            </div>
+          )}
+          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#25D366] border-2 border-white" />
         </button>
-
-        {/* Profile / Settings */}
-        <div
-          title="Profile & Settings"
-          className="w-8 h-8 rounded-full bg-[#202C33] border border-gray-600 flex items-center justify-center text-[#00A884] font-bold text-xs cursor-pointer hover:ring-2 hover:ring-[#00A884] transition"
-        >
-          SC
-        </div>
       </div>
 
     </nav>

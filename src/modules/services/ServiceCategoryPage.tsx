@@ -10,6 +10,8 @@ import { getImageUrl } from '../../api/client';
 import ServiceBannerCarousel, { getServiceBanner } from '../../components/services/ServiceBannerCarousel';
 import { SERVICE_PAGE_BANNERS } from '../../components/services/servicePageBanners';
 import { stripHtml } from '../../components/common/RichText';
+import { useServiceCart } from '../../context/ServiceCartContext';
+import { useAuth } from '../../context/AuthContext';
 
 // Material UI Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -18,11 +20,16 @@ import StarIcon from '@mui/icons-material/Star';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 
 export const ServiceCategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId?: string }>();
   const navigate = useNavigate();
+  const { addToCart } = useServiceCart();
+  const { isAuthenticated, openAuth } = useAuth();
+  const [addingId, setAddingId] = useState<number | null>(null);
+
   const query = useServiceQuery('category', categoryId);
   const category = query.data?.data?.category || null;
   const services: any[] = query.data?.data?.services || [];
@@ -30,6 +37,25 @@ export const ServiceCategoryPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
   const filtered = useMemo(() => filterServices(services, debouncedSearch, false), [services, debouncedSearch]);
+
+  const handleQuickAddToCart = async (srv: any) => {
+    if (!isAuthenticated) {
+      openAuth('login');
+      return;
+    }
+    const sId = Number(srv.id);
+    setAddingId(sId);
+    try {
+      await addToCart({
+        service_id: sId,
+        variant_id: Number(srv.default_variant_id || 0),
+      });
+    } catch (e) {
+      console.warn('Failed to add service to cart:', e);
+    } finally {
+      setAddingId(null);
+    }
+  };
 
   if (query.isError) return <ServiceSectionState query={query} label="category services" />;
 
@@ -174,10 +200,27 @@ export const ServiceCategoryPage: React.FC = () => {
                       <span className="text-[10px] text-gray-400 block font-medium">all inclusive</span>
                     </div>
 
-                    <span className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
-                      <span>Get Started</span>
-                      <ArrowForwardIcon sx={{ fontSize: 13 }} />
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleQuickAddToCart(srv);
+                        }}
+                        disabled={addingId === Number(srv.id)}
+                        aria-label={`Add ${srv.name} to cart`}
+                        title="Add to Services Cart"
+                        className="w-8 h-8 rounded-xl bg-purple-50 hover:bg-[#7C3AED] hover:text-white text-[#7C3AED] border border-purple-200/80 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-95 disabled:opacity-50"
+                      >
+                        <ShoppingCartOutlinedIcon sx={{ fontSize: 16 }} />
+                      </button>
+
+                      <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#8b3ab5] to-[#a855f7] shadow-xs group-hover:opacity-95 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <span>Get Started</span>
+                        <ArrowForwardIcon sx={{ fontSize: 13 }} />
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );

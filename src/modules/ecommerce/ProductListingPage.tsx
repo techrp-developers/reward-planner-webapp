@@ -12,19 +12,17 @@ import {
   fetchMostViewedProducts,
   fetchRecentProducts,
   fetchRecommendations,
-  fetchNavratriProducts,
 } from '../../api/productApi';
 import ProductCard from '../../components/product/ProductCard';
-import EcommerceAdBannerCarousel from './components/EcommerceAdBannerCarousel';
+import diwaliBannerImg from '../../assets/diwalibanners/diwalibanner.png';
 import EcommerceCategoriesGrid from './components/EcommerceCategoriesGrid';
 import EcommerceFlashSale from './components/EcommerceFlashSale';
 import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
 import EcommerceFeaturedWeek from './components/EcommerceFeaturedWeek';
 import EcommerceCategoryTabGrid from './components/EcommerceCategoryTabGrid';
-import navratriBanner from '../../assets/home/Navratri_banner.png';
-import { ArrowLeft, Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Filter, SlidersHorizontal, ChevronDown, ChevronRight, Check, Star, RotateCcw, ShoppingCart, LayoutGrid } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import Pagination from '@mui/material/Pagination';
+import { getImageUrl } from '../../api/client';
 
 export const ProductListingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,7 +33,6 @@ export const ProductListingPage = () => {
   const viewParam = searchParams.get('view') || '';
   const categoryParam = searchParams.get('category') || '';
   const subParam = searchParams.get('sub') || '';
-  const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
   // Determine whether to display the Landing Showcase vs Catalog with Filters
   const isCatalogMode = Boolean(
@@ -49,8 +46,6 @@ export const ProductListingPage = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(pageParam);
   const [loading, setLoading] = useState(false);
 
   // Landing Page Showcase State (Step-by-Step Sections)
@@ -159,60 +154,115 @@ export const ProductListingPage = () => {
     return found ? String(found.id) : categoryParam;
   }, [categoryParam, categories]);
 
-  // 3. Fetch Products whenever in Catalog Mode and category, sub, query, or page changes
+  // 3. Fetch All Products whenever in Catalog Mode and category, sub, or query changes
   useEffect(() => {
     if (!isCatalogMode) return;
 
-    let isMounted = true;
+    let isCancelled = false;
     setLoading(true);
 
     const loadProducts = async () => {
       try {
-        let resList: any = [];
-        const limit = 36; // 36 items per page for a rich 3- or 4-column grid
+        const limit = 50;
 
+        let firstBatch: any = [];
         if (subParam) {
-          resList = await fetchProductsBySubcategory(subParam, {
-            page: currentPage,
+          firstBatch = await fetchProductsBySubcategory(subParam, {
+            page: 1,
             limit,
             search: query || undefined,
           });
         } else if (resolvedCategoryId) {
-          resList = await fetchProductsByCategory(resolvedCategoryId, {
-            page: currentPage,
+          firstBatch = await fetchProductsByCategory(resolvedCategoryId, {
+            page: 1,
             limit,
             search: query || undefined,
           });
         } else {
-          resList = await fetchAllProducts({
-            page: currentPage,
+          firstBatch = await fetchAllProducts({
+            page: 1,
             limit,
             search: query || undefined,
           });
         }
 
-        if (!isMounted) return;
+        if (isCancelled) return;
 
-        setProducts(resList || []);
-        setTotalProducts(resList?.total || (resList?.length || 0));
-        setTotalPages(resList?.totalPages || Math.ceil((resList?.total || resList?.length || 1) / limit) || 1);
-      } catch (err) {
-        console.error('Failed to load products from database:', err);
-        if (isMounted) {
-          setProducts([]);
-          setTotalProducts(0);
+        let allProducts = Array.isArray(firstBatch) ? [...firstBatch] : [];
+        setProducts(allProducts);
+        setTotalProducts(firstBatch?.total || allProducts.length);
+        setLoading(false);
+
+        const totalPagesCount = firstBatch?.totalPages || 1;
+        if (totalPagesCount > 1) {
+          const fetchPromises = [];
+          for (let p = 2; p <= totalPagesCount; p++) {
+            if (subParam) {
+              fetchPromises.push(
+                fetchProductsBySubcategory(subParam, {
+                  page: p,
+                  limit,
+                  search: query || undefined,
+                })
+              );
+            } else if (resolvedCategoryId) {
+              fetchPromises.push(
+                fetchProductsByCategory(resolvedCategoryId, {
+                  page: p,
+                  limit,
+                  search: query || undefined,
+                })
+              );
+            } else {
+              fetchPromises.push(
+                fetchAllProducts({
+                  page: p,
+                  limit,
+                  search: query || undefined,
+                })
+              );
+            }
+          }
+
+          const subsequentPages = await Promise.all(fetchPromises);
+          if (isCancelled) return;
+
+          subsequentPages.forEach((pageRes) => {
+            if (Array.isArray(pageRes)) {
+              allProducts = allProducts.concat(pageRes);
+            }
+          });
+
+          // Deduplicate by ID
+          const seen = new Set();
+          const deduped: any[] = [];
+          for (const item of allProducts) {
+            const key = `${item.id}-${item.variant_id || 0}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              deduped.push(item);
+            }
+          }
+
+          setProducts(deduped);
+          setTotalProducts(deduped.length);
         }
+      } catch (err) {
+        if (isCancelled) return;
+        console.error('Failed to load products from database:', err);
+        setProducts([]);
+        setTotalProducts(0);
       } finally {
-        if (isMounted) setLoading(false);
+        if (!isCancelled) setLoading(false);
       }
     };
 
     loadProducts();
 
     return () => {
-      isMounted = false;
+      isCancelled = true;
     };
-  }, [isCatalogMode, resolvedCategoryId, subParam, query, currentPage]);
+  }, [isCatalogMode, resolvedCategoryId, subParam, query]);
 
   // Handle Category Selection (switches to Catalog Mode)
   const handleSelectCategory = (catId) => {
@@ -222,8 +272,6 @@ export const ProductListingPage = () => {
     } else {
       params.set('category', catId);
     }
-    params.set('page', '1');
-    setCurrentPage(1);
     setSearchParams(params);
     setMobileFilterOpen(false);
   };
@@ -233,8 +281,6 @@ export const ProductListingPage = () => {
     const params = new URLSearchParams();
     params.set('category', catId);
     params.set('sub', subId);
-    params.set('page', '1');
-    setCurrentPage(1);
     setSearchParams(params);
     setMobileFilterOpen(false);
   };
@@ -242,7 +288,6 @@ export const ProductListingPage = () => {
   // Return to Store Landing View
   const handleBackToStoreHome = () => {
     setSearchParams({});
-    setCurrentPage(1);
     setSelectedPriceRange('all');
     setSelectedMinRating(0);
     setSortBy('popular');
@@ -259,7 +304,6 @@ export const ProductListingPage = () => {
     if (subParam) params.set('sub', subParam);
     if (query) params.set('q', query);
     setSearchParams(params);
-    setCurrentPage(1);
   };
 
   // Toggle subcategory accordion
@@ -307,14 +351,6 @@ export const ProductListingPage = () => {
         return (b.id || 0) - (a.id || 0); // popular
       });
   }, [products, selectedPriceRange, selectedMinRating, sortBy]);
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-    const params = new URLSearchParams(searchParams);
-    params.set('page', String(value));
-    setSearchParams(params);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <div className="min-h-screen bg-white pb-10 space-y-6 text-gray-900 pt-2 sm:pt-2.5">
@@ -369,37 +405,28 @@ export const ProductListingPage = () => {
             </div>
           </div>
 
-          {/* NAVRATRI SPECIAL FESTIVE HERO BANNER */}
+          {/* DIWALI FESTIVE HERO BANNER CARD (SMALL HEIGHT & FULL WIDTH) */}
           <div
-            onClick={() => {
-              fetchNavratriProducts();
-              navigate('/navratri');
-            }}
-            onMouseEnter={() => {
-              fetchNavratriProducts();
-            }}
+            onClick={() => handleSelectCategory('all')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                fetchNavratriProducts();
-                navigate('/navratri');
+                handleSelectCategory('all');
               }
             }}
             role="button"
             tabIndex={0}
-            className="relative w-full h-[180px] sm:h-[270px] md:h-[350px] lg:h-[430px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
-            title="Navratri Special - Shop Now"
+            className="relative w-full h-[160px] sm:h-[200px] md:h-[230px] lg:h-[260px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
+            title="Happy Diwali Festive Season - Explore Offers"
           >
             <img
-              src={navratriBanner}
-              alt="Navratri Special - Shop • Celebrate • Save"
-              className="w-full h-full object-cover object-[center_42%] select-none pointer-events-none transition-transform duration-500 group-hover:scale-[1.01]"
+              src={diwaliBannerImg}
+              alt="Happy Diwali - Festive Season Offers"
+              loading="eager"
               draggable={false}
+              className="w-full h-full object-cover object-[center_33%] select-none pointer-events-none transition-transform duration-500 group-hover:scale-[1.01]"
             />
           </div>
-
-          {/* ADVERTISEMENT HERO BANNER CAROUSEL (EXACT BANNERS MATCHING APP REFERENCE) */}
-          <EcommerceAdBannerCarousel onSelectCategory={handleSelectCategory} />
 
           {/* 1. CATEGORIES SECTION (WITH 3D PEDESTAL ICONS) */}
           <EcommerceCategoriesGrid
@@ -479,67 +506,88 @@ export const ProductListingPage = () => {
                 <span>Back</span>
               </button>
 
-              <div>
-                <nav className="text-xs text-gray-500 mb-1 flex items-center gap-1.5 flex-wrap">
-                  <span
-                    onClick={handleBackToStoreHome}
-                    className="hover:text-[#7C3AED] cursor-pointer"
-                  >
-                    Home
-                  </span>
-                <span>/</span>
-                <span
-                  onClick={handleBackToStoreHome}
-                  className={`hover:text-[#7C3AED] cursor-pointer ${
-                    viewParam === 'all' && !categoryParam && !query ? 'text-gray-900 font-bold' : ''
-                  }`}
-                >
-                  Store
-                </span>
-                {viewParam === 'all' && !categoryParam && !subParam && !query && (
-                  <>
-                    <span>/</span>
-                    <span className="text-gray-900 font-bold">All Products</span>
-                  </>
+              <div className="flex items-center gap-3">
+                {activeCategoryObj?.image && (
+                  <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 p-1 flex items-center justify-center shrink-0 shadow-2xs">
+                    <img
+                      src={getImageUrl(activeCategoryObj.image)}
+                      alt={activeCategoryObj.name}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as any).src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
                 )}
-                {activeCategoryObj && (
-                  <>
+                <div>
+                  <nav className="text-xs text-gray-500 mb-0.5 flex items-center gap-1.5 flex-wrap">
+                    <span
+                      onClick={handleBackToStoreHome}
+                      className="hover:text-[#7C3AED] cursor-pointer"
+                    >
+                      Home
+                    </span>
                     <span>/</span>
                     <span
-                      onClick={() => handleSelectCategory(activeCategoryObj.id)}
+                      onClick={handleBackToStoreHome}
                       className={`hover:text-[#7C3AED] cursor-pointer ${
-                        !subParam ? 'text-gray-900 font-bold' : ''
+                        viewParam === 'all' && !categoryParam && !query ? 'text-gray-900 font-bold' : ''
                       }`}
                     >
-                      {activeCategoryObj.name}
+                      Store
                     </span>
-                  </>
-                )}
-                {activeSubcategoryObj && (
-                  <>
-                    <span>/</span>
-                    <span className="text-gray-900 font-bold">{activeSubcategoryObj.name}</span>
-                  </>
-                )}
-                {query && (
-                  <>
-                    <span>/</span>
-                    <span className="text-[#7C3AED] font-bold">Search: "{query}"</span>
-                  </>
-                )}
-              </nav>
+                    {viewParam === 'all' && !categoryParam && !subParam && !query && (
+                      <>
+                        <span>/</span>
+                        <span className="text-gray-900 font-bold">All Products</span>
+                      </>
+                    )}
+                    {activeCategoryObj && (
+                      <>
+                        <span>/</span>
+                        <span
+                          onClick={() => handleSelectCategory(activeCategoryObj.id)}
+                          className={`hover:text-[#7C3AED] cursor-pointer ${
+                            !subParam ? 'text-gray-900 font-bold' : ''
+                          }`}
+                        >
+                          {activeCategoryObj.name}
+                        </span>
+                      </>
+                    )}
+                    {activeSubcategoryObj && (
+                      <>
+                        <span>/</span>
+                        <span className="text-gray-900 font-bold">{activeSubcategoryObj.name}</span>
+                      </>
+                    )}
+                    {query && (
+                      <>
+                        <span>/</span>
+                        <span className="text-[#7C3AED] font-bold">Search: "{query}"</span>
+                      </>
+                    )}
+                  </nav>
 
-              <h2 className="text-xl sm:text-2xl font-black text-gray-900">
-                {query
-                  ? `Search Results for "${query}"`
-                  : activeSubcategoryObj
-                  ? activeSubcategoryObj.name
-                  : activeCategoryObj
-                  ? activeCategoryObj.name
-                  : 'All Products'}
-              </h2>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h2 className="text-xl sm:text-2xl font-black text-gray-900">
+                      {query
+                        ? `Search Results for "${query}"`
+                        : activeSubcategoryObj
+                        ? activeSubcategoryObj.name
+                        : activeCategoryObj
+                        ? activeCategoryObj.name
+                        : 'All Products'}
+                    </h2>
+                    {!loading && filteredProducts.length > 0 && (
+                      <span className="text-xs font-bold text-[#7C3AED] bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">
+                        {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
 
             {/* Top Controls: Mobile Filter Button & Sort By Dropdown */}
             <div className="flex items-center gap-3 self-end md:self-auto text-sm font-semibold">
@@ -619,21 +667,28 @@ export const ProductListingPage = () => {
                 )}
               </div>
 
-              {/* 1. Category Hierarchy Filter */}
+              {/* 1. Category Hierarchy Filter (Styled matching mobile CategoriesScreen sidebar) */}
               <div className="space-y-2.5">
                 <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Categories</h4>
                 <div className="space-y-1">
                   {/* All Products option */}
                   <button
                     onClick={() => handleSelectCategory('all')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    className={`w-full text-left px-2.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-between cursor-pointer border ${
                       viewParam === 'all' && !categoryParam && !subParam
-                        ? 'bg-purple-100 text-[#7C3AED] font-bold'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-violet-50 text-[#7C3AED] border-violet-200 font-bold shadow-2xs'
+                        : 'text-gray-700 hover:bg-gray-50 border-transparent'
                     }`}
                   >
-                    <span>All Products</span>
-                    {viewParam === 'all' && !categoryParam && !subParam && <Check size={16} />}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-600">
+                        <LayoutGrid size={14} />
+                      </div>
+                      <span className="truncate">All Products</span>
+                    </div>
+                    {viewParam === 'all' && !categoryParam && !subParam && (
+                      <Check size={16} className="text-[#7C3AED] shrink-0" />
+                    )}
                   </button>
 
                   {/* Category Tree with Accordion Subcategories */}
@@ -641,27 +696,40 @@ export const ProductListingPage = () => {
                     const isCatSelected = String(resolvedCategoryId) === String(cat.id);
                     const isExpanded = Boolean(expandedCategories[cat.id]);
                     const subList = cat.subcategories || [];
+                    const catImg = cat.image ? getImageUrl(cat.image) : '/placeholder.svg';
 
                     return (
-                      <div key={cat.id} className="rounded-lg">
+                      <div key={cat.id} className="rounded-xl">
                         <div
                           onClick={() => handleSelectCategory(cat.id)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer group ${
+                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-between cursor-pointer group border ${
                             isCatSelected && !subParam
-                              ? 'bg-purple-100 text-[#7C3AED] font-bold'
-                              : 'text-gray-700 hover:bg-gray-100'
+                              ? 'bg-violet-50 text-[#7C3AED] border-violet-200 font-bold shadow-2xs'
+                              : 'text-gray-700 hover:bg-gray-50 border-transparent'
                           }`}
                         >
-                          <span className="truncate">{cat.name}</span>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-lg bg-white border border-gray-200 p-0.5 flex items-center justify-center shrink-0 shadow-2xs">
+                              <img
+                                src={catImg}
+                                alt={cat.name}
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                  (e.target as any).src = '/placeholder.svg';
+                                }}
+                              />
+                            </div>
+                            <span className="truncate">{cat.name}</span>
+                          </div>
                           <div className="flex items-center gap-1">
                             {subList.length > 0 && (
                               <button
                                 type="button"
                                 onClick={(e) => toggleCategoryExpand(cat.id, e)}
-                                className="p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-700"
+                                className="p-1 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-700"
                               >
                                 <ChevronDown
-                                  size={16}
+                                  size={15}
                                   className={`transition-transform duration-200 ${
                                     isExpanded ? 'rotate-180' : ''
                                   }`}
@@ -673,14 +741,14 @@ export const ProductListingPage = () => {
 
                         {/* Subcategories Accordion */}
                         {isExpanded && subList.length > 0 && (
-                          <div className="pl-4 pr-1 py-1 space-y-0.5 border-l-2 border-purple-200 ml-3 mt-1">
+                          <div className="pl-5 pr-1 py-1 space-y-0.5 border-l-2 border-purple-200 ml-4 mt-1">
                             {subList.map((sub) => {
                               const isSubSelected = String(subParam) === String(sub.id);
                               return (
                                 <button
                                   key={sub.id}
                                   onClick={() => handleSelectSubcategory(cat.id, sub.id)}
-                                  className={`w-full text-left px-2.5 py-1.5 rounded text-xs transition-colors block truncate cursor-pointer ${
+                                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors block truncate cursor-pointer ${
                                     isSubSelected
                                       ? 'text-[#7C3AED] font-bold bg-purple-50'
                                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -782,37 +850,12 @@ export const ProductListingPage = () => {
                 </div>
               ) : (
                 <>
-                  {/* Product Grid */}
+                  {/* Product Grid - All Products Rendered */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {filteredProducts.map((prod) => (
                       <ProductCard key={`${prod.id}-${prod.variant_id || 0}`} item={prod} />
                     ))}
                   </div>
-
-                  {/* Pagination Bar */}
-                  {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
-                      <span className="text-sm text-gray-600 font-medium">
-                        Showing Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
-                      </span>
-
-                      <Pagination
-                        count={totalPages}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        color="primary"
-                        shape="rounded"
-                        size="medium"
-                        sx={{
-                          '& .Mui-selected': {
-                            backgroundColor: '#8b3ab5 !important',
-                            color: '#fff !important',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      />
-                    </div>
-                  )}
                 </>
               )}
             </main>

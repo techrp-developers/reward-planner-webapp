@@ -67,9 +67,13 @@ export const HomePage = () => {
   const [announcementIndex, setAnnouncementIndex] = useState(0);
 
   // Interactive reaction counters for announcements
-  const [reactionCounts, setReactionCounts] = useState({
-    kudos: 34,
-    celebrated: 19
+  const [reactionCounts, setReactionCounts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('rp_announcement_reactions');
+      return saved ? JSON.parse(saved) : { kudos: 34, celebrated: 19 };
+    } catch {
+      return { kudos: 34, celebrated: 19 };
+    }
   });
 
   const showToast = (msg) => {
@@ -80,8 +84,16 @@ export const HomePage = () => {
   };
 
   const handleReaction = (type) => {
-    setReactionCounts(prev => ({ ...prev, [type]: prev[type] + 1 }));
-    showToast(`Reaction added! Thank you for celebrating our team members! 🎉`);
+    setReactionCounts((prev) => {
+      const updated = { ...prev, [type]: (prev[type] || 0) + 1 };
+      try {
+        localStorage.setItem('rp_announcement_reactions', JSON.stringify(updated));
+      } catch (err) {
+        console.warn(err);
+      }
+      return updated;
+    });
+    showToast(`Reaction added! Thank you for celebrating with the team! 🎉`);
   };
 
   const handleGameClick = () => {
@@ -388,152 +400,46 @@ export const HomePage = () => {
   };
 
 
-  // Top Performers data matching podium layout in reference image (media_1790841692615.png)
-  const performersData = {
-    June: {
-      podium: [
-        {
-          rank: 2,
-          name: 'Lokesh Ankam',
-          role: 'UX Designer',
-          score: '5.0',
-          badgeText: '2',
-          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 1,
-          name: 'Chandra Shekar',
-          role: 'Product Lead',
-          score: '5.0',
-          isCrown: true,
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 3,
-          name: 'Monica Sylas',
-          role: 'Sr. Designer',
-          score: '5.0',
-          badgeText: '3',
-          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'
-        }
-      ],
-      list: [
-        { id: 4, name: 'Alina Hubner', role: 'Recruiter', score: '4.9', points: '920 RP Coins', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80' },
-        { id: 5, name: 'Yana Crout', role: 'Recruiter', score: '4.9', points: '890 RP Coins', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' },
-        { id: 6, name: 'Thom Haye', role: 'UI Designer', score: '4.8', points: '840 RP Coins', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80' }
-      ]
-    },
-    July: {
-      podium: [
-        {
-          rank: 2,
-          name: 'Alina Hubner',
-          role: 'Talent Acquisition',
-          score: '5.0',
-          badgeText: '2',
-          avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 1,
-          name: 'Lokesh Ankam',
-          role: 'UX Lead',
-          score: '5.0',
-          isCrown: true,
-          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 3,
-          name: 'Yana Crout',
-          role: 'People Ops',
-          score: '5.0',
-          badgeText: '3',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-        }
-      ],
-      list: [
-        { id: 4, name: 'Chandra Shekar', role: 'Product Lead', score: '4.9', points: '910 RP Coins', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80' },
-        { id: 5, name: 'Thom Haye', role: 'UI Designer', score: '4.9', points: '880 RP Coins', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80' },
-        { id: 6, name: 'Samuel Felix', role: 'Marketing Head', score: '4.8', points: '830 RP Coins', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=150&q=80' }
-      ]
-    },
-    August: {
-      podium: [
-        {
-          rank: 2,
-          name: 'Thom Haye',
-          role: 'UI Designer',
-          score: '5.0',
-          badgeText: '2',
-          avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 1,
-          name: 'Monica Sylas',
-          role: 'Design Director',
-          score: '5.0',
-          isCrown: true,
-          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'
-        },
-        {
-          rank: 3,
-          name: 'Chandra Shekar',
-          role: 'Product Lead',
-          score: '5.0',
-          badgeText: '3',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
-        }
-      ],
-      list: [
-        { id: 4, name: 'Lokesh Ankam', role: 'UX Designer', score: '4.9', points: '940 RP Coins', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80' },
-        { id: 5, name: 'Alina Hubner', role: 'Recruiter', score: '4.9', points: '890 RP Coins', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80' },
-        { id: 6, name: 'Yana Crout', role: 'Recruiter', score: '4.8', points: '850 RP Coins', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' }
-      ]
-    }
-  };
+
 
   const announcements = [
     {
       id: 1,
-      type: 'eotm',
-      name: 'Monica Sylas',
-      title: 'Monica Sylas',
-      badge: 'Employee of The Month',
-      role: 'User Experience Designer',
-      department: 'HDP Department',
-      phone: '+91 8762198729',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-      bonus: '5,000 RP Coins',
-      desc: 'Congratulations to Monica for extraordinary UX innovation, design systems leadership, and cross-team mentorship this month!',
-      cta: 'Claim Rewards',
+      type: 'spotlight',
+      title: 'Q3 Rewards & Recognition Program',
+      badge: 'Company Spotlight',
+      icon: EmojiEventsIcon,
+      desc: 'Reward Planners has launched the Q3 Recognition initiative across all company teams! Appreciate your colleagues with kudos, achieve quarterly milestones, and redeem bonus RP Coins across the corporate store.',
+      tags: ['5,000 RP Pool', 'All Departments', 'Active Q3'],
+      cta: 'Explore Rewards Store',
       actionType: 'claim',
-      icon: MilitaryTechOutlinedIcon,
       color: 'from-amber-500/10 via-rose-500/10 to-purple-500/10'
     },
     {
       id: 2,
       type: 'birthday',
-      name: "Sushma's Birthday",
-      title: "Sushma's Birthday",
+      title: "Team Birthday Celebrations",
       badge: 'Birthday Celebration',
-      person: 'Sushma',
-      desc: "On occasion of Sushma's Birthday, let's meet and greet her warm wishes followed by cake cutting and celebration.",
-      cta: 'Send Greetings',
-      actionType: 'toast',
       icon: CakeOutlinedIcon,
-      color: 'from-pink-500/10 to-purple-500/10'
+      desc: "Warmest birthday wishes to our colleagues celebrating this month! Join the company celebration followed by cake cutting and greetings.",
+      tags: ['Celebration', 'Cake Cutting', '4:30 PM Today'],
+      cta: 'Send Birthday Wishes',
+      actionType: 'toast',
+      person: 'our Birthday Celebrants',
+      color: 'from-pink-500/10 via-purple-500/10 to-rose-500/10'
     },
     {
       id: 3,
-      type: 'anniversary',
-      name: "Rahul's 5th Work Anniversary",
-      title: "Rahul's 5th Work Anniversary",
+      type: 'milestone',
+      title: 'Work Anniversary Milestones',
       badge: 'Work Anniversary',
-      person: 'Rahul Verma',
-      desc: 'Congratulations to Rahul for completing 5 inspiring years at Reward Planners! Join us in wishing him continued success.',
-      cta: 'Send Wishes',
-      actionType: 'toast',
       icon: WorkspacePremiumIcon,
-      color: 'from-amber-500/10 to-yellow-500/10'
+      desc: 'Congratulations to our dedicated team members achieving notable work anniversary milestones this quarter. Thank you for your leadership and excellence at Reward Planners!',
+      tags: ['Loyalty Honors', 'Recognition Badges', '5+ Years'],
+      cta: 'Send Milestone Wishes',
+      actionType: 'toast',
+      person: 'our Milestone Achievers',
+      color: 'from-amber-500/10 via-yellow-500/10 to-orange-500/10'
     }
   ];
 
@@ -568,7 +474,7 @@ export const HomePage = () => {
         {/* ── 1. TOP ENGAGEMENT & PRODUCTIVITY CARDS (3-COLUMN BALANCED FULL-WIDTH GRID) ── */}
         <section className="engagement-cards-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch mb-16 sm:mb-20">
           
-          {/* Card 1: Top Performers (Company Leaderboard - Podium & Star Ratings) */}
+          {/* Card 1: Top Performers (Lightweight Leaderboard Preview - No Dummy Profiles, Ready for Live Data) */}
           <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all flex flex-col justify-between bg-[#E0C3F2] border border-[#C79FE0] text-[#24162F]">
             <div>
               {/* Header */}
@@ -604,134 +510,70 @@ export const HomePage = () => {
                 </div>
               </div>
 
-              {/* Podium Section (Top 3 Performers) */}
-              {(() => {
-                const currentMonthData = performersData[activeMonth] || performersData.July;
-                const p1 = currentMonthData.podium.find((p) => p.rank === 1) || currentMonthData.podium[1];
-                const p2 = currentMonthData.podium.find((p) => p.rank === 2) || currentMonthData.podium[0];
-                const p3 = currentMonthData.podium.find((p) => p.rank === 3) || currentMonthData.podium[2];
-
-                return (
-                  <div className="pt-5 pb-4 flex items-end justify-center gap-2 sm:gap-4 lg:gap-5">
-                    {/* Rank 2 (Left - Emerald badge 2, Star 5.0) */}
-                    <div className="flex flex-col items-center text-center w-22 sm:w-26">
-                      <div className="relative mb-2">
-                        <img
-                          src={p2.avatar}
-                          alt={p2.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#C79FE0]/80 shadow-sm"
-                        />
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#10B981] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
-                          2
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-[#24162F] text-sm sm:text-base">
-                        <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
-                        <span>{p2.score}</span>
-                      </div>
-                      <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
-                        {p2.name}
-                      </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#6B537B] leading-tight mt-0.5 font-medium">
-                        {p2.role}
-                      </div>
+              {/* Clean, Lightweight Top Performers Podium Standings Placeholder */}
+              <div className="pt-4 pb-2">
+                <div className="bg-white/85 rounded-2xl p-4 sm:p-5 border border-[#C79FE0]/75 shadow-2xs text-center flex flex-col items-center justify-between min-h-[255px]">
+                  <div>
+                    {/* Top Trophy Badge */}
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1C0E28] to-[#3B1E54] text-amber-400 flex items-center justify-center shadow-md mb-2.5 mx-auto">
+                      <EmojiEventsIcon sx={{ fontSize: 26 }} className="text-amber-400" />
                     </div>
 
-                    {/* Rank 1 (Center, Elevated - Gold Crown badge, Star 5.0) */}
-                    <div className="flex flex-col items-center text-center w-26 sm:w-30 -mt-4">
-                      <div className="relative mb-2">
-                        <img
-                          src={p1.avatar}
-                          alt={p1.name}
-                          className="w-20 h-20 sm:w-22 sm:h-22 rounded-full object-cover border-4 border-amber-300 shadow-lg ring-4 ring-amber-200/50"
-                        />
-                        <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center border-2 border-white shadow-md">
-                          <EmojiEventsIcon sx={{ fontSize: 18 }} className="text-white" />
-                        </div>
+                    <h4 className="text-sm sm:text-base font-bold text-[#24162F]">
+                      Top Performers ({activeMonth})
+                    </h4>
+                    <p className="text-xs text-[#6B537B] font-medium max-w-xs mt-1 leading-relaxed mx-auto">
+                      Standings are being calculated from active employee achievements and quiz scores. Top performers will be showcased here!
+                    </p>
+                  </div>
+
+                  {/* 3-Spot Clean Podium Preview (Prepares for upcoming user profiles) */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5 w-full my-3">
+                    {/* 2nd Place */}
+                    <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-[#C79FE0]/70 flex flex-col items-center justify-center text-center shadow-2xs">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-black flex items-center justify-center mb-1 shadow-2xs">
+                        2
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1.5 font-semibold text-[#24162F] text-base sm:text-lg">
-                        <StarIcon sx={{ fontSize: 20 }} className="text-amber-400" />
-                        <span>{p1.score}</span>
-                      </div>
-                      <div className="text-sm sm:text-base font-semibold text-[#24162F] mt-0.5 leading-snug break-words">
-                        {p1.name}
-                      </div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full text-xs text-[#1C0E28] bg-white/80 border border-[#C79FE0]/80 font-semibold leading-tight mt-1">
-                        {p1.role}
-                      </div>
+                      <div className="text-xs font-bold text-[#24162F]">2nd Place</div>
+                      <div className="text-[10px] text-[#6B537B] font-medium mt-0.5">Revealing soon</div>
                     </div>
 
-                    {/* Rank 3 (Right - Bronze badge 3, Star 5.0) */}
-                    <div className="flex flex-col items-center text-center w-22 sm:w-26">
-                      <div className="relative mb-2">
-                        <img
-                          src={p3.avatar}
-                          alt={p3.name}
-                          className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white ring-2 ring-[#C79FE0]/80 shadow-sm"
-                        />
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#F59E0B] text-white text-xs font-black flex items-center justify-center border-2 border-white shadow-sm">
-                          3
-                        </div>
+                    {/* 1st Place (Elevated) */}
+                    <div className="bg-white p-3 rounded-xl border-2 border-amber-300 flex flex-col items-center justify-center text-center shadow-sm -mt-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white flex items-center justify-center mb-1 shadow-xs">
+                        <EmojiEventsIcon sx={{ fontSize: 15 }} className="text-white" />
                       </div>
-                      <div className="flex items-center justify-center gap-1 mt-1 font-bold text-[#24162F] text-sm sm:text-base">
-                        <StarIcon sx={{ fontSize: 18 }} className="text-amber-400" />
-                        <span>{p3.score}</span>
+                      <div className="text-xs font-extrabold text-[#24162F]">1st Place</div>
+                      <div className="text-[10px] text-amber-600 font-bold mt-0.5">Top Achiever</div>
+                    </div>
+
+                    {/* 3rd Place */}
+                    <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-[#C79FE0]/70 flex flex-col items-center justify-center text-center shadow-2xs">
+                      <div className="w-6 h-6 rounded-full bg-[#F59E0B] text-white text-[11px] font-black flex items-center justify-center mb-1 shadow-2xs">
+                        3
                       </div>
-                      <div className="text-xs sm:text-sm font-bold text-[#24162F] mt-0.5 leading-snug break-words">
-                        {p3.name}
-                      </div>
-                      <div className="text-[10px] sm:text-[11px] text-[#6B537B] leading-tight mt-0.5 font-medium">
-                        {p3.role}
-                      </div>
+                      <div className="text-xs font-bold text-[#24162F]">3rd Place</div>
+                      <div className="text-[10px] text-[#6B537B] font-medium mt-0.5">Revealing soon</div>
                     </div>
                   </div>
-                );
-              })()}
 
-              {/* Performers Ranked List (Ranks 4, 5, 6 with Star ratings) */}
-              <div className="border-t border-[#C79FE0]/70 pt-4 space-y-2">
-                {(performersData[activeMonth]?.list || performersData.July.list).map((p, idx) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between p-2 rounded-2xl hover:bg-white/60 transition-all border border-transparent hover:border-[#C79FE0]/60"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="w-5 h-5 rounded-full bg-white/80 text-[#6B537B] text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#C79FE0]/80">
-                        {idx + 4}
-                      </span>
-                      <img
-                        src={p.avatar}
-                        alt={p.name}
-                        className="w-10 h-10 rounded-full object-cover border border-[#C79FE0]/80 shadow-2xs shrink-0"
-                      />
-                      <div>
-                        <div className="text-xs sm:text-sm font-bold text-[#24162F]">
-                          {p.name}
-                        </div>
-                        <div className="text-[11px] text-[#6B537B] font-medium">
-                          {p.role}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="hidden sm:inline-block text-[11px] font-semibold text-[#6B537B] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#C79FE0]/80">
-                        {p.points}
-                      </span>
-                      <div className="flex items-center gap-1 font-bold text-[#24162F] text-xs sm:text-sm">
-                        <StarIcon sx={{ fontSize: 16 }} className="text-amber-400" />
-                        <span>{p.score}</span>
-                      </div>
-                    </div>
+                  {/* Lightweight Highlight Chips */}
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 text-[10px] font-bold text-[#1C0E28]">
+                    <span className="bg-white px-2.5 py-1 rounded-lg border border-[#C79FE0]/70 shadow-2xs">
+                      🏆 5,000 RP Coins Pool
+                    </span>
+                    <span className="bg-white px-2.5 py-1 rounded-lg border border-[#C79FE0]/70 shadow-2xs">
+                      👥 All Employees Eligible
+                    </span>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-[#C79FE0]/70 flex items-center justify-between text-[11px] text-[#6B537B] font-medium">
+            <div className="mt-3 pt-3 border-t border-[#C79FE0]/70 flex items-center justify-between text-[11px] text-[#6B537B] font-medium">
               <span>Dynamic quarterly rankings</span>
               <span className="text-[#1C0E28] font-bold flex items-center gap-1 bg-white/80 px-2.5 py-0.5 rounded-full border border-[#C79FE0]/80">
-                <AutoAwesomeIcon sx={{ fontSize: 13 }} /> Peer Recognition Model
+                <AutoAwesomeIcon sx={{ fontSize: 13 }} /> Live Company Tracking
               </span>
             </div>
           </div>
@@ -805,131 +647,71 @@ export const HomePage = () => {
                 })}
               </div>
 
-              {/* Main Announcement Slide */}
-              {currentAnnouncement.type === 'eotm' ? (
-                /* Premium Employee of the Month Spotlight */
-                <div className="rounded-2xl p-4 bg-gradient-to-br from-[#F4EEF8] via-[#FAF8FC] to-[#F1EAF6] border border-[#E4DCE9] shadow-2xs relative overflow-hidden">
-                  {/* Subtle background glow */}
-                  <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+              {/* Main Announcement Slide (Clean, concise & expressive card with NO dummy profile) */}
+              <div className="rounded-2xl p-4 bg-white/90 border border-[#E9AC85]/80 shadow-2xs relative overflow-hidden flex flex-col justify-between min-h-[255px]">
+                {/* Subtle background glow */}
+                <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
 
-                  {/* Profile & Badge */}
-                  <div className="flex items-start gap-4">
-                    <div className="relative shrink-0">
-                      <img
-                        src={currentAnnouncement.image}
-                        alt={currentAnnouncement.name}
-                        className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover ring-3 ring-amber-400/60 shadow-md border-2 border-white"
-                      />
-                      <div className="absolute -bottom-1 -right-1 bg-amber-400 text-amber-950 p-1 rounded-full shadow-md border-2 border-white flex items-center justify-center">
-                        <MilitaryTechOutlinedIcon sx={{ fontSize: 14 }} className="text-amber-950" />
-                      </div>
+                <div>
+                  {/* Category Badge & Title */}
+                  <div className="flex items-start gap-3 mb-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-[#1C0E28] text-white flex items-center justify-center shadow-xs shrink-0">
+                      {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 22 }, className: "text-amber-400" })}
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#1C0E28] text-white shadow-2xs mb-1">
-                        <EmojiEventsIcon sx={{ fontSize: 12 }} className="text-white" />
+                    <div className="min-w-0 flex-1">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1C0E28] text-white shadow-2xs mb-1">
+                        {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 12 }, className: "text-amber-400" })}
                         <span>{currentAnnouncement.badge}</span>
                       </span>
-                      <h4 className="text-base font-semibold text-[#24162F] truncate">
-                        {currentAnnouncement.name}
+                      <h4 className="text-sm sm:text-base font-bold text-[#24162F] leading-snug">
+                        {currentAnnouncement.title}
                       </h4>
-                      <p className="text-xs font-semibold text-[#776B80] truncate">
-                        {currentAnnouncement.role} • <span className="text-[#93849F] font-medium">{currentAnnouncement.department}</span>
-                      </p>
                     </div>
                   </div>
 
-                  {/* Recognition Statement */}
-                  <p className="text-xs text-[#55435F] leading-relaxed font-medium mt-4 bg-white/95 p-2 rounded-xl border border-[#E4DCE9]/80 shadow-2xs">
+                  {/* Concise expressive announcement description */}
+                  <p className="text-xs text-[#55435F] leading-relaxed font-medium bg-white/80 p-3 rounded-xl border border-[#E9AC85]/50 shadow-2xs">
                     "{currentAnnouncement.desc}"
                   </p>
 
-                  {/* Highlight Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mt-4 text-center">
-                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
-                        <MonetizationOnOutlinedIcon sx={{ fontSize: 12 }} className="text-amber-500" />
-                        <span>Award</span>
-                      </div>
-                      <div className="text-xs font-semibold text-amber-600 mt-0.5">{currentAnnouncement.bonus}</div>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
-                        <TrendingUpIcon sx={{ fontSize: 12 }} className="text-[#1C0E28]" />
-                        <span>Impact</span>
-                      </div>
-                      <div className="text-xs font-semibold text-[#1C0E28] mt-0.5">Top 1%</div>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white border border-[#E4DCE9] shadow-2xs flex flex-col items-center">
-                      <div className="flex items-center gap-1 text-[9px] text-[#776B80] font-semibold uppercase tracking-wider">
-                        <VerifiedOutlinedIcon sx={{ fontSize: 12 }} className="text-rose-500" />
-                        <span>Delivery</span>
-                      </div>
-                      <div className="text-xs font-semibold text-rose-600 mt-0.5">100% On-Time</div>
-                    </div>
-                  </div>
-
-                  {/* Interactive Peer Reactions with Material UI Icons */}
-                  <div className="mt-4 pt-2.5 border-t border-[#E4DCE9]/60 flex items-center justify-between">
-                    <span className="text-[11px] text-[#776B80] font-medium">Join the celebration:</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleReaction('kudos')}
-                        className="px-2.5 py-1 rounded-full bg-white hover:bg-[#F0E9F5] text-[#55435F] text-[11px] font-bold border border-[#E4DCE9] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                  {/* Expressive Highlight Tags */}
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                    {currentAnnouncement.tags?.map((tag, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className="text-[10px] font-bold text-[#1C0E28] bg-white px-2.5 py-1 rounded-lg border border-[#E9AC85]/60 shadow-2xs"
                       >
-                        <ThumbUpAltOutlinedIcon sx={{ fontSize: 13 }} className="text-[#1C0E28]" />
-                        <span>Kudos</span>
-                        <strong className="text-[#1C0E28]">({reactionCounts.kudos})</strong>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleReaction('celebrated')}
-                        className="px-2.5 py-1 rounded-full bg-white hover:bg-rose-50 text-[#55435F] text-[11px] font-bold border border-[#E4DCE9] shadow-2xs flex items-center gap-1 transition-all cursor-pointer hover:scale-105 active:scale-95"
-                      >
-                        <CelebrationOutlinedIcon sx={{ fontSize: 13 }} className="text-rose-600" />
-                        <span>Celebrate</span>
-                        <strong className="text-rose-600">({reactionCounts.celebrated})</strong>
-                      </button>
-                    </div>
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              ) : (
-                /* Other Announcements (Birthday, Anniversary, Townhall) */
-                <div className={`rounded-2xl p-4 bg-gradient-to-br ${currentAnnouncement.color} border border-[#E4DCE9] shadow-2xs relative overflow-hidden flex flex-col justify-between min-h-[270px]`}>
-                  <div>
-                    <div className="flex items-center gap-4 mb-2.5">
-                      <div className="w-11 h-11 rounded-xl bg-white shadow-xs flex items-center justify-center text-rose-500 shrink-0">
-                        {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 24 } })}
-                      </div>
-                      <div>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#1C0E28] bg-white px-2 py-0.5 rounded-full mb-1 shadow-2xs">
-                          {React.createElement(currentAnnouncement.icon, { sx: { fontSize: 12 }, className: "text-[#1C0E28]" })}
-                          <span>{currentAnnouncement.badge}</span>
-                        </span>
-                        <h4 className="text-base font-bold text-[#24162F]">
-                          {currentAnnouncement.name}
-                        </h4>
-                      </div>
-                    </div>
 
-                    <div className="bg-white/90 p-3 rounded-xl border border-white text-xs text-[#55435F] leading-relaxed font-medium mt-1">
-                      {currentAnnouncement.desc}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-2.5 border-t border-[#E4DCE9]/60 flex items-center justify-between text-[11px] text-[#776B80] font-medium">
-                    <span className="flex items-center gap-1">
-                      <EventOutlinedIcon sx={{ fontSize: 13 }} className="text-[#93849F]" />
-                      Reward Planners Calendar
-                    </span>
-                    <span className="text-[#1C0E28] font-bold flex items-center gap-1">
-                      <GroupsOutlinedIcon sx={{ fontSize: 13 }} />
-                      Company-Wide Event
-                    </span>
+                {/* Interactive Peer Reactions */}
+                <div className="mt-3 pt-2.5 border-t border-[#E9AC85]/60 flex items-center justify-between">
+                  <span className="text-[11px] text-[#776B80] font-medium">Join celebration:</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleReaction('kudos')}
+                      className="px-2.5 py-1 rounded-full bg-white hover:bg-purple-50 text-[#55435F] text-[11px] font-bold border border-[#E9AC85] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                    >
+                      <ThumbUpAltOutlinedIcon sx={{ fontSize: 13 }} className="text-[#1C0E28]" />
+                      <span>Kudos</span>
+                      <strong className="text-[#1C0E28]">({reactionCounts.kudos})</strong>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleReaction('celebrated')}
+                      className="px-2.5 py-1 rounded-full bg-white hover:bg-rose-50 text-[#55435F] text-[11px] font-bold border border-[#E9AC85] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 active:scale-95"
+                    >
+                      <CelebrationOutlinedIcon sx={{ fontSize: 13 }} className="text-rose-600" />
+                      <span>Celebrate</span>
+                      <strong className="text-rose-600">({reactionCounts.celebrated})</strong>
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Bottom Actions & Indicator Dots */}
@@ -944,7 +726,7 @@ export const HomePage = () => {
                   className="w-full py-2.5 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
                   <MilitaryTechOutlinedIcon sx={{ fontSize: 17 }} />
-                  <span>{currentAnnouncement.cta} & Explore Store</span>
+                  <span>{currentAnnouncement.cta}</span>
                   <ArrowForwardIcon sx={{ fontSize: 15 }} />
                 </button>
               ) : (

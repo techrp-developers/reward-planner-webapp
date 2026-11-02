@@ -18,6 +18,7 @@ import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import SparklesIcon from '@mui/icons-material/AutoAwesomeRounded';
 import { notificationApi, AppNotification } from '../../api/notificationApi';
+import { resolveNotificationMeta } from '../../utils/notificationRouting';
 
 export type NotificationTab = 'All' | 'Unread' | 'Orders' | 'Payments' | 'Rewards' | 'Reminders';
 
@@ -192,95 +193,23 @@ function computeTimeHorizon(value?: string | number): 'Today' | 'Yesterday' | 'E
   return 'Earlier';
 }
 
-function resolveNotificationMeta(item: AppNotification): {
-  category: 'Orders' | 'Payments' | 'Rewards' | 'Reminders' | 'Updates';
-  badgeLabel: string;
-  to: string;
-  actionLabel: string;
-  IconComponent: any;
-} {
-  const mod = (item.module || '').toLowerCase();
-  const type = (item.type || '').toLowerCase();
-  const title = (item.title || '').toLowerCase();
-  const actionUrl = (item.action_url || item.to || '').trim();
-
-  // 1. Orders & E-commerce
-  if (mod === 'ecommerce' || type.includes('order') || title.includes('order') || title.includes('delivery') || title.includes('dispatched')) {
-    return {
-      category: 'Orders',
-      badgeLabel: 'Order',
-      to: actionUrl || '/profile',
-      actionLabel: 'View Order',
-      IconComponent: ShoppingBagOutlinedIcon,
-    };
-  }
-
-  // 2. Services
-  if (mod === 'service' || type.includes('service') || title.includes('service') || title.includes('booking')) {
-    return {
-      category: 'Orders',
-      badgeLabel: 'Service',
-      to: actionUrl || '/services',
-      actionLabel: 'View Booking',
-      IconComponent: AssignmentOutlinedIcon,
-    };
-  }
-
-  // 3. Payments & BBPS
-  if (mod === 'bbps' || type.includes('bbps') || type.includes('bill') || title.includes('bill') || title.includes('electricity') || title.includes('recharge')) {
-    return {
-      category: 'Payments',
-      badgeLabel: 'Payment',
-      to: actionUrl || '/bbps',
-      actionLabel: 'Pay / View',
-      IconComponent: ReceiptLongOutlinedIcon,
-    };
-  }
-
-  // 4. Rewards, Wallet & Points
-  if (mod === 'rewards' || mod === 'wallet' || type.includes('reward') || type.includes('wallet') || type.includes('point') || type.includes('coin') || title.includes('point') || title.includes('cashback') || title.includes('wallet')) {
-    return {
-      category: 'Rewards',
-      badgeLabel: 'Reward',
-      to: actionUrl || (mod === 'wallet' ? '/profile' : '/rewards'),
-      actionLabel: mod === 'wallet' ? 'Wallet' : 'Explore',
-      IconComponent: CardGiftcardOutlinedIcon,
-    };
-  }
-
-  // 5. Wellness & Fitness
-  if (mod === 'wellness' || mod === 'fitness' || type.includes('fitness') || type.includes('step') || title.includes('step') || title.includes('walk') || title.includes('streak')) {
-    return {
-      category: 'Reminders',
-      badgeLabel: 'Health',
-      to: actionUrl || '/wellness',
-      actionLabel: 'Wellness',
-      IconComponent: FitnessCenterOutlinedIcon,
-    };
-  }
-
-  // 6. Reminders & Tasks
-  if (mod === 'todo' || type.includes('todo') || type.includes('reminder') || title.includes('reminder') || title.includes('task')) {
-    return {
-      category: 'Reminders',
-      badgeLabel: 'Reminder',
-      to: actionUrl || '/',
-      actionLabel: 'View Task',
-      IconComponent: NotificationsActiveOutlinedIcon,
-    };
-  }
-
-  // Default Fallback
-  return {
-    category: 'Updates',
-    badgeLabel: item.category || 'Update',
-    to: actionUrl || '/',
-    actionLabel: 'Details',
-    IconComponent: NotificationsOutlinedIcon,
-  };
-}
-
 const SAMPLE_NOTIFICATIONS: AppNotification[] = [
+  {
+    id: 'sample-chat-msg',
+    notification_id: 'sample-chat-msg',
+    title: 'Arpita Bhilare',
+    message: 'Ky krtay net nahiye tr',
+    module: 'chat',
+    type: 'chat_message',
+    category: 'Updates',
+    reference_type: 'conversation',
+    reference_id: '28',
+    action_url: '/chat/28',
+    metadata: { conversation_id: 28, message_id: 113, sender_user_id: 12 },
+    priority: 'normal',
+    is_read: 0,
+    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+  },
   {
     id: 'sample-order-dispatch',
     notification_id: 'sample-order-dispatch',
@@ -876,7 +805,7 @@ export default function NotificationsPanel() {
                                 </span>
 
                                 {/* Quick Mark Read & Delete icon buttons */}
-                                <div className="flex items-center gap-0.5">
+                                <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
                                   {isUnread && (
                                     <button
                                       type="button"

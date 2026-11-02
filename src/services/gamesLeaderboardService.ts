@@ -15,7 +15,9 @@ export const SUDOKU_LEADERBOARD_CHANGED_EVENT = 'rp_sudoku_leaderboard_changed';
 
 export interface QuizUserStats {
   score: number;
+  points: number;
   bestScore: number;
+  streak: number;
   totalGames: number;
   lastPlayed: number;
 }
@@ -26,20 +28,20 @@ export interface SudokuUserStats {
   lastPlayed: number;
 }
 
-// Initial reference data for Quivio Quiz
+// Initial reference data for Quivio Quiz (Matching mobile app LeaderboardScreen & MPS Global standings)
 export const DEFAULT_QUIZ_PLAYERS: QuizPlayer[] = [
-  { user_id: 37, name: 'Sakshi Chavan', score: 10, total_games: 5 },
-  { user_id: 102, name: 'Prajesh kumar', score: 10, total_games: 4 },
-  { user_id: 103, name: 'Burhan Partapurwala', score: 10, total_games: 3 },
-  { user_id: 104, name: 'Pooja Suresh Harne', score: 10, total_games: 4 },
-  { user_id: 105, name: 'Bhagyashree Appasaheb Rodage', score: 10, total_games: 3 },
-  { user_id: 106, name: 'Shejal Vaman Kamble', score: 10, total_games: 2 },
-  { user_id: 107, name: 'Vivek Pise', score: 10, total_games: 2 },
-  { user_id: 108, name: 'Devashish Pal', score: 9, total_games: 6 },
-  { user_id: 109, name: 'Sanket Sangale', score: 8, total_games: 4 },
-  { user_id: 110, name: 'Sahil Mujawar', score: 7, total_games: 2 },
-  { user_id: 111, name: 'Rinku Makhijani', score: 6, total_games: 3 },
-  { user_id: 112, name: 'Onkar Ram Kharat', score: 6, total_games: 2 },
+  { user_id: 37, name: 'Sakshi Chavan', score: 450, points: 450, streak: 4, total_games: 5 },
+  { user_id: 102, name: 'Prajesh kumar', score: 410, points: 410, streak: 3, total_games: 4 },
+  { user_id: 103, name: 'Alice', score: 360, points: 360, streak: 2, total_games: 4 },
+  { user_id: 104, name: 'Burhan Partapurwala', score: 320, points: 320, streak: 2, total_games: 3 },
+  { user_id: 105, name: 'Pooja Suresh Harne', score: 300, points: 300, streak: 1, total_games: 4 },
+  { user_id: 106, name: 'Bob', score: 280, points: 280, streak: 0, total_games: 3 },
+  { user_id: 107, name: 'Bhagyashree Appasaheb Rodage', score: 250, points: 250, streak: 1, total_games: 3 },
+  { user_id: 108, name: 'Shejal Vaman Kamble', score: 210, points: 210, streak: 1, total_games: 2 },
+  { user_id: 109, name: 'Vivek Pise', score: 180, points: 180, streak: 0, total_games: 2 },
+  { user_id: 110, name: 'Devashish Pal', score: 160, points: 160, streak: 2, total_games: 6 },
+  { user_id: 111, name: 'Sanket Sangale', score: 140, points: 140, streak: 1, total_games: 4 },
+  { user_id: 112, name: 'Sahil Mujawar', score: 120, points: 120, streak: 0, total_games: 2 },
 ];
 
 // Initial reference data for Sudoku Challenge
@@ -87,18 +89,26 @@ export const getStoredQuizUserStats = (): QuizUserStats | null => {
 export const recordQuizGameScore = (
   playerName: string,
   userId: number | string | undefined,
-  score: number
-): { rank: number; score: number; bestScore: number; totalGames: number } => {
-  const cleanName = (playerName || 'You').trim();
+  scoreEarned: number
+): { rank: number; score: number; points: number; bestScore: number; streak: number; totalGames: number } => {
+  const cleanName = (playerName || 'Sakshi Chavan').trim();
   const validUserId = userId ? Number(userId) : 37;
 
   // 1. Update personal stats
   const prevStats = getStoredQuizUserStats();
-  const totalGames = (prevStats?.totalGames || 0) + 1;
-  const bestScore = Math.max(prevStats?.bestScore || 0, score);
+  const totalGames = (prevStats?.totalGames || 5) + 1;
+  const prevPoints = prevStats?.points ?? prevStats?.score ?? 450;
+  // Calculate points gained: in mobile, each quiz grants points (e.g. +20 to +100 PTS)
+  const pointsAwarded = scoreEarned > 15 ? scoreEarned : Math.max(20, scoreEarned * 20);
+  const newPoints = prevPoints + pointsAwarded;
+  const bestScore = Math.max(prevStats?.bestScore || 0, newPoints);
+  const newStreak = (prevStats?.streak ?? 4) + (scoreEarned > 0 ? 1 : 0);
+
   const currentStats: QuizUserStats = {
-    score,
+    score: newPoints,
+    points: newPoints,
     bestScore,
+    streak: newStreak,
     totalGames,
     lastPlayed: Date.now(),
   };
@@ -129,20 +139,33 @@ export const recordQuizGameScore = (
       ...players[idx],
       name: cleanName,
       user_id: validUserId,
-      score, // Dynamically updates according to this quiz game score!
+      score: newPoints,
+      points: newPoints,
+      streak: newStreak,
       total_games: totalGames,
     };
   } else {
     players.push({
       user_id: validUserId,
       name: cleanName,
-      score,
+      score: newPoints,
+      points: newPoints,
+      streak: newStreak,
       total_games: totalGames,
     });
   }
 
-  // 4. Re-sort by score DESC, then total_games DESC, then alphabetical
-  players.sort((a, b) => b.score - a.score || b.total_games - a.total_games || a.name.localeCompare(b.name));
+  // 4. Re-sort by points/score DESC, then streak DESC, then total_games DESC, then alphabetical
+  players.sort((a, b) => {
+    const ptsA = a.points ?? a.score ?? 0;
+    const ptsB = b.points ?? b.score ?? 0;
+    if (ptsB !== ptsA) return ptsB - ptsA;
+    const strA = a.streak ?? 0;
+    const strB = b.streak ?? 0;
+    if (strB !== strA) return strB - strA;
+    if (b.total_games !== a.total_games) return b.total_games - a.total_games;
+    return a.name.localeCompare(b.name);
+  });
 
   // 5. Save back to localStorage
   try {
@@ -159,12 +182,12 @@ export const recordQuizGameScore = (
   try {
     window.dispatchEvent(
       new CustomEvent(QUIZ_LEADERBOARD_CHANGED_EVENT, {
-        detail: { rank, score, bestScore, totalGames, players },
+        detail: { rank, score: newPoints, points: newPoints, bestScore, streak: newStreak, totalGames, players },
       })
     );
   } catch {}
 
-  return { rank, score, bestScore, totalGames };
+  return { rank, score: newPoints, points: newPoints, bestScore, streak: newStreak, totalGames };
 };
 
 /**
@@ -175,7 +198,7 @@ export const getMergedQuizLeaderboard = (
   playerName?: string,
   userId?: number | string
 ): QuizPlayer[] => {
-  const cleanName = (playerName || 'You').trim();
+  const cleanName = (playerName || 'Sakshi Chavan').trim();
   const validUserId = userId ? Number(userId) : 37;
   const userStats = getStoredQuizUserStats();
 
@@ -183,7 +206,11 @@ export const getMergedQuizLeaderboard = (
 
   // If backend provided players, start from backend
   if (Array.isArray(backendPlayers) && backendPlayers.length > 0) {
-    list = backendPlayers.map((p) => ({ ...p }));
+    list = backendPlayers.map((p) => ({
+      ...p,
+      points: p.points ?? p.score,
+      streak: p.streak ?? 0,
+    }));
   } else {
     // Check localStorage cached dynamic leaderboard
     try {
@@ -203,44 +230,60 @@ export const getMergedQuizLeaderboard = (
     if (idx !== -1) {
       list[idx] = {
         ...list[idx],
-        score: userStats.score, // Dynamically changes according to quiz game score
+        score: userStats.points || userStats.score,
+        points: userStats.points || userStats.score,
+        streak: userStats.streak,
         total_games: Math.max(list[idx].total_games || 0, userStats.totalGames),
       };
     } else {
       list.push({
         user_id: validUserId,
         name: cleanName,
-        score: userStats.score,
+        score: userStats.points || userStats.score,
+        points: userStats.points || userStats.score,
+        streak: userStats.streak,
         total_games: userStats.totalGames,
       });
     }
   }
 
-  // Sort descending: highest score first
-  list.sort((a, b) => b.score - a.score || b.total_games - a.total_games || a.name.localeCompare(b.name));
+  // Sort descending: highest points first
+  list.sort((a, b) => {
+    const ptsA = a.points ?? a.score ?? 0;
+    const ptsB = b.points ?? b.score ?? 0;
+    if (ptsB !== ptsA) return ptsB - ptsA;
+    const strA = a.streak ?? 0;
+    const strB = b.streak ?? 0;
+    if (strB !== strA) return strB - strA;
+    if (b.total_games !== a.total_games) return b.total_games - a.total_games;
+    return a.name.localeCompare(b.name);
+  });
 
   return list;
 };
 
 /**
- * Returns current user's dynamic Quiz rank, score, and total games
+ * Returns current user's dynamic Quiz rank, score, streak, and total games
  */
 export const getDynamicQuizUserStats = (
   leaderboard: QuizPlayer[],
   playerName?: string,
   userId?: number | string
-): { rank: number; score: number; bestScore: number; totalGames: number } => {
-  const cleanName = (playerName || 'You').trim();
+): { rank: number; score: number; points: number; bestScore: number; streak: number; totalGames: number } => {
+  const cleanName = (playerName || 'Sakshi Chavan').trim();
   const validUserId = userId ? Number(userId) : 37;
   const stored = getStoredQuizUserStats();
 
   const idx = leaderboard.findIndex((p) => isPlayerMatch(p, cleanName, validUserId));
   if (idx !== -1) {
     const player = leaderboard[idx];
+    const pts = player.points ?? player.score;
     return {
       rank: idx + 1,
-      score: player.score,
-      bestScore: stored?.bestScore || player.score,
+      score: pts,
+      points: pts,
+      bestScore: stored?.bestScore || pts,
+      streak: player.streak ?? stored?.streak ?? 4,
       totalGames: player.total_games,
     };
   }
@@ -248,13 +291,15 @@ export const getDynamicQuizUserStats = (
   if (stored) {
     return {
       rank: 1,
-      score: stored.score,
+      score: stored.points || stored.score,
+      points: stored.points || stored.score,
       bestScore: stored.bestScore,
+      streak: stored.streak ?? 4,
       totalGames: stored.totalGames,
     };
   }
 
-  return { rank: 1, score: 10, bestScore: 10, totalGames: 5 };
+  return { rank: 1, score: 450, points: 450, bestScore: 450, streak: 4, totalGames: 5 };
 };
 
 /**

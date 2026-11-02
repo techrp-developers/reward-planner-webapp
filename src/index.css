@@ -304,3 +304,36 @@ html, body, * {
     scroll-behavior: auto;
   }
 }
+
+/* Sticky Notes Editor formatting and placeholder */
+.sticky-editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: #9CA3AF;
+  pointer-events: none;
+  font-style: italic;
+}
+
+.sticky-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 6px 0;
+  display: block;
+}
+
+.sticky-editor-content ul {
+  list-style-type: disc !important;
+  padding-left: 20px !important;
+  margin: 4px 0 !important;
+}
+
+.sticky-editor-content ol {
+  list-style-type: decimal !important;
+  padding-left: 20px !important;
+  margin: 4px 0 !important;
+}
+
+.sticky-editor-content li {
+  margin-bottom: 2px;
+}
+

@@ -43,7 +43,7 @@ export const ChatCallModal: React.FC<ChatCallModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fadeIn p-4">
-      <div className="relative w-full max-w-lg bg-[#111B21] text-white rounded-3xl overflow-hidden shadow-2xl flex flex-col items-center justify-between min-h-[500px] p-6 border border-white/10">
+      <div className="relative w-full max-w-lg bg-[#0F172A] text-white rounded-3xl overflow-hidden shadow-2xl flex flex-col items-center justify-between min-h-[500px] p-6 border border-white/10">
         
         {/* Top bar info */}
         <div className="w-full flex items-center justify-between text-gray-400 text-xs">

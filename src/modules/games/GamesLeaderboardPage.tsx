@@ -223,6 +223,8 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
       return {
         rank: stats.rank,
         score: stats.score,
+        points: stats.points,
+        streak: stats.streak,
         bestScore: stats.bestScore,
         totalGames: stats.totalGames,
         games: stats.totalGames,
@@ -233,12 +235,14 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
         return {
           rank: idx + 1,
           score: sudokuPlayers[idx].total_points,
+          points: sudokuPlayers[idx].total_points,
+          streak: 0,
           bestScore: sudokuPlayers[idx].total_points,
           totalGames: sudokuPlayers[idx].total_games,
           games: sudokuPlayers[idx].total_games,
         };
       }
-      return { rank: 1, score: 130, bestScore: 130, totalGames: 16, games: 16 };
+      return { rank: 1, score: 130, points: 130, streak: 0, bestScore: 130, totalGames: 16, games: 16 };
     }
   }, [activeTab, quizPlayers, sudokuPlayers, currentUserName, currentUserId]);
 
@@ -289,12 +293,17 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
           </button>
 
           {/* Header Title with Trophy */}
-          <div className="flex items-center gap-2">
-            <img src={trophyGolden} alt="Trophy" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow" />
-            <h1 className="text-lg sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 drop-shadow">
-              Games Leaderboard
-            </h1>
-            <img src={trophyGolden} alt="Trophy" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow" />
+          <div className="flex flex-col items-center">
+            <div className="flex items-center gap-2">
+              <img src={trophyGolden} alt="Trophy" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow" />
+              <h1 className="text-lg sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 drop-shadow">
+                Games Leaderboard
+              </h1>
+              <img src={trophyGolden} alt="Trophy" className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow" />
+            </div>
+            <p className="text-[11px] sm:text-xs text-cyan-300/80 font-medium tracking-wide">
+              Top employees of MPS Global
+            </p>
           </div>
 
           {/* Refresh Action */}
@@ -328,7 +337,7 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
             </div>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-6 justify-around w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+          <div className="flex items-center gap-3 sm:gap-5 justify-around w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
             <div className="text-center">
               <span className="block text-[10px] text-slate-400 font-bold uppercase">Your Rank</span>
               <span className="text-base sm:text-lg font-black text-amber-300 flex items-center justify-center gap-1">
@@ -337,14 +346,25 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
             </div>
             <div className="h-7 w-[1px] bg-white/15" />
             <div className="text-center">
-              <span className="block text-[10px] text-slate-400 font-bold uppercase">Best Score</span>
+              <span className="block text-[10px] text-slate-400 font-bold uppercase">Points</span>
               <span className="text-base sm:text-lg font-black text-cyan-300">
-                {userRankInfo.score} PTS
+                {activeTab === 'quiz' ? (userRankInfo.points ?? userRankInfo.score * 10) : userRankInfo.score} PTS
               </span>
             </div>
+            {activeTab === 'quiz' && (
+              <>
+                <div className="h-7 w-[1px] bg-white/15" />
+                <div className="text-center">
+                  <span className="block text-[10px] text-slate-400 font-bold uppercase">Day Streak</span>
+                  <span className="text-base sm:text-lg font-black text-amber-400 flex items-center justify-center gap-1">
+                    🔥 {userRankInfo.streak || 0}d
+                  </span>
+                </div>
+              </>
+            )}
             <div className="h-7 w-[1px] bg-white/15" />
             <div className="text-center">
-              <span className="block text-[10px] text-slate-400 font-bold uppercase">Games Played</span>
+              <span className="block text-[10px] text-slate-400 font-bold uppercase">{activeTab === 'quiz' ? 'Quizzes' : 'Puzzles'}</span>
               <span className="text-base sm:text-lg font-black text-purple-300">
                 {userRankInfo.games}
               </span>
@@ -434,7 +454,7 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
               {topThree[1] ? (activeTab === 'quiz' ? (topThree[1] as QuizPlayer).name : (topThree[1] as SudokuLeaderboardEntry).username) : 'Player 2'}
             </span>
             <span className="text-[11px] sm:text-xs font-black text-slate-300">
-              {topThree[1] ? (activeTab === 'quiz' ? `${(topThree[1] as QuizPlayer).score} PTS` : `${(topThree[1] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
+              {topThree[1] ? (activeTab === 'quiz' ? `${(topThree[1] as QuizPlayer).points ?? (topThree[1] as QuizPlayer).score * 10} PTS` : `${(topThree[1] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
             </span>
             <div className="w-full h-16 sm:h-20 mt-2 rounded-t-2xl bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-t-2 border-slate-400 flex items-center justify-center font-black text-slate-400 text-base sm:text-lg">
               2nd
@@ -454,7 +474,7 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
               {topThree[0] ? (activeTab === 'quiz' ? (topThree[0] as QuizPlayer).name : (topThree[0] as SudokuLeaderboardEntry).username) : 'Champion'}
             </span>
             <span className="text-xs sm:text-sm font-black text-white">
-              {topThree[0] ? (activeTab === 'quiz' ? `${(topThree[0] as QuizPlayer).score} PTS` : `${(topThree[0] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
+              {topThree[0] ? (activeTab === 'quiz' ? `${(topThree[0] as QuizPlayer).points ?? (topThree[0] as QuizPlayer).score * 10} PTS` : `${(topThree[0] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
             </span>
             <div className="w-full h-24 sm:h-28 mt-2 rounded-t-2xl bg-gradient-to-b from-amber-600/30 via-[#1E1B4B] to-[#0F172A] border-t-2 border-amber-400 flex items-center justify-center font-black text-amber-300 text-xl sm:text-2xl shadow-[0_0_20px_rgba(251,191,36,0.3)]">
               1st
@@ -473,7 +493,7 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
               {topThree[2] ? (activeTab === 'quiz' ? (topThree[2] as QuizPlayer).name : (topThree[2] as SudokuLeaderboardEntry).username) : 'Player 3'}
             </span>
             <span className="text-[11px] sm:text-xs font-black text-orange-300">
-              {topThree[2] ? (activeTab === 'quiz' ? `${(topThree[2] as QuizPlayer).score} PTS` : `${(topThree[2] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
+              {topThree[2] ? (activeTab === 'quiz' ? `${(topThree[2] as QuizPlayer).points ?? (topThree[2] as QuizPlayer).score * 10} PTS` : `${(topThree[2] as SudokuLeaderboardEntry).total_points} PTS`) : '-'}
             </span>
             <div className="w-full h-14 sm:h-18 mt-2 rounded-t-2xl bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-t-2 border-orange-400 flex items-center justify-center font-black text-orange-400 text-base sm:text-lg">
               3rd
@@ -488,11 +508,14 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
           <div className="flex items-center px-3 py-2 border-b border-white/10 text-xs font-bold text-slate-400 shrink-0">
             <span className="w-10 sm:w-16 text-center">Rank</span>
             <span className="flex-1 text-left pl-2 sm:pl-3">Player</span>
+            {activeTab === 'quiz' && (
+              <span className="w-24 sm:w-32 text-center">Streak</span>
+            )}
             {activeTab === 'sudoku' && (
               <span className="hidden md:inline-block w-36 text-center text-[11px]">Difficulty Mix</span>
             )}
-            <span className="hidden sm:inline-block w-20 sm:w-28 text-center">Total Games</span>
-            <span className="w-20 sm:w-28 text-right pr-2">Best Score</span>
+            <span className="hidden sm:inline-block w-20 sm:w-28 text-center">{activeTab === 'quiz' ? 'Quizzes' : 'Puzzles'}</span>
+            <span className="w-20 sm:w-28 text-right pr-2">Points</span>
           </div>
 
           {/* Table Rows (Scrollable Container) */}
@@ -542,20 +565,27 @@ export const GamesLeaderboardPage: React.FC<GamesLeaderboardPageProps> = ({ defa
                             )}
                           </div>
                           <span className="block text-[10px] text-slate-400 truncate">
-                            <span className="sm:hidden font-semibold text-cyan-300">{player.total_games} {player.total_games === 1 ? 'game' : 'games'} • </span>Verified Player • MPS Global
+                            <span className="sm:hidden font-semibold text-cyan-300">{player.total_games} {player.total_games === 1 ? 'quiz' : 'quizzes'} • </span>Verified Employee • MPS Global
                           </span>
                         </div>
                       </div>
 
-                      {/* Total Games (Desktop) */}
-                      <div className="hidden sm:block w-20 sm:w-28 text-center text-xs font-semibold text-slate-300 shrink-0">
-                        {player.total_games} {player.total_games === 1 ? 'game' : 'games'}
+                      {/* Streak Column */}
+                      <div className="w-24 sm:w-32 flex items-center justify-center shrink-0">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 font-bold text-xs whitespace-nowrap shadow-sm">
+                          🔥 {player.streak || 0} Day Streak
+                        </span>
                       </div>
 
-                      {/* Best Score */}
+                      {/* Total Games (Desktop) */}
+                      <div className="hidden sm:block w-20 sm:w-28 text-center text-xs font-semibold text-slate-300 shrink-0">
+                        {player.total_games} {player.total_games === 1 ? 'quiz' : 'quizzes'}
+                      </div>
+
+                      {/* Points */}
                       <div className="w-20 sm:w-28 text-right pr-2 shrink-0">
                         <span className="inline-block px-2.5 py-1 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 font-black text-xs sm:text-sm">
-                          {player.score} PTS
+                          {player.points ?? (player.score ? player.score * 10 : 0)} PTS
                         </span>
                       </div>
                     </div>

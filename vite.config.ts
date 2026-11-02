@@ -16,6 +16,14 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (_err, _req, res) => {
+            if (!res.headersSent && typeof (res as any).writeHead === 'function') {
+              (res as any).writeHead(503, { 'Content-Type': 'application/json' });
+              (res as any).end(JSON.stringify({ error: 'Backend server not reachable on port 5000' }));
+            }
+          });
+        },
       },
       '/api/policyplanner': {
         target: 'https://policyplanner.com',
@@ -31,6 +39,14 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (_err, _req, res) => {
+            if (!res.headersSent && typeof (res as any).writeHead === 'function') {
+              (res as any).writeHead(503, { 'Content-Type': 'application/json' });
+              (res as any).end(JSON.stringify({ error: 'Backend server not reachable on port 5000' }));
+            }
+          });
+        },
       },
     },
   },

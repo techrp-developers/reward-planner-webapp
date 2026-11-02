@@ -1,14 +1,19 @@
-// src/modules/ecommerce/components/EcommerceCategoryTabGrid.jsx
+// src/modules/ecommerce/components/EcommerceCategoryTabGrid.tsx
+// Ported from mobile app ProductCategoriesScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { fetchAllCategories, fetchProductsByCategory } from '../../../api/productApi';
 import ProductCard from '../../../components/product/ProductCard';
 import { getImageUrl } from '../../../api/client';
 import { ChevronRight } from 'lucide-react';
 
-export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
-  const [categories, setCategories] = useState([]);
-  const [activeCategoryId, setActiveCategoryId] = useState(null);
-  const [products, setProducts] = useState([]);
+interface Props {
+  onOpenCategoryCatalog: (categoryId: string | number) => void;
+}
+
+export const EcommerceCategoryTabGrid: React.FC<Props> = ({ onOpenCategoryCatalog }) => {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [activeCategoryId, setActiveCategoryId] = useState<number | string | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [loadingProds, setLoadingProds] = useState(false);
 
@@ -16,7 +21,7 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
   useEffect(() => {
     let isMounted = true;
     fetchAllCategories()
-      .then((res) => {
+      .then((res: any) => {
         if (!isMounted) return;
         const list = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
         setCategories(list);
@@ -34,35 +39,70 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
     };
   }, []);
 
-  // 2. Fetch products for active category
+  // 2. Fetch all products for active category (no limit restriction to 2 rows)
   useEffect(() => {
     if (!activeCategoryId) return;
-    let isMounted = true;
+    let isCancelled = false;
     setLoadingProds(true);
-    fetchProductsByCategory(activeCategoryId, { limit: 12, page: 1 })
-      .then((prods) => {
-        if (!isMounted) return;
-        setProducts(prods || []);
-      })
-      .catch((err) => {
+
+    const loadCategoryProducts = async () => {
+      try {
+        const firstBatch: any = await fetchProductsByCategory(activeCategoryId, { limit: 50, page: 1 });
+        if (isCancelled) return;
+
+        let all = Array.isArray(firstBatch) ? [...firstBatch] : [];
+        setProducts(all);
+        setLoadingProds(false);
+
+        const totalPages = firstBatch?.totalPages || 1;
+        if (totalPages > 1) {
+          const promises = [];
+          for (let p = 2; p <= totalPages; p++) {
+            promises.push(fetchProductsByCategory(activeCategoryId, { limit: 50, page: p }));
+          }
+          const rest = await Promise.all(promises);
+          if (isCancelled) return;
+
+          rest.forEach((batch) => {
+            if (Array.isArray(batch)) {
+              all = all.concat(batch);
+            }
+          });
+
+          // Deduplicate by ID & variant
+          const seen = new Set();
+          const deduped: any[] = [];
+          for (const item of all) {
+            const key = `${item.id}-${item.variant_id || 0}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              deduped.push(item);
+            }
+          }
+          setProducts(deduped);
+        }
+      } catch (err) {
+        if (isCancelled) return;
         console.error(`Failed to load products for category ${activeCategoryId}:`, err);
-        if (isMounted) setProducts([]);
-      })
-      .finally(() => {
-        if (isMounted) setLoadingProds(false);
-      });
+        setProducts([]);
+      } finally {
+        if (!isCancelled) setLoadingProds(false);
+      }
+    };
+
+    loadCategoryProducts();
 
     return () => {
-      isMounted = false;
+      isCancelled = true;
     };
   }, [activeCategoryId]);
 
   if (loadingCats && categories.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="h-14 bg-white rounded-2xl animate-pulse" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 10 }).map((_, i) => (
+        <div className="h-16 bg-white rounded-2xl animate-pulse" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-[3/4] bg-gray-100 rounded-2xl animate-pulse" />
           ))}
         </div>
@@ -72,15 +112,15 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
 
   if (categories.length === 0) return null;
 
-  const activeCategory = categories.find((c) => c.id === activeCategoryId);
+  const activeCategory = categories.find((c) => String(c.id) === String(activeCategoryId));
 
   return (
-    <section className="w-full space-y-5">
-      {/* Category Tab Bar (Sticky / Horizontal Scroll) */}
-      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-2xs p-2 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1.5 sm:gap-2 min-w-max">
+    <section className="w-full space-y-4">
+      {/* Category Tab Bar (Horizontal Scrollable Strip matching mobile ProductCategoriesScreen.tsx) */}
+      <div className="bg-white rounded-2xl border border-gray-200/90 shadow-2xs p-1.5 sm:p-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 min-w-max">
           {categories.map((cat) => {
-            const isActive = cat.id === activeCategoryId;
+            const isActive = String(cat.id) === String(activeCategoryId);
             const iconUrl = cat.image ? getImageUrl(cat.image) : '/placeholder.svg';
             return (
               <button
@@ -89,13 +129,16 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
                 type="button"
                 className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 relative cursor-pointer ${
                   isActive
-                    ? 'bg-violet-50 text-[#7C3AED] font-bold'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                    ? 'text-[#7C3AED] font-bold'
+                    : 'text-gray-600 hover:text-gray-900 font-medium hover:bg-gray-50'
                 }`}
               >
+                {/* Category Thumbnail Container */}
                 <div
                   className={`w-9 h-9 rounded-full p-1 flex items-center justify-center transition-transform ${
-                    isActive ? 'scale-110' : 'opacity-85'
+                    isActive
+                      ? 'scale-110 ring-2 ring-[#7C3AED]/30 bg-purple-50'
+                      : 'opacity-80 bg-gray-50'
                   }`}
                 >
                   <img
@@ -107,9 +150,13 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
                     }}
                   />
                 </div>
+
+                {/* Category Title */}
                 <span className="text-xs whitespace-nowrap">{cat.name}</span>
+
+                {/* Active Indicator Underline */}
                 {isActive && (
-                  <span className="absolute bottom-0 inset-x-3 h-0.5 bg-[#7C3AED] rounded-full" />
+                  <span className="absolute bottom-0 inset-x-2 h-0.5 bg-[#7C3AED] rounded-full" />
                 )}
               </button>
             );
@@ -118,25 +165,32 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
       </div>
 
       {/* Products Grid for Selected Category */}
-      <div>
-        <div className="flex items-center justify-between pb-3">
-          <h4 className="text-base sm:text-lg font-bold text-gray-800">
-            {activeCategory?.name || 'Category'} Products
-          </h4>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between pb-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-base sm:text-lg font-bold text-gray-800">
+              {activeCategory?.name || 'Category'} Products
+            </h4>
+            {products.length > 0 && (
+              <span className="text-xs font-bold text-[#7C3AED] bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+                {products.length} {products.length === 1 ? 'item' : 'items'}
+              </span>
+            )}
+          </div>
           {activeCategory && (
             <button
               onClick={() => onOpenCategoryCatalog(activeCategory.id)}
-              className="text-xs sm:text-sm font-bold text-[#7C3AED] hover:underline flex items-center gap-0.5 cursor-pointer"
+              className="text-xs sm:text-sm font-bold text-gray-700 hover:text-[#7C3AED] flex items-center gap-0.5 cursor-pointer group"
             >
               <span>Explore All {activeCategory.name}</span>
-              <ChevronRight size={16} />
+              <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </button>
           )}
         </div>
 
         {loadingProds ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="aspect-[3/4] bg-gray-100 rounded-2xl animate-pulse" />
             ))}
           </div>
@@ -147,7 +201,7 @@ export const EcommerceCategoryTabGrid = ({ onOpenCategoryCatalog }) => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {products.map((prod) => (
               <ProductCard key={`cat-prod-${prod.id}-${prod.variant_id || 0}`} item={prod} />
             ))}

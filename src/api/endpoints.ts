@@ -224,5 +224,25 @@ export const ENDPOINTS = {
       leaderboard: '/v1/sudoku/leaderboard',
     },
   },
+  chat: {
+    users: (search = '') => `/v1/chat/users${search ? `?search=${encodeURIComponent(search)}` : ''}`,
+    presence: (userIds: ApiId[]) => `/v1/chat/presence?user_ids=${userIds.join(',')}`,
+    conversations: '/v1/chat/conversations',
+    conversationById: (id: ApiId) => `/v1/chat/conversations/${id}`,
+    messages: (id: ApiId, beforeId?: ApiId, limit = 50) =>
+      `/v1/chat/conversations/${id}/messages?limit=${limit}${beforeId ? `&before_id=${beforeId}` : ''}`,
+    sendMessage: (id: ApiId) => `/v1/chat/conversations/${id}/messages`,
+    markRead: (id: ApiId) => `/v1/chat/conversations/${id}/read`,
+    deleteMessage: (conversationId: ApiId, messageId: ApiId) =>
+      `/v1/chat/conversations/${conversationId}/messages/${messageId}`,
+    uploadImage: '/v1/chat/uploads/images',
+    uploadDocument: '/v1/chat/uploads/documents',
+    createPoll: (id: ApiId) => `/v1/chat/conversations/${id}/polls`,
+    votePoll: (pollId: ApiId) => `/v1/chat/polls/${pollId}/votes`,
+    groupImage: (id: ApiId) => `/v1/chat/conversations/${id}/image`,
+    groupMembers: (id: ApiId) => `/v1/chat/conversations/${id}/members`,
+    removeGroupMember: (id: ApiId, userId: ApiId) => `/v1/chat/conversations/${id}/members/${userId}`,
+    leaveGroup: (id: ApiId) => `/v1/chat/conversations/${id}/leave`,
+  },
 };
 

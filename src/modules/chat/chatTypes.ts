@@ -2,6 +2,8 @@
 
 export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read';
 
+export type DisappearingTimer = 'off' | '24_hours' | '7_days' | '90_days';
+
 export interface ChatMessage {
   id: string;
   senderId: string;
@@ -11,16 +13,23 @@ export interface ChatMessage {
   text?: string;
   image?: string;
   imageCaption?: string;
+  attachmentUrl?: string;
+  attachmentName?: string;
+  attachmentMimeType?: string;
+  messageType?: 'text' | 'image' | 'document' | 'poll' | 'file';
   time: string;
   timestamp: number;
   isOutgoing: boolean;
   status?: MessageStatus;
   isVoiceNote?: boolean;
   voiceDuration?: string;
+  isSystemNotice?: boolean;
+  expiresAt?: number;
 }
 
 export interface ChatMember {
   id: string;
+  userId?: number;
   name: string;
   role: string;
   avatar?: string;
@@ -39,22 +48,26 @@ export interface ChatConversation {
   avatarBg?: string; // background color for vector icon avatars
   avatarIconType?: 'users' | 'megaphone' | 'image' | 'purple_group' | 'rp_connect';
   isGroup: boolean;
+  isCommunity?: boolean;
   isAnnouncement?: boolean;
   isMuted?: boolean;
   membersCount?: number;
   members?: ChatMember[];
   lastMessage: string;
   lastMessageTime: string;
+  lastMessageIsOutgoing?: boolean;
+  lastMessageStatus?: MessageStatus;
   unreadCount: number;
   isOnline?: boolean;
   messages: ChatMessage[];
   hasMentions?: boolean;
   description?: string;
+  disappearingTimer?: DisappearingTimer;
 }
 
 export type ChatFilterTab = 'all' | 'unread' | 'groups' | 'direct' | 'mentions';
 
-export type RailTab = 'chats' | 'calls' | 'status' | 'communities' | 'channels' | 'meta_ai';
+export type RailTab = 'chats' | 'calls' | 'status' | 'communities' | 'channels' | 'meta_ai' | 'profile';
 
 export type CallType = 'audio' | 'video' | null;
 
@@ -82,4 +95,14 @@ export interface StatusItem {
   storiesCount: number;
   imageUrl?: string;
   caption?: string;
+}
+
+export interface SidebarContact {
+  id: string;
+  userId?: number;
+  name: string;
+  subtitle?: string;
+  avatar?: string;
+  section: string;
+  isSpecial?: boolean;
 }

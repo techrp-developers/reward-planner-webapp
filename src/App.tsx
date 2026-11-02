@@ -7,6 +7,7 @@ import { LocationProvider } from './context/LocationContext';
 import { CartProvider } from './context/CartContext';
 import { ServiceCartProvider } from './context/ServiceCartContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { StickyNotesProvider } from './components/stickyNotes/StickyNotesContext';
 import AppRouter from './router/AppRouter';
 import { ServiceQuerySession } from './modules/services/serviceQueries';
 
@@ -21,7 +22,9 @@ export default function App() {
             <CartProvider>
               <ServiceCartProvider>
                 <ThemeProvider>
-                  <ServiceQuerySession><AppRouter /></ServiceQuerySession>
+                  <StickyNotesProvider>
+                    <ServiceQuerySession><AppRouter /></ServiceQuerySession>
+                  </StickyNotesProvider>
                 </ThemeProvider>
               </ServiceCartProvider>
             </CartProvider>

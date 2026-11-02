@@ -1,12 +1,17 @@
-// src/components/ui/RPpriceBadge.jsx
-// Exact mobile component ported to Web with Tailwind CSS
+// src/components/ui/RPpriceBadge.tsx
+// Ported directly from mobile app RPpriceBadge.tsx
 import React from 'react';
 
-export const RPpriceBadge = ({ value, className = '' }) => {
+interface Props {
+  value: string | number;
+  className?: string;
+}
+
+export const RPpriceBadge: React.FC<Props> = ({ value, className = '' }) => {
   if (!value && value !== 0) return null;
 
   // Extract clean number to format decimals cleanly (e.g. ₹487.03999999999996 -> ₹487.04)
-  const cleanNumber = (val) => {
+  const cleanNumber = (val: string | number) => {
     if (typeof val === 'number') return isNaN(val) ? null : val;
     const str = String(val).replace(/[^0-9.]/g, '');
     const num = Number(str);
@@ -23,19 +28,19 @@ export const RPpriceBadge = ({ value, className = '' }) => {
 
   return (
     <div
-      className={`inline-flex items-center rounded-md px-2 py-0.5 border shadow-xs transition-transform duration-150 ${className}`}
+      className={`inline-flex items-center rounded-lg px-1.5 py-0.5 border shadow-2xs ${className}`}
       style={{
         backgroundColor: '#F6D58B',
         borderColor: '#D69A33',
       }}
     >
       <span
-        className="text-[9px] font-bold uppercase tracking-wider mr-1"
+        className="text-[9px] font-bold uppercase tracking-wider mr-1 select-none leading-none"
         style={{ color: '#5F341A' }}
       >
         RP
       </span>
-      <span className="text-xs font-extrabold text-[#111827]">
+      <span className="text-[11px] font-extrabold text-[#111827] leading-none">
         {formattedValue}
       </span>
     </div>

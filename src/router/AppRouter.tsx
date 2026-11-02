@@ -8,13 +8,13 @@ import TopHeader from '../components/layout/TopHeader';
 import MegaMenuStrip from '../components/layout/MegaMenuStrip';
 import CartDrawer from '../components/cart/CartDrawer';
 import AuthModal from '../modules/auth/AuthModal';
+import StickyNotesContainer from '../components/stickyNotes/StickyNotesContainer';
 import rpLogo from '../assets/rp_logo_crisp.png';
 import MobileBottomBar from '../components/layout/MobileBottomBar';
 
 import LoginPage from '../modules/auth/LoginPage';
 import CinematicModuleStage from '../modules/stage/CinematicModuleStage';
 import ProductDetailPage from '../modules/ecommerce/ProductDetailPage';
-import NavratriProductsPage from '../modules/ecommerce/NavratriProductsPage';
 import CartPage from '../modules/ecommerce/CartPage';
 import CheckoutPage from '../modules/ecommerce/CheckoutPage';
 const ServiceCategoryPage = lazy(() => import('../modules/services/ServiceCategoryPage'));
@@ -79,8 +79,7 @@ export const AppRouter = () => {
   const isEcommercePage =
     location.pathname.startsWith('/store') ||
     location.pathname.startsWith('/deals') ||
-    location.pathname.startsWith('/product') ||
-    location.pathname.startsWith('/navratri');
+    location.pathname.startsWith('/product');
 
   const isGamesPage = location.pathname.startsWith('/games');
   const isChatPage = location.pathname.startsWith('/chat');
@@ -154,8 +153,8 @@ export const AppRouter = () => {
             <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/navratri" element={<NavratriProductsPage />} />
-            <Route path="/store/navratri" element={<NavratriProductsPage />} />
+            <Route path="/navratri" element={<Navigate to="/store" replace />} />
+            <Route path="/store/navratri" element={<Navigate to="/store" replace />} />
             
             {/* SERVICES FULL SUITE */}
             <Route path="/services/cart" element={<ServiceCartPage />} />
@@ -221,6 +220,9 @@ export const AppRouter = () => {
 
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
+
+      {/* GLOBAL DRAGGABLE STICKY NOTES (PERSISTENT ACROSS ALL PAGES) */}
+      <StickyNotesContainer />
 
 
       {!isGamesPage && !isChatPage && <MobileBottomBar />}

@@ -3,9 +3,11 @@ import { api } from './client';
 import { ENDPOINTS } from './endpoints';
 
 export interface QuizPlayer {
-  user_id: number;
+  user_id: number | string;
   name: string;
   score: number;
+  points?: number;
+  streak?: number;
   total_games: number;
 }
 
