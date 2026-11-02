@@ -1,0 +1,1 @@
+import{a as e,t}from"./client-DJfXERAD.js";var n=async n=>(await t.post(e.services.enquiry,n)).data;export{n as t};

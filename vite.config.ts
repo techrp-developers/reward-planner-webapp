@@ -48,6 +48,11 @@ export default defineConfig({
           });
         },
       },
+      '/api/busbooking': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })
