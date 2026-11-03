@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Search,
   MoreVertical,
+  Palette,
   Plus,
   ArrowLeft,
   ArrowRight,
@@ -66,6 +67,7 @@ interface ChatSidebarProps {
   openNewChatTrigger?: number;
   openAddStatusTrigger?: number;
   onOpenDisappearingForChat?: (chat: ChatConversation) => void;
+  onOpenTemplates?: () => void;
 }
 
 // WhatsApp icon SVG
@@ -95,6 +97,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
   openNewChatTrigger,
   openAddStatusTrigger,
   onOpenDisappearingForChat,
+  onOpenTemplates,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'unread' | 'favourites' | 'groups'>('all');
@@ -1814,6 +1817,13 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                   >
                     <Clock className="w-4 h-4 text-[#00A884]" />
                     <span>Disappearing messages</span>
+                  </button>
+                  <button
+                    onClick={() => { setMenuOpen(false); onOpenTemplates?.(); }}
+                    className="w-full text-left px-4 py-2 hover:bg-[#F8FAFC] cursor-pointer flex items-center space-x-2 text-[#0F172A]"
+                  >
+                    <Palette className="w-4 h-4 text-[#4F46E5]" />
+                    <span>Templates</span>
                   </button>
                   <button
                     onClick={() => { setMenuOpen(false); }}

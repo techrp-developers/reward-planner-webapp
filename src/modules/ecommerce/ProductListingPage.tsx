@@ -14,7 +14,8 @@ import {
   fetchRecommendations,
 } from '../../api/productApi';
 import ProductCard from '../../components/product/ProductCard';
-import diwaliBannerImg from '../../assets/diwalibanners/diwalibanner.png';
+import { EcommerceDiwaliBanner } from './components/EcommerceDiwaliBanner';
+import { EcommerceDiwaliPosters } from './components/EcommerceDiwaliPosters';
 import EcommerceCategoriesGrid from './components/EcommerceCategoriesGrid';
 import EcommerceFlashSale from './components/EcommerceFlashSale';
 import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
@@ -405,28 +406,11 @@ export const ProductListingPage = () => {
             </div>
           </div>
 
-          {/* DIWALI FESTIVE HERO BANNER CARD (SMALL HEIGHT & FULL WIDTH) */}
-          <div
-            onClick={() => handleSelectCategory('all')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleSelectCategory('all');
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            className="relative w-full h-[160px] sm:h-[200px] md:h-[230px] lg:h-[260px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_4px_24px_rgba(245,158,11,0.14)] border border-amber-200/80 cursor-pointer group transition-all duration-300 hover:shadow-[0_8px_32px_rgba(245,158,11,0.24)] hover:scale-[1.002] focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
-            title="Happy Diwali Festive Season - Explore Offers"
-          >
-            <img
-              src={diwaliBannerImg}
-              alt="Happy Diwali - Festive Season Offers"
-              loading="eager"
-              draggable={false}
-              className="w-full h-full object-cover object-[center_33%] select-none pointer-events-none transition-transform duration-500 group-hover:scale-[1.01]"
-            />
-          </div>
+          {/* DIWALI FESTIVE HERO BANNER */}
+          <EcommerceDiwaliBanner onClick={() => handleSelectCategory('all')} />
+
+          {/* DIWALI OFFER POSTERS */}
+          <EcommerceDiwaliPosters onClick={() => handleSelectCategory('all')} />
 
           {/* 1. CATEGORIES SECTION (WITH 3D PEDESTAL ICONS) */}
           <EcommerceCategoriesGrid

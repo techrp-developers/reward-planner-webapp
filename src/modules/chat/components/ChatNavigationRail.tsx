@@ -41,7 +41,7 @@ export const ChatNavigationRail: React.FC<ChatNavigationRailProps> = ({
     : 'SC';
 
   return (
-    <nav className="w-14 h-full bg-gradient-to-b from-white to-[#D795F6] border-r border-[#CBD5E1] flex flex-col items-center justify-between py-3 select-none shrink-0 z-30 font-['Segoe_UI',Helvetica,Arial,sans-serif]">
+    <nav className="chat-rail w-14 h-full border-r border-[#CBD5E1] flex flex-col items-center justify-between py-3 select-none shrink-0 z-30 font-['Segoe_UI',Helvetica,Arial,sans-serif]">
       
       {/* Top Icons: Only Chats and Status */}
       <div className="flex flex-col items-center space-y-3 w-full pt-2">
@@ -52,8 +52,8 @@ export const ChatNavigationRail: React.FC<ChatNavigationRailProps> = ({
             title="Chats"
             className={`w-10 h-10 rounded-full flex items-center justify-center transition cursor-pointer relative ${
               activeTab === 'chats'
-                ? 'bg-[#EEF2FF] text-black'
-                : 'text-black hover:bg-[#F1F5F9]'
+                ? 'bg-white/25 text-white'
+                : 'text-white hover:bg-white/20'
             }`}
           >
             <MessageCircleMore className="w-[22px] h-[22px] stroke-[1.75]" />
@@ -72,8 +72,8 @@ export const ChatNavigationRail: React.FC<ChatNavigationRailProps> = ({
             title="Status"
             className={`w-10 h-10 rounded-full flex items-center justify-center transition cursor-pointer relative ${
               activeTab === 'status'
-                ? 'bg-[#EEF2FF] text-black'
-                : 'text-black hover:bg-[#F1F5F9]'
+                ? 'bg-white/25 text-white'
+                : 'text-white hover:bg-white/20'
             }`}
           >
             <Aperture className="w-[22px] h-[22px] stroke-[1.75]" />

@@ -29,6 +29,12 @@
   box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
 }
 
+/* Navigation rail: matches the New Chat button */
+.chat-rail {
+  background-color: #B63EEE;
+  border-right-color: #B63EEE;
+}
+
 /* Light Theme Scrollbars */
 .chat-custom-scroll::-webkit-scrollbar {
   width: 6px;

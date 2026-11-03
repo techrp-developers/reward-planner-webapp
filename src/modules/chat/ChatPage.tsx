@@ -11,6 +11,8 @@ import ChatGroupInfoModal from './components/ChatGroupInfoModal';
 import ChatNewChatModal from './components/ChatNewChatModal';
 import ChatDisappearingModal from './components/ChatDisappearingModal';
 import ChatWelcomeScreen from './components/ChatWelcomeScreen';
+import ChatThemePicker from './components/ChatThemePicker';
+import { ChatThemeId, getChatThemeRootProps, getStoredChatThemeId, storeChatThemeId } from './chatThemes';
 import {
   fetchConversations,
   fetchMessages,
@@ -29,6 +31,7 @@ import {
 } from './services/chatAdapter';
 import { useChatSocket } from './services/useChatSocket';
 import './Chat.css';
+import './ChatThemes.css';
 
 const getDisappearingDurationMs = (timer: DisappearingTimer): number => {
   switch (timer) {
@@ -60,6 +63,8 @@ export const ChatPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [activeRailTab, setActiveRailTab] = useState<RailTab>('chats');
+  const [chatThemeId, setChatThemeId] = useState<ChatThemeId>(getStoredChatThemeId);
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [activeChatId, setActiveChatId] = useState<string | null>(targetChatId || null);
@@ -924,7 +929,7 @@ export const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-full flex overflow-hidden bg-[#F1F5F9] text-[#0F172A] font-['Segoe_UI',Helvetica,Arial,sans-serif] select-none">
+    <div {...getChatThemeRootProps(chatThemeId)} className="h-screen w-full flex overflow-hidden bg-[#F1F5F9] text-[#0F172A] font-['Segoe_UI',Helvetica,Arial,sans-serif] select-none">
       {/* 1. Far-Left Navigation Rail (Fixed 56px / w-14) */}
       <ChatNavigationRail
         activeTab={activeRailTab}
@@ -959,6 +964,7 @@ export const ChatPage: React.FC = () => {
             setActiveChatId(chat.id);
             setShowDisappearingModal(true);
           }}
+          onOpenTemplates={() => setShowThemePicker(true)}
         />
       </div>
 
@@ -1065,6 +1071,18 @@ export const ChatPage: React.FC = () => {
           conversationName={activeConversation.name}
           onClose={() => setShowDisappearingModal(false)}
           onApply={(timer) => handleUpdateDisappearingTimer(timer)}
+        />
+      )}
+
+      {/* Chat Templates Picker */}
+      {showThemePicker && (
+        <ChatThemePicker
+          activeThemeId={chatThemeId}
+          onSelectTheme={(id) => {
+            setChatThemeId(id);
+            storeChatThemeId(id);
+          }}
+          onClose={() => setShowThemePicker(false)}
         />
       )}
 
