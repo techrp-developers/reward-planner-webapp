@@ -51,6 +51,7 @@ export interface BusTrip {
   tags: string[];
   traceId?: string | number;
   resultIndex?: string;
+  srdvIndex?: string;
 }
 
 export type SeatGender = 'female' | 'male';

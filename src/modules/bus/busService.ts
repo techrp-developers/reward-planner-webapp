@@ -23,35 +23,67 @@ import {
 } from '../../api/busApi';
 
 export const BUS_CITIES: BusCity[] = [
-  { id: '2754', name: 'Delhi', state: 'Delhi', popular: true },
-  { id: 'mumbai', name: 'Mumbai', state: 'Maharashtra', popular: true },
-  { id: 'pune', name: 'Pune', state: 'Maharashtra', popular: true },
-  { id: 'bangalore', name: 'Bangalore', state: 'Karnataka', popular: true },
-  { id: 'hyderabad', name: 'Hyderabad', state: 'Telangana', popular: true },
-  { id: 'chennai', name: 'Chennai', state: 'Tamil Nadu', popular: true },
-  { id: 'goa', name: 'Goa (Panaji)', state: 'Goa', popular: true },
-  { id: 'ahmedabad', name: 'Ahmedabad', state: 'Gujarat', popular: true },
-  { id: 'jaipur', name: 'Jaipur', state: 'Rajasthan', popular: true },
-  { id: 'nashik', name: 'Nashik', state: 'Maharashtra' },
-  { id: 'shirdi', name: 'Shirdi', state: 'Maharashtra' },
-  { id: 'kolhapur', name: 'Kolhapur', state: 'Maharashtra' },
-  { id: 'aurangabad', name: 'Aurangabad', state: 'Maharashtra' },
-  { id: 'nagpur', name: 'Nagpur', state: 'Maharashtra' },
-  { id: 'lonavala', name: 'Lonavala', state: 'Maharashtra' },
-  { id: 'udaipur', name: 'Udaipur', state: 'Rajasthan' },
-  { id: 'indore', name: 'Indore', state: 'Madhya Pradesh' },
-  { id: 'surat', name: 'Surat', state: 'Gujarat' },
-  { id: 'mysore', name: 'Mysore', state: 'Karnataka' },
-  { id: 'coimbatore', name: 'Coimbatore', state: 'Tamil Nadu' },
-  { id: 'vijayawada', name: 'Vijayawada', state: 'Andhra Pradesh' },
-  { id: 'manali', name: 'Manali', state: 'Himachal Pradesh' },
+  { id: '1213', name: 'Mumbai', state: 'Maharashtra', popular: true },
+  { id: '1167', name: 'Pune', state: 'Maharashtra', popular: true },
+  { id: '2754', name: 'Delhi', state: 'Delhi State', popular: true },
+  { id: '2596', name: 'Jaipur', state: 'Rajasthan', popular: true },
+  { id: '4', name: 'Bangalore', state: 'Karnataka', popular: true },
+  { id: '9', name: 'Hyderabad', state: 'Telangana', popular: true },
+  { id: '185', name: 'Chennai', state: 'Tamil Nadu', popular: true },
+  { id: '1148', name: 'Goa', state: 'Goa', popular: true },
+  { id: '2164', name: 'Ahmedabad', state: 'Gujarat', popular: true },
+  { id: '2483', name: 'Lucknow', state: 'Uttar Pradesh', popular: true },
+  { id: '1187', name: 'Nashik', state: 'Maharashtra' },
+  { id: '1185', name: 'Shirdi', state: 'Maharashtra' },
+  { id: '2162', name: 'Surat', state: 'Gujarat' },
+  { id: '2262', name: 'Indore', state: 'Madhya Pradesh' },
+  { id: '3574', name: 'Udaipur', state: 'Rajasthan' },
+  { id: '1252', name: 'Nagpur', state: 'Maharashtra' },
+  { id: '1313', name: 'Lonavala', state: 'Maharashtra' },
+  { id: '911', name: 'Mysore', state: 'Karnataka' },
+  { id: '199', name: 'Coimbatore', state: 'Tamil Nadu' },
+  { id: '16', name: 'Vijayawada', state: 'Andhra Pradesh' },
+  { id: '2118', name: 'Manali', state: 'Himachal Pradesh' },
 ];
+
+export const CITY_SLUGS: Record<string, string> = {
+  mumbai: '1213',
+  pune: '1167',
+  delhi: '2754',
+  jaipur: '2596',
+  bangalore: '4',
+  bengaluru: '4',
+  hyderabad: '9',
+  chennai: '185',
+  goa: '1148',
+  ahmedabad: '2164',
+  lucknow: '2483',
+  nashik: '1187',
+  shirdi: '1185',
+  surat: '2162',
+  indore: '2262',
+  udaipur: '3574',
+  nagpur: '1252',
+  lonavala: '1313',
+  mysore: '911',
+  coimbatore: '199',
+  vijayawada: '16',
+  manali: '2118',
+};
 
 const cityMap = new Map<string, BusCity>();
 
 BUS_CITIES.forEach((c) => {
   cityMap.set(c.id.toLowerCase(), c);
   cityMap.set(c.name.toLowerCase(), c);
+});
+
+// Also register aliases
+Object.entries(CITY_SLUGS).forEach(([slug, id]) => {
+  const city = BUS_CITIES.find((c) => c.id === id);
+  if (city) {
+    cityMap.set(slug.toLowerCase(), city);
+  }
 });
 
 export const updateLiveCities = (cities: BusCity[]) => {
@@ -89,16 +121,20 @@ export const loadBusCities = async (query?: string): Promise<BusCity[]> => {
 export const getCity = (id: string | null | undefined): BusCity | undefined => {
   if (!id) return undefined;
   const clean = String(id).trim().toLowerCase();
-  return cityMap.get(clean) || BUS_CITIES.find((c) => c.id.toLowerCase() === clean || c.name.toLowerCase() === clean);
+  const direct = cityMap.get(clean);
+  if (direct) return direct;
+  const aliasedId = CITY_SLUGS[clean];
+  if (aliasedId && cityMap.has(aliasedId)) return cityMap.get(aliasedId);
+  return BUS_CITIES.find((c) => c.id.toLowerCase() === clean || c.name.toLowerCase() === clean);
 };
 
 export let POPULAR_ROUTES: { from: string; to: string; fareFrom: number; buses: number }[] = [
-  { from: 'mumbai', to: 'pune', fareFrom: 450, buses: 312 },
-  { from: 'bangalore', to: 'chennai', fareFrom: 599, buses: 248 },
-  { from: 'hyderabad', to: 'bangalore', fareFrom: 899, buses: 186 },
-  { from: 'mumbai', to: 'goa', fareFrom: 1099, buses: 142 },
-  { from: 'delhi', to: 'jaipur', fareFrom: 549, buses: 205 },
-  { from: 'pune', to: 'nashik', fareFrom: 399, buses: 98 },
+  { from: '1213', to: '1167', fareFrom: 105, buses: 312 }, // Mumbai -> Pune
+  { from: '2754', to: '2596', fareFrom: 549, buses: 205 }, // Delhi -> Jaipur
+  { from: '4', to: '185', fareFrom: 599, buses: 248 },     // Bangalore -> Chennai
+  { from: '9', to: '4', fareFrom: 899, buses: 186 },       // Hyderabad -> Bangalore
+  { from: '1213', to: '1148', fareFrom: 1099, buses: 142 },// Mumbai -> Goa
+  { from: '1167', to: '1187', fareFrom: 399, buses: 98 },  // Pune -> Nashik
 ];
 
 export const loadPopularRoutes = async () => {
@@ -284,16 +320,18 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
         sourceCityCode: srcCode,
         destinationCityCode: destCode,
         journeyDate: date,
+        journeyTime: '00:00',
       });
 
       if (res?.success && Array.isArray(res.buses) && res.buses.length > 0) {
         const traceId = res.traceId;
         return res.buses.map((bus: any, idx: number): BusTrip => {
-          const operator = bus.TravelName || bus.TravelsName || 'Express Travels';
+          const operator = bus.TravelsName || bus.TravelName || 'Express Travels';
           const busType = bus.BusType || 'A/C Sleeper (2+1)';
-          const ac = Boolean(bus.IsAC || /a\/?c/i.test(busType));
-          const layout: BusLayout = /sleeper/i.test(busType) ? 'sleeper' : 'seater';
-          const resultIndex = String(bus.ResultIndex || idx);
+          const ac = Boolean(bus.IsAC === 'true' || bus.IsAC === true || /a\/?c/i.test(busType));
+          const layout: BusLayout = (bus.Sleeper === 'true' || bus.Sleeper === true || /sleeper/i.test(busType)) ? 'sleeper' : 'seater';
+          const resultIndex = String(bus.ResultIndex ?? idx);
+          const srdvIndex = String(bus.SrdvIndex ?? bus.ResultIndex ?? idx);
 
           const depStr = String(bus.DepartureTime || '');
           const arrStr = String(bus.ArrivalTime || '');
@@ -302,10 +340,13 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
 
           const depMins = timeToMins(departure);
           const arrMins = timeToMins(arrival);
-          const durationMins = arrMins >= depMins ? arrMins - depMins : arrMins + 1440 - depMins;
-          const arrivalDayOffset = arrMins < depMins || (depStr.slice(0, 10) && arrStr.slice(0, 10) && arrStr.slice(0, 10) > depStr.slice(0, 10)) ? 1 : 0;
+          const durationMins = typeof bus.Duration === 'number' && bus.Duration > 0
+            ? bus.Duration
+            : (arrMins >= depMins ? arrMins - depMins : arrMins + 1440 - depMins);
+          const arrivalDayOffset = bus.IsArrivingNextDay === 'true' || bus.IsArrivingNextDay === true || arrMins < depMins || (depStr.slice(0, 10) && arrStr.slice(0, 10) && arrStr.slice(0, 10) > depStr.slice(0, 10)) ? 1 : 0;
 
-          const fare = Number(bus.Price?.PublishedFare || bus.Price?.TotalDisplayFare || bus.Price?.BasePrice || bus.Price || 450);
+          const priceObj = Array.isArray(bus.Price) ? bus.Price[0] : bus.Price;
+          const fare = Number(bus.DisplayFare || priceObj?.PublishedFare || priceObj?.TotalDisplayFare || priceObj?.BasePrice || 450);
           const seatsLeft = Number(bus.AvailableSeats ?? 12);
           const rating = Number(bus.BusRating || bus.Rating || 4.2);
 
@@ -313,14 +354,14 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
           if (ac) amenities.push('charging');
           amenities.push('water');
           if (layout === 'sleeper') amenities.push('blanket');
-          if (bus.LiveTrackingAvailable) amenities.push('tracking');
+          if (bus.LiveTracking === 'true' || bus.LiveTrackingAvailable) amenities.push('tracking');
 
           const tags: string[] = [];
           if (amenities.includes('tracking')) tags.push('Live Tracking');
           if (rating >= 4.4) tags.push('Primo');
 
           return {
-            id: `${from}~${to}~${date}~${traceId}~${encodeURIComponent(resultIndex)}`,
+            id: `${from}~${to}~${date}~${traceId}~${encodeURIComponent(resultIndex)}~${encodeURIComponent(srdvIndex)}`,
             operator,
             busType,
             ac,
@@ -342,18 +383,22 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
             tags,
             traceId,
             resultIndex,
+            srdvIndex,
           };
         }).sort((a: BusTrip, b: BusTrip) => timeToMins(a.departure) - timeToMins(b.departure));
       }
+
+      // If live API returns 0 buses, return empty list
+      return [];
     } catch (err) {
-      console.warn('[busService] Live search failed or not authenticated, using fallback:', err);
+      console.warn('[busService] Live search returned an error or no buses:', err);
+      return [];
     }
   }
 
-  // Fallback to deterministic trips
-  return OPERATORS.map((_, idx) => buildTrip(from, to, date, idx)).sort(
-    (a, b) => timeToMins(a.departure) - timeToMins(b.departure),
-  );
+  // Live provider returned no results or route unresolvable: return empty array.
+  // Do NOT generate mock or dummy trips.
+  return [];
 };
 
 // ---------- boarding / dropping points ----------
@@ -519,13 +564,14 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
   const parts = tripId.split('~');
 
   if (parts.length >= 5) {
-    const [from, to, date, traceId, encodedResultIndex] = parts;
+    const [from, to, date, traceId, encodedResultIndex, encodedSrdvIndex] = parts;
     const resultIndex = decodeURIComponent(encodedResultIndex);
+    const srdvIndex = encodedSrdvIndex ? decodeURIComponent(encodedSrdvIndex) : resultIndex;
 
     try {
       const [layoutRes, pointsRes] = await Promise.all([
-        fetchSeatLayoutApi({ traceId, resultIndex }),
-        fetchBoardingDroppingPointsApi({ traceId, resultIndex }),
+        fetchSeatLayoutApi({ traceId, resultIndex, srdvIndex }),
+        fetchBoardingDroppingPointsApi({ traceId, resultIndex, srdvIndex }),
       ]);
 
       if (layoutRes?.success && Array.isArray(layoutRes.seats) && layoutRes.seats.length > 0) {
@@ -579,6 +625,7 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
               date,
               traceId,
               resultIndex,
+              srdvIndex,
               fare: seats.filter((s) => !s.booked)[0]?.price || syncFallback.trip.fare,
               seatsLeft: seats.filter((s) => !s.booked).length,
             }
@@ -605,6 +652,7 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
               tags: ['Primo'],
               traceId,
               resultIndex,
+              srdvIndex,
             };
 
         return {
@@ -627,11 +675,13 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
         };
       }
     } catch (err) {
-      console.warn('[busService] Failed to load live seat layout / points, using fallback:', err);
+      console.warn('[busService] Failed to load live seat layout / points:', err);
+      return null;
     }
   }
 
-  return syncFallback;
+  // Do not fallback to synthetic mock seats when live layout cannot be retrieved
+  return null;
 };
 
 // ---------- fares ----------

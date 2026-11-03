@@ -124,6 +124,10 @@ export const AppRouter = () => {
           <Route path="/chat" element={<LoginPage />} />
           <Route path="/chat/:chatId" element={<LoginPage />} />
           <Route path="/policies/:policyId" element={<PolicyPage />} />
+          <Route path="/bus" element={<Suspense fallback={<div className="p-8 text-center text-sm text-gray-500">Loading bus booking...</div>}><BusHomePage /></Suspense>} />
+          <Route path="/bus/results" element={<Suspense fallback={<div className="p-8 text-center text-sm text-gray-500">Loading trips...</div>}><BusResultsPage /></Suspense>} />
+          <Route path="/bus/trip/:tripId" element={<Suspense fallback={<div className="p-8 text-center text-sm text-gray-500">Loading trip details...</div>}><BusBookingPage /></Suspense>} />
+          <Route path="/bus/confirmation" element={<Suspense fallback={<div className="p-8 text-center text-sm text-gray-500">Loading confirmation...</div>}><BusConfirmationPage /></Suspense>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

@@ -15,13 +15,11 @@ import { loadRazorpay } from '../../utils/loadRazorpay';
 import type { BusBookingConfirmation, BusSeat, ContactDraft, PassengerDraft, BusTripDetails } from './busTypes';
 import {
   POINT_VALUE,
-  SAVED_TRAVELLERS,
   calculateFare,
   formatINR,
   formatJourneyDate,
   getCity,
   getTripDetails,
-  getTripDetailsSync,
   todayISO,
 } from './busService';
 import { BookingStepper, BusCard, BusFlowHeader, BusPageShell, PrimaryButton, Toggle } from './components/BusUI';
@@ -55,15 +53,25 @@ export const BusBookingPage = () => {
   const { user, openAuth } = useAuth() as { user: any; openAuth?: (v?: string) => void };
   const women = params.get('women') === '1';
 
-  const [details, setDetails] = useState<BusTripDetails | null>(() => getTripDetailsSync(decodeURIComponent(tripId)));
+  const [loading, setLoading] = useState(true);
+  const [details, setDetails] = useState<BusTripDetails | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    getTripDetails(decodeURIComponent(tripId)).then((d) => {
-      if (!cancelled && d) {
-        setDetails(d);
-      }
-    });
+    setLoading(true);
+    getTripDetails(decodeURIComponent(tripId))
+      .then((d) => {
+        if (!cancelled) {
+          setDetails(d);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('Failed to load live trip details:', err);
+          setLoading(false);
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -84,6 +92,15 @@ export const BusBookingPage = () => {
   const [notice, setNotice] = useState('');
   const [paying, setPaying] = useState(false);
 
+  const savedTravellers = useMemo(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('rp_bus_saved_travellers') : null;
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
   const stepParam = params.get('step') as Step | null;
   const requested = Math.max(0, STEPS.indexOf(stepParam ?? 'seats'));
 
@@ -100,7 +117,7 @@ export const BusBookingPage = () => {
   const step = STEPS[stepIndex];
 
   const rawPoints = Number(user?.rewardPoints ?? user?.wallet_points ?? user?.points ?? user?.steps?.coins);
-  const pointsBalance = Number.isFinite(rawPoints) && rawPoints > 0 ? rawPoints : 2480;
+  const pointsBalance = Number.isFinite(rawPoints) && rawPoints > 0 ? rawPoints : 0;
   const baseFare = calculateFare(seats);
   const maxPointsValue = Math.min(Math.floor(pointsBalance * POINT_VALUE), Math.floor((baseFare.baseFare + baseFare.gst - baseFare.discount) * 0.5));
   const fare = calculateFare(seats, usePoints ? maxPointsValue / POINT_VALUE : 0);
@@ -126,7 +143,34 @@ export const BusBookingPage = () => {
     return () => clearTimeout(t);
   }, [notice]);
 
-  if (!details || details.trip.date < todayISO()) return <Navigate to="/bus" replace />;
+  if (loading) {
+    return (
+      <BusPageShell>
+        <div className="flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-3 border-[#D62839] border-t-transparent" />
+          <p className="mt-4 text-sm font-bold text-[#1C0E28]">Loading live seat layout…</p>
+        </div>
+      </BusPageShell>
+    );
+  }
+
+  if (!details || (details.trip?.date && details.trip.date < todayISO())) {
+    return (
+      <BusPageShell>
+        <div className="bus-card mx-auto max-w-lg p-8 text-center my-12">
+          <p className="text-base font-extrabold text-[#1C0E28]">Unable to load bus details</p>
+          <p className="mt-2 text-xs text-[#776B80]">This bus or seat layout is no longer available on the live server. Please choose another bus.</p>
+          <button
+            type="button"
+            onClick={() => navigate('/bus')}
+            className="mt-6 rounded-xl bg-[#D62839] px-6 py-2.5 text-xs font-bold text-white hover:bg-[#b5202f]"
+          >
+            Back to Bus Search
+          </button>
+        </div>
+      </BusPageShell>
+    );
+  }
   const { trip } = details;
   const fromName = getCity(trip.fromCityId)!.name;
   const toName = getCity(trip.toCityId)!.name;
@@ -165,7 +209,18 @@ export const BusBookingPage = () => {
   };
 
   const pay = async () => {
-    if (!user) {
+    const activeUser =
+      user ||
+      (() => {
+        try {
+          const raw = typeof window !== 'undefined' ? sessionStorage.getItem('rp_user_profile') : null;
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      })();
+
+    if (!activeUser) {
       setNotice('Please log in to complete your bus booking');
       if (openAuth) openAuth('login');
       return;
@@ -182,18 +237,19 @@ export const BusBookingPage = () => {
           LastName: p.lastName.trim() || 'Traveler',
           Gender: (p.gender === 'F' ? '2' : '1') as '1' | '2',
           Age: Math.max(1, Math.min(120, Number(p.age) || 28)),
-          Email: contact.email.trim() || user?.email || 'customer@rewardplanners.com',
-          PhoneNo: contact.phone.trim().slice(-10) || String(user?.phone || '9999999999').slice(-10),
+          Email: contact.email.trim() || activeUser?.email || 'customer@rewardplanners.com',
+          PhoneNo: contact.phone.trim().slice(-10) || String(activeUser?.phone || '9999999999').slice(-10),
           Address: 'India',
           SeatName: p.seatId,
           LeadPassenger: idx === 0,
-          IdType: '',
-          IdNumber: '',
+          IdType: (p as any).idType || 'PanCard',
+          IdNumber: (p as any).idNumber || 'ABCDE1234F',
         }));
 
         const blockRes = await blockBusSeatApi({
           traceId: trip.traceId,
           resultIndex: trip.resultIndex,
+          srdvIndex: trip.srdvIndex || trip.resultIndex,
           boardingPointId: String(boarding.id),
           droppingPointId: String(dropping.id),
           refId: `RPB_${Date.now()}`,
@@ -395,7 +451,7 @@ export const BusBookingPage = () => {
               }}
               activeIndex={activePax}
               onActiveIndexChange={setActivePax}
-              savedTravellers={SAVED_TRAVELLERS}
+              savedTravellers={savedTravellers}
               errors={errors}
             />
           )}

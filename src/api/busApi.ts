@@ -19,11 +19,13 @@ export interface SearchBusesPayload {
   sourceCityCode: string | number;
   destinationCityCode: string | number;
   journeyDate: string; // YYYY-MM-DD
+  journeyTime?: string; // HH:mm
 }
 
 export interface SeatLayoutPayload {
   traceId: string | number;
   resultIndex: string;
+  srdvIndex?: string | number;
   boardingPointId?: string;
   droppingPointId?: string;
 }
@@ -31,6 +33,7 @@ export interface SeatLayoutPayload {
 export interface BoardingDroppingPayload {
   traceId: string | number;
   resultIndex: string;
+  srdvIndex?: string | number;
 }
 
 export interface BlockBusPassengerDto {
@@ -55,6 +58,7 @@ export interface BlockBusPassengerDto {
 export interface BlockBusSeatPayload {
   traceId: string | number;
   resultIndex: string;
+  srdvIndex?: string | number;
   boardingPointId: string;
   droppingPointId: string;
   refId: string;
@@ -106,6 +110,7 @@ export const searchBusesApi = async (payload: SearchBusesPayload) => {
       sourceCityCode: Number(payload.sourceCityCode),
       destinationCityCode: Number(payload.destinationCityCode),
       journeyDate: payload.journeyDate,
+      journeyTime: payload.journeyTime || '00:00',
     });
     return res.data;
   } catch (err: any) {
@@ -120,6 +125,7 @@ export const fetchSeatLayoutApi = async (payload: SeatLayoutPayload) => {
     const res = await api.post(ENDPOINTS.bus.seatLayout, {
       traceId: Number(payload.traceId),
       resultIndex: String(payload.resultIndex).trim(),
+      srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
       ...(payload.boardingPointId ? { boardingPointId: String(payload.boardingPointId) } : {}),
       ...(payload.droppingPointId ? { droppingPointId: String(payload.droppingPointId) } : {}),
     });
@@ -136,6 +142,7 @@ export const fetchBoardingDroppingPointsApi = async (payload: BoardingDroppingPa
     const res = await api.post(ENDPOINTS.bus.boardingDroppingPoints, {
       traceId: Number(payload.traceId),
       resultIndex: String(payload.resultIndex).trim(),
+      srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
     });
     return res.data;
   } catch (err: any) {
@@ -147,7 +154,10 @@ export const fetchBoardingDroppingPointsApi = async (payload: BoardingDroppingPa
 // 6. Block seat
 export const blockBusSeatApi = async (payload: BlockBusSeatPayload) => {
   try {
-    const res = await api.post(ENDPOINTS.bus.block, payload);
+    const res = await api.post(ENDPOINTS.bus.block, {
+      ...payload,
+      srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
+    });
     return res.data;
   } catch (err: any) {
     console.error('[BusApi] Block seat failed:', err?.response?.data || err?.message);

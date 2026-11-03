@@ -49,9 +49,9 @@ export default defineConfig({
         },
       },
       '/api/busbooking': {
-        target: 'http://localhost:5000',
+        target: 'https://rewardplanners.com/api/crm',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   },
