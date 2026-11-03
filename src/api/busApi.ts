@@ -123,7 +123,7 @@ export const searchBusesApi = async (payload: SearchBusesPayload) => {
 export const fetchSeatLayoutApi = async (payload: SeatLayoutPayload) => {
   try {
     const res = await api.post(ENDPOINTS.bus.seatLayout, {
-      traceId: Number(payload.traceId),
+      traceId: payload.traceId != null ? String(payload.traceId).trim() : '',
       resultIndex: String(payload.resultIndex).trim(),
       srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
       ...(payload.boardingPointId ? { boardingPointId: String(payload.boardingPointId) } : {}),
@@ -140,7 +140,7 @@ export const fetchSeatLayoutApi = async (payload: SeatLayoutPayload) => {
 export const fetchBoardingDroppingPointsApi = async (payload: BoardingDroppingPayload) => {
   try {
     const res = await api.post(ENDPOINTS.bus.boardingDroppingPoints, {
-      traceId: Number(payload.traceId),
+      traceId: payload.traceId != null ? String(payload.traceId).trim() : '',
       resultIndex: String(payload.resultIndex).trim(),
       srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
     });

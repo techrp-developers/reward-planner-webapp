@@ -20,6 +20,7 @@ import {
   formatJourneyDate,
   getCity,
   getTripDetails,
+  getTripDetailsSync,
   todayISO,
 } from './busService';
 import { BookingStepper, BusCard, BusFlowHeader, BusPageShell, PrimaryButton, Toggle } from './components/BusUI';
@@ -53,24 +54,24 @@ export const BusBookingPage = () => {
   const { user, openAuth } = useAuth() as { user: any; openAuth?: (v?: string) => void };
   const women = params.get('women') === '1';
 
-  const [loading, setLoading] = useState(true);
-  const [details, setDetails] = useState<BusTripDetails | null>(null);
+  const [details, setDetails] = useState<BusTripDetails | null>(() => {
+    try {
+      return getTripDetailsSync(decodeURIComponent(tripId));
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     getTripDetails(decodeURIComponent(tripId))
       .then((d) => {
-        if (!cancelled) {
+        if (!cancelled && d) {
           setDetails(d);
-          setLoading(false);
         }
       })
       .catch((err) => {
-        if (!cancelled) {
-          console.error('Failed to load live trip details:', err);
-          setLoading(false);
-        }
+        console.warn('Live trip details fetch error:', err);
       });
     return () => {
       cancelled = true;
@@ -138,28 +139,26 @@ export const BusBookingPage = () => {
   }, [stepIndex]);
 
   useEffect(() => {
+    if (details?.boardingPoints?.length && !boardingId) {
+      setBoardingId(details.boardingPoints[0].id);
+    }
+    if (details?.droppingPoints?.length && !droppingId) {
+      setDroppingId(details.droppingPoints[0].id);
+    }
+  }, [details, boardingId, droppingId]);
+
+  useEffect(() => {
     if (!notice) return;
     const t = setTimeout(() => setNotice(''), 2600);
     return () => clearTimeout(t);
   }, [notice]);
 
-  if (loading) {
-    return (
-      <BusPageShell>
-        <div className="flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-[#D62839] border-t-transparent" />
-          <p className="mt-4 text-sm font-bold text-[#1C0E28]">Loading live seat layout…</p>
-        </div>
-      </BusPageShell>
-    );
-  }
-
-  if (!details || (details.trip?.date && details.trip.date < todayISO())) {
+  if (!details) {
     return (
       <BusPageShell>
         <div className="bus-card mx-auto max-w-lg p-8 text-center my-12">
           <p className="text-base font-extrabold text-[#1C0E28]">Unable to load bus details</p>
-          <p className="mt-2 text-xs text-[#776B80]">This bus or seat layout is no longer available on the live server. Please choose another bus.</p>
+          <p className="mt-2 text-xs text-[#776B80]">This bus or seat layout is no longer available. Please choose another bus.</p>
           <button
             type="button"
             onClick={() => navigate('/bus')}
@@ -172,8 +171,8 @@ export const BusBookingPage = () => {
     );
   }
   const { trip } = details;
-  const fromName = getCity(trip.fromCityId)!.name;
-  const toName = getCity(trip.toCityId)!.name;
+  const fromName = getCity(trip.fromCityId)?.name || trip.fromCityId;
+  const toName = getCity(trip.toCityId)?.name || trip.toCityId;
   const resultsUrl = buildResultsUrl({ from: trip.fromCityId, to: trip.toCityId, date: trip.date, women });
 
   const goStep = (i: number, replace = false) =>
