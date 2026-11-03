@@ -251,7 +251,7 @@ export const BusBookingPage = () => {
           srdvIndex: trip.srdvIndex || trip.resultIndex,
           boardingPointId: String(boarding.id),
           droppingPointId: String(dropping.id),
-          refId: `RPB_${Date.now()}`,
+          refId: `RPB${Date.now()}`,
           passengers: passengersPayload,
           sourceCity: fromName,
           destinationCity: toName,
@@ -327,21 +327,8 @@ export const BusBookingPage = () => {
       }
     }
 
-    // Fallback/demo round-trip
-    setTimeout(() => {
-      const confirmation: BusBookingConfirmation = {
-        pnr: `RPB${String(Date.now()).slice(-7)}`,
-        ticketNo: `TK${trip.fromCityId.slice(0, 2).toUpperCase()}${trip.toCityId.slice(0, 2).toUpperCase()}${Math.floor(100000 + Math.random() * 899999)}`,
-        trip,
-        seats,
-        boarding: boarding!,
-        dropping: dropping!,
-        passengers,
-        contact,
-        totals: fare,
-      };
-      navigate('/bus/confirmation', { state: confirmation, replace: true });
-    }, 1300);
+    setPaying(false);
+    setNotice('Live booking information is missing. Please select a valid bus and seats to proceed.');
   };
 
   const next = () => {

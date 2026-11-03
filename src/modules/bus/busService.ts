@@ -316,11 +316,35 @@ const buildTrip = (from: string, to: string, date: string, idx: number): BusTrip
 };
 
 export const searchBuses = async (from: string, to: string, date: string): Promise<BusTrip[]> => {
-  const fromCity = getCity(from);
-  const toCity = getCity(to);
+  let fromCity = getCity(from);
+  let toCity = getCity(to);
 
-  const srcCode = fromCity && /^\d+$/.test(fromCity.id) ? Number(fromCity.id) : null;
-  const destCode = toCity && /^\d+$/.test(toCity.id) ? Number(toCity.id) : null;
+  let srcCode = fromCity && /^\d+$/.test(fromCity.id) ? Number(fromCity.id) : null;
+  let destCode = toCity && /^\d+$/.test(toCity.id) ? Number(toCity.id) : null;
+
+  if (!srcCode && from) {
+    try {
+      const cities = await loadBusCities(from);
+      const matched = cities.find((c) => c.name.toLowerCase() === from.toLowerCase() || c.id === from);
+      if (matched && /^\d+$/.test(matched.id)) {
+        srcCode = Number(matched.id);
+      }
+    } catch (e) {
+      console.warn('[busService] Failed to resolve source city:', e);
+    }
+  }
+
+  if (!destCode && to) {
+    try {
+      const cities = await loadBusCities(to);
+      const matched = cities.find((c) => c.name.toLowerCase() === to.toLowerCase() || c.id === to);
+      if (matched && /^\d+$/.test(matched.id)) {
+        destCode = Number(matched.id);
+      }
+    } catch (e) {
+      console.warn('[busService] Failed to resolve destination city:', e);
+    }
+  }
 
   if (srcCode && destCode && date) {
     try {
@@ -401,11 +425,8 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
     }
   }
 
-  // Resilient fallback when live API is unavailable or returns 0 buses:
-  // Render buses so the user can always proceed to seat selection and complete the booking flow
-  return OPERATORS.map((_, idx) => buildTrip(from, to, date, idx)).sort(
-    (a, b) => timeToMins(a.departure) - timeToMins(b.departure),
-  );
+  // Live database only: when no live buses exist for route/date, return empty list
+  return [];
 };
 
 // ---------- boarding / dropping points ----------
@@ -523,22 +544,14 @@ const buildSeats = (trip: BusTrip): BusSeat[] => {
 
 export const getTripDetailsSync = (tripId: string): BusTripDetails | null => {
   const parts = tripId.split('~');
+  if (parts.length < 5) return null;
   const [from, to, date] = parts;
   if (!from || !to) return null;
 
-  let traceId = '';
-  let resultIndex = '0';
-  let srdvIndex = '0';
-  let idx = 0;
-
-  if (parts.length >= 5) {
-    traceId = parts[3] || '';
-    resultIndex = decodeURIComponent(parts[4] || '0');
-    srdvIndex = decodeURIComponent(parts[5] || parts[4] || '0');
-  } else {
-    const idxRaw = Number(parts[3]);
-    idx = Number.isInteger(idxRaw) && idxRaw >= 0 && idxRaw < OPERATORS.length ? idxRaw : 0;
-  }
+  const traceId = parts[3] || '';
+  const resultIndex = decodeURIComponent(parts[4] || '0');
+  const srdvIndex = decodeURIComponent(parts[5] || parts[4] || '0');
+  const idx = 0;
 
   const baseTrip = buildTrip(from, to, date || todayISO(), idx);
   const trip: BusTrip = {
@@ -558,19 +571,9 @@ export const getTripDetailsSync = (tripId: string): BusTripDetails | null => {
 
   return {
     trip,
-    seats: buildSeats(trip),
-    boardingPoints: boardingSeeds.map((p, i) => ({
-      id: `b${i}`,
-      time: minsToTime(depMins + p.offset),
-      name: p.name,
-      address: p.address,
-    })),
-    droppingPoints: droppingSeeds.map((p, i) => ({
-      id: `d${i}`,
-      time: minsToTime(arrMins - lastDrop + p.offset),
-      name: p.name,
-      address: p.address,
-    })),
+    seats: [],
+    boardingPoints: [],
+    droppingPoints: [],
     cancellationPolicy: [
       { window: 'More than 24 hrs before departure', charge: '10% of fare' },
       { window: '12 – 24 hrs before departure', charge: '25% of fare' },
@@ -706,8 +709,8 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
     }
   }
 
-  // Resilient fallback guarantees journey always renders
-  return syncFallback;
+  // Live server only: if live seat layout is unavailable, do not show dummy seats
+  return null;
 };
 
 // ---------- fares ----------
