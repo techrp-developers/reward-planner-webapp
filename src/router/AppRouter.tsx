@@ -38,6 +38,7 @@ import QuizGamePage from '../modules/games/QuizGamePage';
 import SudokuGamePage from '../modules/games/SudokuGamePage';
 import GamesLeaderboardPage from '../modules/games/GamesLeaderboardPage';
 import ChatPage from '../modules/chat/ChatPage';
+import DiwaliWelcome from '../components/festive/DiwaliWelcome';
 
 export const AppRouter = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -233,6 +234,9 @@ export const AppRouter = () => {
 
       {/* AUTHENTICATION & TERMS MODAL */}
       <AuthModal />
+
+      {/* FESTIVE WELCOME (once per login, self-retiring after the season) */}
+      <DiwaliWelcome />
 
       {/* GLOBAL DRAGGABLE STICKY NOTES (PERSISTENT ACROSS ALL PAGES) */}
       <StickyNotesContainer />
