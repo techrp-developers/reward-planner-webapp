@@ -610,20 +610,31 @@ export const getTripDetailsSync = (tripId: string): BusTripDetails | null => {
   };
 };
 
+const tripDetailsPromiseCache = new Map<string, Promise<BusTripDetails | null>>();
+
 export const getTripDetails = async (tripId: string): Promise<BusTripDetails | null> => {
-  const syncFallback = getTripDetailsSync(tripId);
-  const parts = tripId.split('~');
+  if (tripDetailsPromiseCache.has(tripId)) {
+    return tripDetailsPromiseCache.get(tripId)!;
+  }
 
-  if (parts.length >= 5) {
-    const [from, to, date, traceId, encodedResultIndex, encodedSrdvIndex] = parts;
-    const resultIndex = decodeURIComponent(encodedResultIndex);
-    const srdvIndex = encodedSrdvIndex ? decodeURIComponent(encodedSrdvIndex) : resultIndex;
+  const promise = (async (): Promise<BusTripDetails | null> => {
+    const syncFallback = getTripDetailsSync(tripId);
+    const parts = tripId.split('~');
 
-    try {
-      const [layoutRes, pointsRes] = await Promise.all([
-        fetchSeatLayoutApi({ traceId, resultIndex, srdvIndex }),
-        fetchBoardingDroppingPointsApi({ traceId, resultIndex, srdvIndex }),
-      ]);
+    if (parts.length >= 5) {
+      const [from, to, date, traceId, encodedResultIndex, encodedSrdvIndex] = parts;
+      const resultIndex = decodeURIComponent(encodedResultIndex);
+      const srdvIndex = encodedSrdvIndex ? decodeURIComponent(encodedSrdvIndex) : resultIndex;
+
+      try {
+        // Sequential calls with delay to prevent SRDV ErrorCode 7014 (concurrent TraceId requests)
+        const layoutRes = await fetchSeatLayoutApi({ traceId, resultIndex, srdvIndex });
+        let pointsRes: any = null;
+        try {
+          pointsRes = await fetchBoardingDroppingPointsApi({ traceId, resultIndex, srdvIndex });
+        } catch (errPoints: any) {
+          console.warn('[busService] Failed to load live boarding/dropping points:', errPoints);
+        }
 
       if (layoutRes?.success && Array.isArray(layoutRes.seats) && layoutRes.seats.length > 0) {
         const rawSeats = layoutRes.seats;
@@ -651,19 +662,19 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
 
         const boardingPoints: BusPoint[] = Array.isArray(pointsRes?.boardingPoints) && pointsRes.boardingPoints.length > 0
           ? pointsRes.boardingPoints.map((p: any, i: number) => ({
-              id: String(p.CityPointIndex || p.Id || `b${i}`),
-              time: String(p.CityPointTime || p.Time || '21:00').slice(0, 5),
-              name: String(p.CityPointName || p.Name || 'Boarding Point'),
-              address: String(p.CityPointAddress || p.Address || p.CityPointLocation || ''),
+              id: String(p.Id || p.CityPointIndex || `b${i}`),
+              time: String(p.Time || p.CityPointTime || '21:00').slice(0, 5),
+              name: String(p.Name || p.CityPointName || 'Boarding Point'),
+              address: String(p.Address || p.Location || p.CityPointAddress || ''),
             }))
           : (syncFallback?.boardingPoints || []);
 
         const droppingPoints: BusPoint[] = Array.isArray(pointsRes?.droppingPoints) && pointsRes.droppingPoints.length > 0
           ? pointsRes.droppingPoints.map((p: any, i: number) => ({
-              id: String(p.CityPointIndex || p.Id || `d${i}`),
-              time: String(p.CityPointTime || p.Time || '06:00').slice(0, 5),
-              name: String(p.CityPointName || p.Name || 'Dropping Point'),
-              address: String(p.CityPointAddress || p.Address || p.CityPointLocation || ''),
+              id: String(p.Id || p.CityPointIndex || `d${i}`),
+              time: String(p.Time || p.CityPointTime || '06:00').slice(0, 5),
+              name: String(p.Name || p.CityPointName || 'Dropping Point'),
+              address: String(p.Address || p.Location || p.CityPointAddress || ''),
             }))
           : (syncFallback?.droppingPoints || []);
 
@@ -730,8 +741,13 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
     }
   }
 
-  // Resilient fallback guarantees journey always renders
-  return syncFallback;
+    // Resilient fallback guarantees journey always renders
+    return syncFallback;
+  })();
+
+  tripDetailsPromiseCache.set(tripId, promise);
+  setTimeout(() => tripDetailsPromiseCache.delete(tripId), 60000);
+  return promise;
 };
 
 // ---------- fares ----------

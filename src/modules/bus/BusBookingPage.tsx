@@ -139,11 +139,15 @@ export const BusBookingPage = () => {
   }, [stepIndex]);
 
   useEffect(() => {
-    if (details?.boardingPoints?.length && !boardingId) {
-      setBoardingId(details.boardingPoints[0].id);
+    if (details?.boardingPoints?.length) {
+      if (!boardingId || !details.boardingPoints.some((p) => p.id === boardingId)) {
+        setBoardingId(details.boardingPoints[0].id);
+      }
     }
-    if (details?.droppingPoints?.length && !droppingId) {
-      setDroppingId(details.droppingPoints[0].id);
+    if (details?.droppingPoints?.length) {
+      if (!droppingId || !details.droppingPoints.some((p) => p.id === droppingId)) {
+        setDroppingId(details.droppingPoints[0].id);
+      }
     }
   }, [details, boardingId, droppingId]);
 

@@ -119,36 +119,87 @@ export const searchBusesApi = async (payload: SearchBusesPayload) => {
   }
 };
 
+// In-flight deduplication and short-term caching to prevent ErrorCode 7014
+const inFlightApi = new Map<string, Promise<any>>();
+const cacheApi = new Map<string, { timestamp: number; data: any }>();
+const API_CACHE_TTL = 3 * 60 * 1000;
+
 // 4. Get seat layout
 export const fetchSeatLayoutApi = async (payload: SeatLayoutPayload) => {
-  try {
-    const res = await api.post(ENDPOINTS.bus.seatLayout, {
-      traceId: payload.traceId != null ? String(payload.traceId).trim() : '',
-      resultIndex: String(payload.resultIndex).trim(),
-      srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
-      ...(payload.boardingPointId ? { boardingPointId: String(payload.boardingPointId) } : {}),
-      ...(payload.droppingPointId ? { droppingPointId: String(payload.droppingPointId) } : {}),
-    });
-    return res.data;
-  } catch (err: any) {
-    console.error('[BusApi] Seat layout failed:', err?.response?.data || err?.message);
-    throw err?.response?.data || err;
+  const traceId = payload.traceId != null ? String(payload.traceId).trim() : '';
+  const resultIndex = String(payload.resultIndex).trim();
+  const srdvIndex = String(payload.srdvIndex || payload.resultIndex).trim();
+  const cacheKey = `layout:${traceId}:${resultIndex}:${payload.boardingPointId || ''}:${payload.droppingPointId || ''}`;
+
+  const cached = cacheApi.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < API_CACHE_TTL) {
+    return cached.data;
   }
+
+  const inFlight = inFlightApi.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const p = (async () => {
+    try {
+      const res = await api.post(ENDPOINTS.bus.seatLayout, {
+        traceId,
+        resultIndex,
+        srdvIndex,
+        ...(payload.boardingPointId ? { boardingPointId: String(payload.boardingPointId) } : {}),
+        ...(payload.droppingPointId ? { droppingPointId: String(payload.droppingPointId) } : {}),
+      });
+      cacheApi.set(cacheKey, { timestamp: Date.now(), data: res.data });
+      return res.data;
+    } catch (err: any) {
+      console.error('[BusApi] Seat layout failed:', err?.response?.data || err?.message);
+      throw err?.response?.data || err;
+    } finally {
+      inFlightApi.delete(cacheKey);
+    }
+  })();
+
+  inFlightApi.set(cacheKey, p);
+  return p;
 };
 
 // 5. Get boarding / dropping points
 export const fetchBoardingDroppingPointsApi = async (payload: BoardingDroppingPayload) => {
-  try {
-    const res = await api.post(ENDPOINTS.bus.boardingDroppingPoints, {
-      traceId: payload.traceId != null ? String(payload.traceId).trim() : '',
-      resultIndex: String(payload.resultIndex).trim(),
-      srdvIndex: String(payload.srdvIndex || payload.resultIndex).trim(),
-    });
-    return res.data;
-  } catch (err: any) {
-    console.error('[BusApi] Boarding/dropping points failed:', err?.response?.data || err?.message);
-    throw err?.response?.data || err;
+  const traceId = payload.traceId != null ? String(payload.traceId).trim() : '';
+  const resultIndex = String(payload.resultIndex).trim();
+  const srdvIndex = String(payload.srdvIndex || payload.resultIndex).trim();
+  const cacheKey = `points:${traceId}:${resultIndex}`;
+
+  const cached = cacheApi.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < API_CACHE_TTL) {
+    return cached.data;
   }
+
+  const inFlight = inFlightApi.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const p = (async () => {
+    try {
+      const res = await api.post(ENDPOINTS.bus.boardingDroppingPoints, {
+        traceId,
+        resultIndex,
+        srdvIndex,
+      });
+      cacheApi.set(cacheKey, { timestamp: Date.now(), data: res.data });
+      return res.data;
+    } catch (err: any) {
+      console.error('[BusApi] Boarding/dropping points failed:', err?.response?.data || err?.message);
+      throw err?.response?.data || err;
+    } finally {
+      inFlightApi.delete(cacheKey);
+    }
+  })();
+
+  inFlightApi.set(cacheKey, p);
+  return p;
 };
 
 // 6. Block seat
