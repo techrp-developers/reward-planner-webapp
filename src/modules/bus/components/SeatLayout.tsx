@@ -69,23 +69,56 @@ const Deck: React.FC<{
   onToggle: (s: BusSeat) => void;
   showDriver?: boolean;
 }> = ({ title, seats, selectedIds, priceFilter, onToggle, showDriver }) => {
-  const isSleeper = seats[0]?.kind === 'sleeper';
-  const rows = Math.max(...seats.map((s) => s.row)) + 1;
-  // Sleeper 2+1: [single] aisle [double double]; seater 2+2: [a b] aisle [c d]
-  const columns = isSleeper ? [0, null, 2, 3] : [0, 1, null, 2, 3];
+  if (!seats || seats.length === 0) return null;
+
+  // Distinct bus rows along the length of the bus (front to back)
+  const distinctRows = useMemo(() => {
+    return [...new Set(seats.map((s) => s.row))].sort((a, b) => a - b);
+  }, [seats]);
+
+  // Distinct column slots across the width of the bus
+  const cols = useMemo(() => {
+    const minCol = Math.min(...seats.map((s) => s.col));
+    const maxCol = Math.max(...seats.map((s) => s.col));
+    const colSpan = maxCol - minCol + 1;
+
+    // Check if seats already include an aisle slot or if it's packed fallback 2+2
+    const seatsPerCol = new Map<number, number>();
+    seats.forEach((s) => seatsPerCol.set(s.col, (seatsPerCol.get(s.col) || 0) + 1));
+    const isPackedFourCols =
+      colSpan === 4 &&
+      minCol === 0 &&
+      [0, 1, 2, 3].every((c) => (seatsPerCol.get(c) || 0) > distinctRows.length * 0.5);
+
+    if (isPackedFourCols) {
+      return [0, 1, null, 2, 3];
+    }
+
+    return Array.from({ length: colSpan }, (_, k) => minCol + k);
+  }, [seats, distinctRows]);
 
   return (
     <div className={`bus-coach w-full px-3.5 pt-4 pb-4 sm:px-4 ${showDriver ? '' : 'bus-coach-upper'}`}>
       <div className="mb-3 flex items-center justify-between border-b border-dashed border-[#E7DFE9] px-2 pb-3">
-        <span className="bus-eyebrow !text-[#1C0E28]">{title}</span>
+        <div className="flex items-center gap-2">
+          <span className="bus-eyebrow !text-[#1C0E28]">{title}</span>
+          <span className="text-[11px] font-bold text-[#7D6F84]">({seats.length} seats)</span>
+        </div>
         {showDriver ? <SteeringWheelIcon className="h-7 w-7 text-[#7D6F84]" /> : <span className="h-7" />}
       </div>
-      <div className="grid gap-x-2 gap-y-2.5" style={{ gridTemplateColumns: columns.map((c) => (c === null ? '0.55fr' : '1fr')).join(' ') }}>
-        {Array.from({ length: rows }).flatMap((_, row) =>
-          columns.map((col, ci) => {
-            if (col === null) return <span key={`${row}-a${ci}`} />;
+      <div
+        className="grid gap-x-2 gap-y-2.5"
+        style={{
+          gridTemplateColumns: cols
+            .map((c) => (c === null ? '0.55fr' : '1fr'))
+            .join(' '),
+        }}
+      >
+        {distinctRows.flatMap((row) =>
+          cols.map((col, ci) => {
+            if (col === null) return <span key={`${row}-aisle-${ci}`} className="h-full w-full" />;
             const seat = seats.find((s) => s.row === row && s.col === col);
-            if (!seat) return <span key={`${row}-${col}`} />;
+            if (!seat) return <span key={`${row}-${col}`} className="h-full w-full" />;
             return (
               <SeatTile
                 key={seat.id}
@@ -121,8 +154,8 @@ export const SeatLayout: React.FC<Props> = ({ seats, selectedIds, onToggle }) =>
   const [priceFilter, setPriceFilter] = useState<number | null>(null);
   const [mobileDeck, setMobileDeck] = useState<'lower' | 'upper'>('lower');
   const prices = useMemo(() => [...new Set(seats.filter((s) => !s.booked).map((s) => s.price))].sort((a, b) => a - b), [seats]);
-  const lower = seats.filter((s) => s.deck === 'lower');
-  const upper = seats.filter((s) => s.deck === 'upper');
+  const lower = useMemo(() => seats.filter((s) => s.deck === 'lower'), [seats]);
+  const upper = useMemo(() => seats.filter((s) => s.deck === 'upper'), [seats]);
   const hasUpper = upper.length > 0;
   const countSelected = (deck: BusSeat[]) => deck.filter((s) => selectedIds.includes(s.id)).length;
 
@@ -148,7 +181,7 @@ export const SeatLayout: React.FC<Props> = ({ seats, selectedIds, onToggle }) =>
       </div>
 
       {hasUpper && (
-        <div className="mb-5 grid grid-cols-2 rounded-2xl bg-[#F1EBF1] p-1 sm:hidden" role="tablist" aria-label="Deck">
+        <div className="mb-5 flex rounded-2xl bg-[#F1EBF1] p-1.5 sm:hidden" role="tablist" aria-label="Deck">
           {(['lower', 'upper'] as const).map((d) => (
             <button
               key={d}
@@ -156,23 +189,30 @@ export const SeatLayout: React.FC<Props> = ({ seats, selectedIds, onToggle }) =>
               role="tab"
               aria-selected={mobileDeck === d}
               onClick={() => setMobileDeck(d)}
-              className={`rounded-xl py-2.5 text-xs font-extrabold capitalize transition ${mobileDeck === d ? 'bg-white text-[#1C0E28] shadow-sm' : 'text-[#7D6F84]'}`}
+              className={`flex-1 rounded-xl py-2.5 text-xs font-extrabold capitalize transition ${
+                mobileDeck === d ? 'bg-white text-[#1C0E28] shadow-sm' : 'text-[#7D6F84] hover:text-[#1C0E28]'
+              }`}
             >
               {d} deck
+              <span className="ml-1.5 rounded-full bg-[#E7DFE9] px-2 py-0.5 text-[10px] font-bold text-[#5B4D66]">
+                {(d === 'lower' ? lower : upper).length}
+              </span>
               {countSelected(d === 'lower' ? lower : upper) > 0 && (
-                <span className="ml-1.5 rounded-full bg-[#D62839] px-1.5 py-0.5 text-[10px] text-white">{countSelected(d === 'lower' ? lower : upper)}</span>
+                <span className="ml-1.5 rounded-full bg-[#D62839] px-1.5 py-0.5 text-[10px] text-white">
+                  {countSelected(d === 'lower' ? lower : upper)}
+                </span>
               )}
             </button>
           ))}
         </div>
       )}
 
-      <div className="flex flex-wrap items-start justify-center gap-5 sm:gap-7">
-        <div className={`w-full max-w-[272px] ${hasUpper && mobileDeck !== 'lower' ? 'hidden sm:block' : ''}`}>
+      <div className="flex flex-wrap items-start justify-center gap-6 sm:gap-8">
+        <div className={`w-full max-w-[310px] sm:max-w-[330px] ${hasUpper && mobileDeck !== 'lower' ? 'hidden sm:block' : ''}`}>
           <Deck title={hasUpper ? 'Lower deck' : 'Seats'} seats={lower} selectedIds={selectedIds} priceFilter={priceFilter} onToggle={onToggle} showDriver />
         </div>
         {hasUpper && (
-          <div className={`w-full max-w-[272px] ${mobileDeck !== 'upper' ? 'hidden sm:block' : ''}`}>
+          <div className={`w-full max-w-[310px] sm:max-w-[330px] ${mobileDeck !== 'upper' ? 'hidden sm:block' : ''}`}>
             <Deck title="Upper deck" seats={upper} selectedIds={selectedIds} priceFilter={priceFilter} onToggle={onToggle} />
           </div>
         )}

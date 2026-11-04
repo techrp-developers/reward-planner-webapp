@@ -639,24 +639,39 @@ export const getTripDetails = async (tripId: string): Promise<BusTripDetails | n
       if (layoutRes?.success && Array.isArray(layoutRes.seats) && layoutRes.seats.length > 0) {
         const rawSeats = layoutRes.seats;
         const seats: BusSeat[] = rawSeats.map((s: any, i: number) => {
-          const isUpper = Boolean(s.IsUpper || s.Deck === 2 || s.DeckNo === 2);
-          const isSleeper = Boolean(s.SeatType === 2 || (s.SeatType && String(s.SeatType).toLowerCase().includes('sleep')));
+          const isUpper = Boolean(s.IsUpper === true || s.IsUpper === 'true' || s.IsUpper === 1 || s.IsUpper === '1' || s.Deck === 2 || s.DeckNo === 2);
+          const isSleeper = Boolean(
+            s.SeatType === 2 ||
+            s.SeatType === 'Sleeper' ||
+            s.SeatType === 'Horizontal Sleeper' ||
+            s.SeatType === 'Vertical Sleeper' ||
+            (s.SeatType && String(s.SeatType).toLowerCase().includes('sleep')) ||
+            s.DoubleBirth === true ||
+            s.DoubleBirth === 'true'
+          );
           const seatName = String(s.SeatName || s.SeatNo || s.Name || `S${i + 1}`);
           const fare = Number(s.SeatFare || s.Price?.PublishedFare || s.Price?.OfferedFare || s.Price || syncFallback?.trip.fare || 500);
           const isBooked = !(s.SeatStatus === true || s.SeatStatus === 'true' || s.SeatStatus === 1 || s.SeatStatus === '1');
-          const reservedLadies = Boolean(s.LadiesSeat === true || s.LadiesSeat === 'true' || s.IsLadiesSeat === true);
+          const reservedLadies = Boolean(s.LadiesSeat === true || s.LadiesSeat === 'true' || s.IsLadiesSeat === true || s.IsLadiesSeat === 'true');
+          const reservedGents = Boolean(s.MalesSeat === true || s.MalesSeat === 'true' || s.IsMalesSeat === true || s.IsMalesSeat === 'true');
+
+          // In provider API:
+          // ColumnNo is the longitudinal row position along the length of the bus (front to back, 0..N).
+          // RowNo is the lateral column position across the width of the bus (left to right, 0..M).
+          const rowAlongBus = Number(s.ColumnNo ?? s.Col ?? Math.floor(i / 4));
+          const colAcrossBus = Number(s.RowNo ?? s.Row ?? (i % 4));
 
           return {
             id: seatName,
             label: seatName,
             deck: isUpper ? 'upper' : 'lower',
             kind: isSleeper ? 'sleeper' : 'seater',
-            row: Number(s.RowNo ?? s.Row ?? Math.floor(i / 4)),
-            col: Number(s.ColumnNo ?? s.Col ?? (i % 4)),
+            row: rowAlongBus,
+            col: colAcrossBus,
             price: fare,
             booked: isBooked,
             reservedFor: reservedLadies ? 'female' : undefined,
-            bookedBy: s.Gender === 'female' || s.Gender === '2' ? 'female' : s.Gender === 'male' || s.Gender === '1' ? 'male' : undefined,
+            bookedBy: reservedLadies ? 'female' : reservedGents ? 'male' : (s.Gender === 'female' || s.Gender === '2' ? 'female' : s.Gender === 'male' || s.Gender === '1' ? 'male' : undefined),
           };
         });
 
