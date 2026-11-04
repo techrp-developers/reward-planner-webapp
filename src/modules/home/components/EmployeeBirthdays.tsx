@@ -3,7 +3,7 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import CheckIcon from '@mui/icons-material/Check';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import bdyBgCard from '../../../assets/home/birthday-banner.png';
+import bdyBgCard from '../../../assets/home/bdy-banner3-clean.png';
 import './EmployeeBirthdays.css';
 import { useAuth } from '../../../context/AuthContext';
 import { fetchCompanyBirthdays, sendBirthdayWishApi } from '../../../api/authApi';
@@ -21,38 +21,12 @@ import {
 } from '../../../data/companyEmployeesData';
 
 /**
- * Confetti Crown graphic that sits directly above upcoming colleague avatars
- * matching the user's reference mockup.
- */
-const ConfettiCrown: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg
-    viewBox="0 0 64 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={`w-12 h-5 pointer-events-none select-none ${className}`}
-  >
-    <circle cx="8" cy="18" r="2" fill="#F43F5E" />
-    <circle cx="16" cy="11" r="2.2" fill="#FBBF24" />
-    <circle cx="25" cy="6" r="2" fill="#EC4899" />
-    <circle cx="32" cy="4" r="2.5" fill="#8B5CF6" />
-    <circle cx="39" cy="6" r="2" fill="#3B82F6" />
-    <circle cx="48" cy="11" r="2.2" fill="#F59E0B" />
-    <circle cx="56" cy="18" r="2" fill="#10B981" />
-    <path d="M20 18 L21.5 20 L20 22 L18.5 20 Z" fill="#F472B6" />
-    <path d="M44 18 L45.5 20 L44 22 L42.5 20 Z" fill="#FBBF24" />
-    <path d="M31 12 L32.5 14 L31 16 L29.5 14 Z" fill="#A855F7" />
-    <path d="M12 7 L14 8 L13 10 L11 9 Z" fill="#38BDF8" />
-    <path d="M51 7 L53 9 L51 10 L49 8 Z" fill="#FB7185" />
-  </svg>
-);
-
-/**
  * Elegant default placeholder for when no colleague has a birthday today.
- * Renders a crisp vector silhouette of a user profile with soft neutral styling.
+ * Renders a crisp vector silhouette of a user profile matching bdy-banner3.
  */
 const EmptyProfileAvatar: React.FC<{ className?: string }> = ({ className = '' }) => (
   <div
-    className={`w-full h-full flex items-center justify-center bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] select-none ${className}`}
+    className={`w-full h-full flex items-center justify-center bg-gradient-to-b from-[#e0ecfc] via-[#d6e5f8] to-[#c7daf2] select-none ${className}`}
   >
     <svg
       viewBox="0 0 24 24"
@@ -70,8 +44,21 @@ const EmptyProfileAvatar: React.FC<{ className?: string }> = ({ className = '' }
 );
 
 /**
- * Avatar component that renders the real photo, or gracefully falls back
- * to a styled circular badge showing the first letter of the first name.
+ * Pastel palette for avatar fallback initials matching bdy-banner3 design.
+ */
+const PASTEL_PALETTES = [
+  { bg: '#BFDBFE', text: '#1E3A8A' }, // Soft Blue (e.g. Card 1 'P')
+  { bg: '#DDD6FE', text: '#5B21B6' }, // Soft Lavender (e.g. Card 2 'M')
+  { bg: '#BAE6FD', text: '#0369A1' }, // Soft Sky (e.g. Card 3 'A')
+  { bg: '#FED7AA', text: '#9A3412' }, // Soft Amber
+  { bg: '#BBF7D0', text: '#166534' }, // Soft Emerald
+  { bg: '#FBCFE8', text: '#9D174D' }, // Soft Rose
+  { bg: '#E0E7FF', text: '#3730A3' }, // Soft Indigo
+];
+
+/**
+ * Avatar component that renders real employee photo, or falls back to
+ * styled circular initials badge matching the bdy-banner3 pastel aesthetic.
  */
 interface UserAvatarProps {
   name: string;
@@ -80,7 +67,7 @@ interface UserAvatarProps {
   isToday?: boolean;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '' }) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '', isToday = false }) => {
   const [imgFailed, setImgFailed] = useState(false);
 
   const firstLetter = useMemo(() => {
@@ -88,6 +75,16 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '' })
     const clean = name.trim();
     const firstName = clean.split(/\s+/)[0] || clean;
     return firstName.charAt(0).toUpperCase() || 'U';
+  }, [name]);
+
+  const palette = useMemo(() => {
+    if (!name) return PASTEL_PALETTES[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const idx = Math.abs(hash) % PASTEL_PALETTES.length;
+    return PASTEL_PALETTES[idx];
   }, [name]);
 
   const resolvedAvatar = useMemo(() => resolveAvatarUrl(avatar), [avatar]);
@@ -103,9 +100,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '' })
           className="w-full h-full object-cover rounded-full"
           loading="lazy"
         />
+      ) : isToday ? (
+        <div className="w-full h-full flex items-center justify-center font-extrabold bg-gradient-to-tr from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white select-none uppercase tracking-tight shadow-inner">
+          {firstLetter}
+        </div>
       ) : (
         <div
-          className="w-full h-full flex items-center justify-center font-black bg-gradient-to-tr from-[#D946EF] via-[#EC4899] to-[#F43F5E] text-white select-none uppercase tracking-tight shadow-inner"
+          className="w-full h-full flex items-center justify-center font-extrabold select-none uppercase tracking-tight shadow-inner"
+          style={{ backgroundColor: palette.bg, color: palette.text }}
         >
           {firstLetter}
         </div>
@@ -630,12 +632,30 @@ export default function EmployeeBirthdays() {
 
   return (
     <section className="birthday-section" aria-label="Team Birthday Celebration">
-      {toastMessage && <div className="birthday-toast" role="status"><CheckIcon fontSize="small" />{toastMessage}</div>}
-      <div className="birthday-banner" style={{ '--birthday-art': `url(${bdyBgCard})` } as React.CSSProperties}>
-        <div className="birthday-art" aria-hidden="true" />
-        <div className="birthday-intro">
-          <h3><span className="birthday-heading-icon"><CalendarTodayOutlinedIcon /></span>Birthdays</h3>
+      {toastMessage && (
+        <div className="birthday-toast" role="status">
+          <CheckIcon fontSize="small" />
+          {toastMessage}
         </div>
+      )}
+      <div
+        className="birthday-banner"
+        style={{ '--birthday-art': `url(${bdyBgCard})` } as React.CSSProperties}
+      >
+        <div className="birthday-art" aria-hidden="true" />
+
+        {/* Top-Left Pill Badge: [ 📅 | Birthdays ] */}
+        <div className="birthday-intro">
+          <div className="birthday-badge">
+            <span className="birthday-badge-icon">
+              <CalendarTodayOutlinedIcon fontSize="small" />
+            </span>
+            <span className="birthday-badge-divider" aria-hidden="true" />
+            <span className="birthday-badge-text">Birthdays</span>
+          </div>
+        </div>
+
+        {/* Left Section: Podium, Laurel Ring, Featured Person */}
         <div className="birthday-feature">
           {featuredPerson ? (
             <>
@@ -657,7 +677,6 @@ export default function EmployeeBirthdays() {
                   isToday={true}
                 />
               </button>
-              <span className="birthday-ribbon">&#9733; Today's Birthday &#9733;</span>
               <div className="birthday-feature-details">
                 <h4 title={featuredPerson.name}>{featuredPerson.name}</h4>
                 <p title={featuredPerson.role}>{featuredPerson.role}</p>
@@ -686,7 +705,6 @@ export default function EmployeeBirthdays() {
               >
                 <EmptyProfileAvatar className="w-full h-full" />
               </div>
-              <span className="birthday-ribbon">&#9733; Today's Birthday &#9733;</span>
               <div className="birthday-feature-details">
                 <h4>No Birthday Today</h4>
                 <p>No celebrations today</p>
@@ -694,29 +712,71 @@ export default function EmployeeBirthdays() {
             </>
           )}
         </div>
+
+        {/* Right Section: Upcoming Birthdays */}
         <div className="birthday-upcoming">
-          <div className="birthday-toolbar">
-            <span className="birthday-count"><i />{todayCelebrants.length} Today <span aria-hidden="true">&bull;</span> {upcomingCelebrants.length} Upcoming</span>
-            <div className="birthday-navigation">
-              <button type="button" onClick={handlePrevUpcoming} disabled={totalUpcomingPages <= 1} aria-label="Previous upcoming birthdays"><ChevronLeftIcon /></button>
-              <button type="button" onClick={handleNextUpcoming} disabled={totalUpcomingPages <= 1} aria-label="Next upcoming birthdays"><ChevronRightIcon /></button>
+          <div className="birthday-header-row">
+            <h4 className="birthday-upcoming-title">
+              <CalendarTodayOutlinedIcon />
+              Upcoming Birthdays
+            </h4>
+            <div className="birthday-toolbar">
+              <span className="birthday-count">
+                <i />
+                {todayCelebrants.length} Today <span aria-hidden="true">&bull;</span> {upcomingCelebrants.length} Upcoming
+              </span>
+              <div className="birthday-navigation">
+                <button
+                  type="button"
+                  onClick={handlePrevUpcoming}
+                  disabled={totalUpcomingPages <= 1}
+                  aria-label="Previous upcoming birthdays"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextUpcoming}
+                  disabled={totalUpcomingPages <= 1}
+                  aria-label="Next upcoming birthdays"
+                >
+                  <ChevronRightIcon />
+                </button>
+              </div>
             </div>
           </div>
-          <h4 className="birthday-upcoming-title"><CalendarTodayOutlinedIcon />Upcoming Birthdays</h4>
+
           <div className="birthday-colleagues" aria-live="polite">
-            {visibleUpcoming.map(colleague => (
-              <button type="button" key={colleague.id} className="birthday-colleague" onClick={() => handleSendWish(colleague)} disabled={wishedIds.has(colleague.id)}
-                aria-label={`${colleague.name}, ${colleague.formattedDate}${wishedIds.has(colleague.id) ? ', wishes sent' : ', send early birthday wishes'}`}>
+            {visibleUpcoming.map((colleague) => (
+              <button
+                type="button"
+                key={colleague.id}
+                className="birthday-colleague"
+                onClick={() => handleSendWish(colleague)}
+                disabled={wishedIds.has(colleague.id)}
+                aria-label={`${colleague.name}, ${colleague.formattedDate}${
+                  wishedIds.has(colleague.id) ? ', wishes sent' : ', send early birthday wishes'
+                }`}
+              >
                 <div className="birthday-colleague-portrait">
-                  <ConfettiCrown className="birthday-confetti" />
-                  <UserAvatar name={colleague.name} avatar={colleague.avatar} className="birthday-colleague-avatar" />
+                  <UserAvatar
+                    name={colleague.name}
+                    avatar={colleague.avatar}
+                    className="birthday-colleague-avatar"
+                  />
                 </div>
                 <h5 title={colleague.name}>{colleague.name}</h5>
                 <p title={colleague.role}>{colleague.role}</p>
-                <span className="birthday-date"><CalendarTodayOutlinedIcon />{colleague.formattedDate}{wishedIds.has(colleague.id) && <CheckIcon />}</span>
+                <span className="birthday-date">
+                  <CalendarTodayOutlinedIcon />
+                  {colleague.formattedDate}
+                  {wishedIds.has(colleague.id) && <CheckIcon />}
+                </span>
               </button>
             ))}
-            {!visibleUpcoming.length && <p className="birthday-empty">More celebrations are on the way. Stay tuned!</p>}
+            {!visibleUpcoming.length && (
+              <p className="birthday-empty">More celebrations are on the way. Stay tuned!</p>
+            )}
           </div>
         </div>
       </div>
