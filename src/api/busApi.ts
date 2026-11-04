@@ -217,9 +217,10 @@ export const blockBusSeatApi = async (payload: BlockBusSeatPayload) => {
 };
 
 // 7. Create Razorpay order
-export const createBusPaymentOrderApi = async (orderRef: string) => {
+export const createBusPaymentOrderApi = async (orderRef: string | { order_ref?: string; orderRef?: string }) => {
+  const ref = typeof orderRef === 'string' ? orderRef : (orderRef?.order_ref || orderRef?.orderRef || '');
   try {
-    const res = await api.post(ENDPOINTS.bus.createOrder, { order_ref: orderRef });
+    const res = await api.post(ENDPOINTS.bus.createOrder, { order_ref: ref });
     return res.data;
   } catch (err: any) {
     console.error('[BusApi] Create payment order failed:', err?.response?.data || err?.message);
@@ -239,9 +240,20 @@ export const verifyBusPaymentApi = async (payload: VerifyBusPaymentPayload) => {
 };
 
 // 9. Book ticket (final provider book)
-export const bookBusTicketApi = async (orderRef: string) => {
+export const bookBusTicketApi = async (
+  payload: string | { orderRef?: string; order_ref?: string; traceId?: string | number; srdvIndex?: string | number; resultIndex?: string }
+) => {
+  const body = typeof payload === 'string'
+    ? { order_ref: payload, orderRef: payload }
+    : {
+        order_ref: payload.order_ref || payload.orderRef,
+        orderRef: payload.order_ref || payload.orderRef,
+        ...(payload.traceId ? { traceId: String(payload.traceId) } : {}),
+        ...(payload.srdvIndex ? { srdvIndex: String(payload.srdvIndex) } : {}),
+        ...(payload.resultIndex ? { resultIndex: String(payload.resultIndex) } : {}),
+      };
   try {
-    const res = await api.post(ENDPOINTS.bus.book, { order_ref: orderRef });
+    const res = await api.post(ENDPOINTS.bus.book, body);
     return res.data;
   } catch (err: any) {
     console.error('[BusApi] Final book failed:', err?.response?.data || err?.message);

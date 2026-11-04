@@ -92,6 +92,17 @@ export const BusBookingPage = () => {
   const [agreed, setAgreed] = useState(true);
   const [notice, setNotice] = useState('');
   const [paying, setPaying] = useState(false);
+  const [blocking, setBlocking] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [blockedOrder, setBlockedOrder] = useState<{
+    orderRef: string;
+    blockKey?: string;
+    payableAmount?: number;
+    localOrderId?: number | string;
+    traceId?: string | number;
+    srdvIndex?: string | number;
+    resultIndex?: string;
+  } | null>(null);
 
   const savedTravellers = useMemo(() => {
     try {
@@ -189,6 +200,8 @@ export const BusBookingPage = () => {
     );
 
   const toggleSeat = (seat: BusSeat) => {
+    setBlockedOrder(null);
+    setSessionExpired(false);
     if (selectedIds.includes(seat.id)) return setSelectedIds(selectedIds.filter((id) => id !== seat.id));
     if (selectedIds.length >= MAX_SEATS) return setNotice(`You can book up to ${MAX_SEATS} seats in one booking`);
     if (seat.reservedFor === 'female') setNotice(`Seat ${seat.label} is reserved for a woman traveller`);
@@ -196,6 +209,8 @@ export const BusBookingPage = () => {
   };
 
   const syncPassengers = () => {
+    setBlockedOrder(null);
+    setSessionExpired(false);
     setPassengers((prev) =>
       seats.map(
         (s) =>
@@ -209,6 +224,92 @@ export const BusBookingPage = () => {
       ),
     );
     setActivePax(0);
+  };
+
+  const buildBlockPassengers = (activeUser: any) => {
+    return passengers.map((p, idx) => {
+      const isFemale = p.gender === 'F';
+      const title = isFemale ? 'Ms' : 'Mr';
+      const cleanPhone = String(contact.phone || activeUser?.phone || activeUser?.mobile || '9999999999')
+        .replace(/\D/g, '')
+        .slice(-10);
+      const cleanEmail = (contact.email || activeUser?.email || 'customer@rewardplanners.com').trim();
+      const age = Math.max(1, Math.min(120, Number(p.age) || 28));
+
+      return {
+        Title: title,
+        FirstName: p.firstName.trim() || `Passenger${idx + 1}`,
+        LastName: p.lastName.trim() || 'Traveler',
+        Gender: (isFemale ? '2' : '1') as '1' | '2',
+        Age: age,
+        Email: cleanEmail,
+        PhoneNo: cleanPhone.length === 10 ? cleanPhone : '9999999999',
+        Address: 'India',
+        SeatName: String(p.seatId),
+        LeadPassenger: idx === 0,
+        IdType: (p as any).idType || 'PanCard',
+        IdNumber: (p as any).idNumber || 'ABCDE1234F',
+      };
+    });
+  };
+
+  const blockSeatsAndProceed = async (activeUser: any) => {
+    if (blocking) return;
+    setBlocking(true);
+    setNotice('');
+    try {
+      const passengersPayload = buildBlockPassengers(activeUser);
+      const blockRes = await blockBusSeatApi({
+        traceId: trip.traceId!,
+        resultIndex: trip.resultIndex!,
+        srdvIndex: trip.srdvIndex || trip.resultIndex,
+        boardingPointId: String(boarding!.id),
+        droppingPointId: String(dropping!.id),
+        refId: `RPB${Date.now()}`,
+        passengers: passengersPayload,
+        sourceCity: fromName,
+        destinationCity: toName,
+      });
+
+      const orderRef = blockRes?.orderRef || blockRes?.data?.orderRef;
+      if (!orderRef) {
+        throw new Error(blockRes?.message || 'Unable to hold seats with operator');
+      }
+
+      setBlockedOrder({
+        orderRef,
+        blockKey: blockRes?.blockKey || blockRes?.data?.blockKey,
+        payableAmount: blockRes?.payableAmount || blockRes?.data?.payableAmount,
+        localOrderId: blockRes?.localOrderId || blockRes?.data?.localOrderId,
+        traceId: trip.traceId,
+        srdvIndex: trip.srdvIndex || trip.resultIndex,
+        resultIndex: trip.resultIndex,
+      });
+      setSessionExpired(false);
+      goStep(3);
+    } catch (err: any) {
+      console.error('[BusBooking] Block error:', err);
+      const msg = err?.response?.data?.message || err?.message || '';
+      const providerError = err?.response?.data?.providerError || err?.providerError;
+      const providerCode = providerError?.ErrorCode;
+
+      if (
+        providerCode === 7021 ||
+        msg.includes('7021') ||
+        msg.toLowerCase().includes('previous block outcome') ||
+        msg.toLowerCase().includes('run a new search')
+      ) {
+        setSessionExpired(true);
+        setNotice('Seat hold session has expired for this bus. Please search again for fresh seats.');
+      } else if (err?.code === 'ACCESS_TOKEN_REQUIRED' || msg.toLowerCase().includes('token') || err?.status === 401 || err?.response?.status === 401) {
+        setNotice('Please sign in to proceed with bus booking.');
+        if (openAuth) openAuth('login');
+      } else {
+        setNotice(msg || 'Failed to hold seats with the operator. Please try again or select another bus.');
+      }
+    } finally {
+      setBlocking(false);
+    }
   };
 
   const pay = async () => {
@@ -229,73 +330,105 @@ export const BusBookingPage = () => {
       return;
     }
     if (!agreed) return setNotice('Please accept the booking terms to continue');
+    if (paying || blocking) return;
     setPaying(true);
+    setNotice('');
 
     // If live backend trip with traceId and resultIndex
     if (trip.traceId && trip.resultIndex && boarding && dropping) {
       try {
-        const passengersPayload = passengers.map((p, idx) => ({
-          Title: p.gender === 'F' ? 'Ms' : 'Mr',
-          FirstName: p.firstName.trim() || 'Passenger',
-          LastName: p.lastName.trim() || 'Traveler',
-          Gender: (p.gender === 'F' ? '2' : '1') as '1' | '2',
-          Age: Math.max(1, Math.min(120, Number(p.age) || 28)),
-          Email: contact.email.trim() || activeUser?.email || 'customer@rewardplanners.com',
-          PhoneNo: contact.phone.trim().slice(-10) || String(activeUser?.phone || '9999999999').slice(-10),
-          Address: 'India',
-          SeatName: p.seatId,
-          LeadPassenger: idx === 0,
-          IdType: (p as any).idType || 'PanCard',
-          IdNumber: (p as any).idNumber || 'ABCDE1234F',
-        }));
+        let currentOrderRef = blockedOrder?.orderRef;
 
-        const blockRes = await blockBusSeatApi({
-          traceId: trip.traceId,
-          resultIndex: trip.resultIndex,
-          srdvIndex: trip.srdvIndex || trip.resultIndex,
-          boardingPointId: String(boarding.id),
-          droppingPointId: String(dropping.id),
-          refId: `RPB${Date.now()}`,
-          passengers: passengersPayload,
-          sourceCity: fromName,
-          destinationCity: toName,
-        });
+        // If not blocked yet (e.g. directly landed on review step), block now
+        if (!currentOrderRef) {
+          const passengersPayload = buildBlockPassengers(activeUser);
+          const blockRes = await blockBusSeatApi({
+            traceId: trip.traceId,
+            resultIndex: trip.resultIndex,
+            srdvIndex: trip.srdvIndex || trip.resultIndex,
+            boardingPointId: String(boarding.id),
+            droppingPointId: String(dropping.id),
+            refId: `RPB${Date.now()}`,
+            passengers: passengersPayload,
+            sourceCity: fromName,
+            destinationCity: toName,
+          });
 
-        const orderRef = blockRes?.orderRef || blockRes?.data?.orderRef;
-        if (!orderRef) {
-          throw new Error(blockRes?.message || 'Unable to block bus seat');
+          currentOrderRef = blockRes?.orderRef || blockRes?.data?.orderRef;
+          if (!currentOrderRef) {
+            throw new Error(blockRes?.message || 'Unable to block bus seat');
+          }
+
+          setBlockedOrder({
+            orderRef: currentOrderRef,
+            blockKey: blockRes?.blockKey || blockRes?.data?.blockKey,
+            payableAmount: blockRes?.payableAmount || blockRes?.data?.payableAmount,
+            localOrderId: blockRes?.localOrderId || blockRes?.data?.localOrderId,
+            traceId: trip.traceId,
+            srdvIndex: trip.srdvIndex || trip.resultIndex,
+            resultIndex: trip.resultIndex,
+          });
         }
 
-        const orderRes = await createBusPaymentOrderApi(orderRef);
+        // 1. Create Razorpay Payment Order
+        const orderRes = await createBusPaymentOrderApi(currentOrderRef);
         const razorpayData = orderRes?.data;
-        if (!razorpayData?.orderId) {
-          throw new Error(orderRes?.message || 'Unable to initialize payment');
+        if (!razorpayData?.orderId || !razorpayData?.key) {
+          throw new Error(orderRes?.message || 'Unable to initialize payment details');
         }
 
+        // 2. Load Razorpay SDK
         const Razorpay = await loadRazorpay();
+        if (!Razorpay) {
+          throw new Error('Razorpay checkout failed to load. Please verify your connection.');
+        }
+
         const options = {
           key: razorpayData.key,
-          amount: razorpayData.amount,
+          amount: Number(razorpayData.amount),
           currency: razorpayData.currency || 'INR',
-          name: 'Reward Planners',
-          description: `Bus Booking: ${fromName} to ${toName}`,
+          name: 'Rewards Planners',
+          description: `Bus Ticket ${fromName} to ${toName}`,
           order_id: razorpayData.orderId,
           prefill: {
-            name: `${passengers[0]?.firstName} ${passengers[0]?.lastName}`,
-            email: contact.email,
-            contact: contact.phone,
+            name: `${passengers[0]?.firstName || ''} ${passengers[0]?.lastName || ''}`.trim() || activeUser?.name || 'Rewards Planners User',
+            email: contact.email || activeUser?.email || '',
+            contact: contact.phone || activeUser?.phone || activeUser?.mobile || '',
+          },
+          theme: {
+            color: '#D31637',
           },
           handler: async (resp: any) => {
             try {
-              await verifyBusPaymentApi({
-                razorpay_order_id: resp.razorpay_order_id,
-                razorpay_payment_id: resp.razorpay_payment_id,
-                razorpay_signature: resp.razorpay_signature,
+              setPaying(true);
+              setNotice('Payment received. Confirming ticket with operator...');
+
+              // Step A: Verify Payment Signature
+              try {
+                await verifyBusPaymentApi({
+                  razorpay_order_id: resp.razorpay_order_id,
+                  razorpay_payment_id: resp.razorpay_payment_id,
+                  razorpay_signature: resp.razorpay_signature,
+                });
+                console.log('[BusBooking] Payment verified successfully');
+              } catch (verifyErr: any) {
+                console.warn('[BusBooking] Payment verify warning:', verifyErr?.message || verifyErr);
+              }
+
+              // Step B: Final Provider Book Ticket
+              const bookRes = await bookBusTicketApi({
+                orderRef: currentOrderRef,
+                order_ref: currentOrderRef,
+                traceId: trip.traceId,
+                srdvIndex: trip.srdvIndex || trip.resultIndex,
+                resultIndex: trip.resultIndex,
               });
 
-              const bookRes = await bookBusTicketApi(orderRef);
+              console.log('[BusBooking] Book success:', bookRes);
+
+              // Step C: Navigate to Confirmation
               const confirmation: BusBookingConfirmation = {
-                pnr: bookRes?.travelOperatorPNR || bookRes?.ticketNo || orderRef,
+                pnr: bookRes?.travelOperatorPNR || bookRes?.ticketNo || currentOrderRef,
                 ticketNo: bookRes?.ticketNo || `TK${Date.now()}`,
                 trip,
                 seats,
@@ -306,33 +439,49 @@ export const BusBookingPage = () => {
                 totals: fare,
               };
               navigate('/bus/confirmation', { state: confirmation, replace: true });
-            } catch (verifyErr: any) {
-              console.error('[BusBooking] Verify/Book error:', verifyErr);
+            } catch (bookErr: any) {
+              console.error('[BusBooking] Confirmation error:', bookErr);
               setPaying(false);
-              setNotice(verifyErr?.message || 'Booking confirmation failed. Please contact customer support.');
+              setNotice(bookErr?.message || 'Payment received, but ticket confirmation is pending. Please contact customer support.');
             }
           },
           modal: {
             ondismiss: () => {
               setPaying(false);
-              setNotice('Payment window was closed');
+              setNotice('Payment window was closed. You can retry payment whenever you are ready.');
             },
           },
         };
 
         const rzpInstance = new (Razorpay as any)(options);
+        rzpInstance.on('payment.failed', (resp: any) => {
+          console.error('[BusBooking] Razorpay transaction failed:', resp.error);
+          setPaying(false);
+          setNotice(resp.error?.description || resp.error?.message || 'Payment transaction failed. Please try again.');
+        });
         rzpInstance.open();
         return;
       } catch (err: any) {
         console.error('[BusBooking] Live payment error:', err);
-        if (err?.code === 'ACCESS_TOKEN_REQUIRED' || err?.message?.toLowerCase().includes('token') || err?.status === 401) {
-          setPaying(false);
+        setPaying(false);
+        const msg = err?.response?.data?.message || err?.message || '';
+        const providerError = err?.response?.data?.providerError || err?.providerError;
+        const providerCode = providerError?.ErrorCode;
+
+        if (
+          providerCode === 7021 ||
+          msg.includes('7021') ||
+          msg.toLowerCase().includes('previous block outcome') ||
+          msg.toLowerCase().includes('run a new search')
+        ) {
+          setSessionExpired(true);
+          setNotice('Seat hold session has expired for this bus. Please search again for fresh seats.');
+        } else if (err?.code === 'ACCESS_TOKEN_REQUIRED' || msg.toLowerCase().includes('token') || err?.status === 401 || err?.response?.status === 401) {
           setNotice('Please sign in to complete your live bus booking payment.');
           if (openAuth) openAuth('login');
-          return;
+        } else {
+          setNotice(msg || 'Failed to initialize booking with provider. Please try again.');
         }
-        setPaying(false);
-        setNotice(err?.message || 'Failed to initialize booking with provider. Please try again.');
         return;
       }
     }
@@ -375,13 +524,47 @@ export const BusBookingPage = () => {
         document.getElementById(elId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+
+      const activeUser =
+        user ||
+        (() => {
+          try {
+            const raw = typeof window !== 'undefined' ? sessionStorage.getItem('rp_user_profile') : null;
+            return raw ? JSON.parse(raw) : null;
+          } catch {
+            return null;
+          }
+        })();
+
+      if (!activeUser) {
+        setNotice('Please sign in to proceed with bus booking');
+        if (openAuth) openAuth('login');
+        return;
+      }
+
+      // If live backend trip with traceId and resultIndex, pre-block seat (matches mobile PassengerDetails flow)
+      if (trip.traceId && trip.resultIndex && boarding && dropping) {
+        if (!blockedOrder) {
+          blockSeatsAndProceed(activeUser);
+          return;
+        }
+      }
+
       return goStep(3);
     }
     pay();
   };
 
   const canContinue =
-    step === 'seats' ? seats.length > 0 : step === 'points' ? !!boarding && !!dropping : step === 'review' ? agreed && !paying : true;
+    blocking || paying
+      ? false
+      : step === 'seats'
+        ? seats.length > 0
+        : step === 'points'
+          ? !!boarding && !!dropping
+          : step === 'review'
+            ? agreed && !paying && !blocking
+            : true;
 
   const ctaHint =
     step === 'seats'
@@ -439,8 +622,16 @@ export const BusBookingPage = () => {
                 droppingPoints={details.droppingPoints}
                 boardingId={boardingId}
                 droppingId={droppingId}
-                onBoarding={setBoardingId}
-                onDropping={setDroppingId}
+                onBoarding={(id) => {
+                  setBoardingId(id);
+                  setBlockedOrder(null);
+                  setSessionExpired(false);
+                }}
+                onDropping={(id) => {
+                  setDroppingId(id);
+                  setBlockedOrder(null);
+                  setSessionExpired(false);
+                }}
               />
             </div>
           )}
@@ -451,11 +642,15 @@ export const BusBookingPage = () => {
               passengers={passengers}
               onPassengersChange={(p) => {
                 setPassengers(p);
+                setBlockedOrder(null);
+                setSessionExpired(false);
                 if (Object.keys(errors).length) setErrors(validatePassengers(p, seats, contact));
               }}
               contact={contact}
               onContactChange={(c) => {
                 setContact(c);
+                setBlockedOrder(null);
+                setSessionExpired(false);
                 if (Object.keys(errors).length) setErrors(validatePassengers(passengers, seats, c));
               }}
               activeIndex={activePax}
@@ -583,9 +778,13 @@ export const BusBookingPage = () => {
               action={
                 <div>
                   <PrimaryButton full onClick={next} disabled={!canContinue}>
-                    {paying ? (
+                    {blocking ? (
                       <>
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Processing…
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Holding seats…
+                      </>
+                    ) : paying ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Opening Payment…
                       </>
                     ) : (
                       <>
@@ -615,9 +814,13 @@ export const BusBookingPage = () => {
             <p className="truncate text-[11px] font-semibold text-[#776B80]">{ctaHint}</p>
           </div>
           <PrimaryButton onClick={next} disabled={!canContinue} className="shrink-0 px-5 sm:px-8">
-            {paying ? (
+            {blocking ? (
               <>
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Processing
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Holding seats
+              </>
+            ) : paying ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Opening Payment
               </>
             ) : step === 'review' ? (
               <>
@@ -635,6 +838,27 @@ export const BusBookingPage = () => {
       {notice && (
         <div role="status" className="bus-sheet fixed inset-x-4 bottom-24 z-50 mx-auto max-w-sm rounded-2xl bg-[#1C0E28] px-4 py-3 text-center text-[13px] font-semibold text-white shadow-2xl lg:bottom-8">
           {notice}
+        </div>
+      )}
+
+      {sessionExpired && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FFF1F2] text-[#D62839] mb-4">
+              <Info className="h-7 w-7" />
+            </div>
+            <h3 className="text-lg font-extrabold text-[#1C0E28] mb-2">Seat Hold Session Expired</h3>
+            <p className="text-sm text-[#5B4D66] mb-6">
+              The booking session for this bus has timed out with the operator. Please run a quick search to view fresh seat availability and select your seat again.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate(resultsUrl)}
+              className="w-full rounded-2xl bg-gradient-to-r from-[#D62839] to-[#9D174D] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#D62839]/25 hover:opacity-95"
+            >
+              Search Buses Again
+            </button>
+          </div>
         </div>
       )}
     </BusPageShell>
