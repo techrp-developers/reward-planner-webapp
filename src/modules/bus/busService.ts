@@ -315,7 +315,12 @@ const buildTrip = (from: string, to: string, date: string, idx: number): BusTrip
   };
 };
 
-export const searchBuses = async (from: string, to: string, date: string): Promise<BusTrip[]> => {
+export interface SearchBusesResponse {
+  trips: BusTrip[];
+  message: string;
+}
+
+export const searchBuses = async (from: string, to: string, date: string): Promise<SearchBusesResponse> => {
   let fromCity = getCity(from);
   let toCity = getCity(to);
 
@@ -355,9 +360,16 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
         journeyTime: '00:00',
       });
 
-      if (res?.success && Array.isArray(res.buses) && res.buses.length > 0) {
+      if (res?.success && Array.isArray(res.buses)) {
+        if (res.buses.length === 0) {
+          return {
+            trips: [],
+            message: res.message || 'Buses not available for this route',
+          };
+        }
+
         const traceId = res.traceId;
-        return res.buses.map((bus: any, idx: number): BusTrip => {
+        const mappedTrips = res.buses.map((bus: any, idx: number): BusTrip => {
           const operator = bus.TravelsName || bus.TravelName || 'Express Travels';
           const busType = bus.BusType || 'A/C Sleeper (2+1)';
           const ac = Boolean(bus.IsAC === 'true' || bus.IsAC === true || /a\/?c/i.test(busType));
@@ -418,17 +430,44 @@ export const searchBuses = async (from: string, to: string, date: string): Promi
             srdvIndex,
           };
         }).sort((a: BusTrip, b: BusTrip) => timeToMins(a.departure) - timeToMins(b.departure));
+
+        return {
+          trips: mappedTrips,
+          message: res.message || 'Buses found successfully',
+        };
       }
 
-    } catch (err) {
+      const resMsg = String(res?.message || '');
+      if (/no bus|not available|no route|no service|no data/i.test(resMsg)) {
+        return {
+          trips: [],
+          message: 'Buses not available for this route',
+        };
+      }
+
+    } catch (err: any) {
       console.warn('[busService] Live search returned an error or no buses:', err);
+      const errMsg = String(err?.message || err?.error || err?.response?.data?.message || '');
+      if (/no bus|not available|no route|no service|no data/i.test(errMsg)) {
+        return {
+          trips: [],
+          message: 'Buses not available for this route',
+        };
+      }
     }
+
+    // Live search was performed with valid city codes and date, but returned 0 buses:
+    return {
+      trips: [],
+      message: 'Buses not available for this route',
+    };
   }
 
-  // Resilient fallback when live API is unavailable or requires auth:
-  return OPERATORS.map((_, idx) => buildTrip(from, to, date, idx)).sort(
-    (a, b) => timeToMins(a.departure) - timeToMins(b.departure),
-  );
+  // If city codes are not present in live city database:
+  return {
+    trips: [],
+    message: 'Buses not available for this route',
+  };
 };
 
 // ---------- boarding / dropping points ----------

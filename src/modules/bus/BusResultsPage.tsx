@@ -2,7 +2,7 @@
 // Search results: date strip, sort, filters (sidebar on desktop, sheet on mobile) and bus cards.
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUpDown, BusFront, Moon, Pencil, SlidersHorizontal, Sun, Sunrise, Sunset } from 'lucide-react';
+import { ArrowUpDown, AlertCircle, BusFront, Moon, Pencil, SlidersHorizontal, Sun, Sunrise, Sunset } from 'lucide-react';
 import Woman2Icon from '@mui/icons-material/Woman2';
 import type { BusTrip } from './busTypes';
 import { addDaysISO, formatJourneyDate, fromISODate, getCity, searchBuses, timeToMins, todayISO } from './busService';
@@ -172,10 +172,12 @@ export const BusResultsPage = () => {
   const [sheet, setSheet] = useState<'filters' | 'modify' | null>(null);
   const [loading, setLoading] = useState(true);
   const [trips, setTrips] = useState<BusTrip[]>([]);
+  const [apiMessage, setApiMessage] = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setApiMessage('');
     if (!getCity(from) || !getCity(to)) {
       setTrips([]);
       setLoading(false);
@@ -185,13 +187,16 @@ export const BusResultsPage = () => {
     searchBuses(from, to, date)
       .then((res) => {
         if (!cancelled) {
-          setTrips(res);
+          setTrips(res.trips);
+          setApiMessage(res.message);
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!cancelled) {
           console.error('Failed to search buses:', err);
+          setTrips([]);
+          setApiMessage('Buses not available for this route');
           setLoading(false);
         }
       });
@@ -223,7 +228,13 @@ export const BusResultsPage = () => {
               {fromName} <span className="text-[#F0A58F]">→</span> {toName}
             </span>
           }
-          subtitle={`${formatJourneyDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${trips.length} buses`}
+          subtitle={
+            loading
+              ? `${formatJourneyDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} · Searching buses...`
+              : trips.length > 0
+                ? `${formatJourneyDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${trips.length} buses`
+                : `${formatJourneyDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} · Buses not available for this route`
+          }
           right={
             <button
               type="button"
@@ -271,86 +282,131 @@ export const BusResultsPage = () => {
         </div>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[272px_minmax(0,1fr)]">
-        {/* Desktop filters */}
-        <aside className="hidden lg:block">
-          <div className="bus-card sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto p-5">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-sm font-extrabold text-[#1C0E28]">
-                <SlidersHorizontal className="h-4 w-4" /> Filters
-              </h2>
-              {activeCount > 0 && (
-                <button type="button" onClick={() => setFilters(EMPTY_FILTERS)} className="text-xs font-bold text-[#DC2626] hover:underline">
-                  Clear all
-                </button>
-              )}
-            </div>
-            <FilterPanel filters={filters} setFilters={setFilters} operators={operators} />
-          </div>
-        </aside>
-
-        <div className="min-w-0">
-          {/* Sort + mobile filter */}
-          <div className="mb-4 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setSheet('filters')}
-              className="relative inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-[#E7DFE9] bg-white px-3 py-2 text-xs font-bold text-[#1C0E28] lg:hidden"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
-              {activeCount > 0 && (
-                <span className="flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#D62839] px-1 text-[10px] text-white">{activeCount}</span>
-              )}
-            </button>
-            <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar">
-              <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-[#776B80] sm:inline-flex">
-                <ArrowUpDown className="h-3.5 w-3.5" /> Sort by
-              </span>
-              {SORTS.map((s) => (
-                <Chip key={s.key} active={sort === s.key} onClick={() => setSort(s.key)}>
-                  {s.label}
-                </Chip>
-              ))}
-            </div>
+      {/* If no buses available for the entire route */}
+      {!loading && trips.length === 0 ? (
+        <div className="mt-8 mx-auto max-w-xl">
+          {/* Small message banner matching user request */}
+          <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-amber-200/90 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-950 shadow-2xs">
+            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+            <span>Buses not available for this route</span>
           </div>
 
-          {!loading && (
-            <p className="mb-3 text-xs font-semibold text-[#776B80]">
-              Showing <strong className="text-[#1C0E28]">{visible.length}</strong> of {trips.length} buses
+          {/* Clean route unavailable card with quick actions */}
+          <div className="bus-card bus-rise rounded-2xl border border-amber-200/80 bg-gradient-to-b from-amber-50/40 via-white to-white p-6 sm:p-8 text-center shadow-xs">
+            <div className="mx-auto mb-3.5 flex h-13 w-13 items-center justify-center rounded-2xl bg-amber-100/70 text-amber-700 shadow-2xs">
+              <BusFront className="h-6 w-6 text-amber-600" />
+            </div>
+
+            <h2 className="text-base sm:text-lg font-extrabold text-[#1C0E28] tracking-tight">
+              Buses not available for this route
+            </h2>
+
+            <p className="mt-2 text-xs sm:text-sm text-[#776B80] leading-relaxed max-w-md mx-auto">
+              We couldn't find any direct buses operating between <strong className="text-[#1C0E28] font-bold">{fromName}</strong> and <strong className="text-[#1C0E28] font-bold">{toName}</strong> on <span className="text-[#1C0E28] font-bold">{formatJourneyDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</span>.
             </p>
-          )}
 
-          <div className="space-y-4">
-            {loading ? (
-              Array.from({ length: 3 }, (_, i) => <BusResultCardSkeleton key={i} />)
-            ) : visible.length ? (
-              visible.map((trip) => (
-                <BusResultCard
-                  key={trip.id}
-                  trip={trip}
-                  highlightWomen={women}
-                  onViewSeats={(t) => navigate(`/bus/trip/${encodeURIComponent(t.id)}${women ? '?women=1' : ''}`)}
-                />
-              ))
-            ) : (
-              <div className="bus-card bus-rise flex flex-col items-center px-6 py-16 text-center">
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FEF2F2] text-[#DC2626]">
-                  <BusFront className="h-7 w-7" />
-                </span>
-                <p className="mt-4 text-base font-extrabold text-[#1C0E28]">No buses match these filters</p>
-                <p className="mt-1 text-sm text-[#776B80]">Try removing a filter or picking another date.</p>
-                <button
-                  type="button"
-                  onClick={() => setFilters(EMPTY_FILTERS)}
-                  className="mt-5 rounded-xl border-2 border-[#DC2626] px-5 py-2 text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]"
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setSheet('modify')}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition active:scale-95 cursor-pointer"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                <span>Modify search</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => go({ date: addDaysISO(date, 1) })}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#E7DFE9] bg-white hover:bg-slate-50 px-4 py-2.5 text-xs font-bold text-[#1C0E28] shadow-2xs transition active:scale-95 cursor-pointer"
+              >
+                <span>Check next day ({formatJourneyDate(addDaysISO(date, 1), { day: 'numeric', month: 'short' })})</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[272px_minmax(0,1fr)]">
+          {/* Desktop filters */}
+          <aside className="hidden lg:block">
+            <div className="bus-card sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto p-5">
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-sm font-extrabold text-[#1C0E28]">
+                  <SlidersHorizontal className="h-4 w-4" /> Filters
+                </h2>
+                {activeCount > 0 && (
+                  <button type="button" onClick={() => setFilters(EMPTY_FILTERS)} className="text-xs font-bold text-[#DC2626] hover:underline">
+                    Clear all
+                  </button>
+                )}
+              </div>
+              <FilterPanel filters={filters} setFilters={setFilters} operators={operators} />
+            </div>
+          </aside>
+
+          <div className="min-w-0">
+            {/* Sort + mobile filter */}
+            <div className="mb-4 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSheet('filters')}
+                className="relative inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-[#E7DFE9] bg-white px-3 py-2 text-xs font-bold text-[#1C0E28] lg:hidden"
+              >
+                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                {activeCount > 0 && (
+                  <span className="flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#D62839] px-1 text-[10px] text-white">{activeCount}</span>
+                )}
+              </button>
+              <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar">
+                <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-[#776B80] sm:inline-flex">
+                  <ArrowUpDown className="h-3.5 w-3.5" /> Sort by
+                </span>
+                {SORTS.map((s) => (
+                  <Chip key={s.key} active={sort === s.key} onClick={() => setSort(s.key)}>
+                    {s.label}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+
+            {!loading && (
+              <p className="mb-3 text-xs font-semibold text-[#776B80]">
+                Showing <strong className="text-[#1C0E28]">{visible.length}</strong> of {trips.length} buses
+              </p>
+            )}
+
+            <div className="space-y-4">
+              {loading ? (
+                Array.from({ length: 3 }, (_, i) => <BusResultCardSkeleton key={i} />)
+              ) : visible.length ? (
+                visible.map((trip) => (
+                  <BusResultCard
+                    key={trip.id}
+                    trip={trip}
+                    highlightWomen={women}
+                    onViewSeats={(t) => navigate(`/bus/trip/${encodeURIComponent(t.id)}${women ? '?women=1' : ''}`)}
+                  />
+                ))
+              ) : (
+                <div className="bus-card bus-rise flex flex-col items-center px-6 py-16 text-center">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FEF2F2] text-[#DC2626]">
+                    <BusFront className="h-7 w-7" />
+                  </span>
+                  <p className="mt-4 text-base font-extrabold text-[#1C0E28]">No buses match these filters</p>
+                  <p className="mt-1 text-sm text-[#776B80]">Try removing a filter or picking another date.</p>
+                  <button
+                    type="button"
+                    onClick={() => setFilters(EMPTY_FILTERS)}
+                    className="mt-5 rounded-xl border-2 border-[#DC2626] px-5 py-2 text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <BusSheet
         open={sheet === 'filters'}
