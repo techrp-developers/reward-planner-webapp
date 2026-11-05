@@ -37,7 +37,10 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
-import whatsappDoodle from '../../assets/home/whatsapp_doodle.png';
+import AddIcon from '@mui/icons-material/Add';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import gameIcon from '../../assets/home/Gameicon.png';
 import chatIcon from '../../assets/home/Chaticon.png';
 import { useAuth } from '../../context/AuthContext';
@@ -180,6 +183,7 @@ export const HomePage = () => {
 
   const [tasks, setTasks] = useState<any[]>(initialFallbackTasks);
   const [showAllTasks, setShowAllTasks] = useState(false);
+  const [taskFilter, setTaskFilter] = useState<'all' | 'pending' | 'completed'>('all');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDate, setTaskDate] = useState('');
@@ -380,13 +384,13 @@ export const HomePage = () => {
         showToast(`Error: ${errMsg}`);
       }
     } else {
-      setTasks(previous => previous.filter(task => task.id !== String(taskId)));
+      setTasks(previous => previous.filter(task => String(task.id) !== String(taskId)));
       showToast('Task removed');
     }
   };
 
   const toggleTask = async (taskId: string | number) => {
-    setTasks(previous => previous.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task));
+    setTasks(previous => previous.map(task => String(task.id) === String(taskId) ? { ...task, completed: !task.completed } : task));
     
     const numericId = Number(taskId);
     if (!isNaN(numericId) && numericId > 0) {
@@ -760,283 +764,350 @@ export const HomePage = () => {
             </div>
           </div>
 
-          {/* Card 3: WhatsApp Chat Screen Theme for To-Do List */}
-          <div
-            className="rounded-[24px] overflow-hidden border border-[#D1D7DB] shadow-[0_4px_24px_-2px_rgba(20,34,25,0.08)] hover:shadow-md transition-all duration-300 flex flex-col justify-between md:col-span-2 xl:col-span-1 relative select-none"
-            style={{
-              backgroundColor: '#EFEAE2',
-              backgroundImage: `url(${whatsappDoodle})`,
-              backgroundRepeat: 'repeat',
-              backgroundSize: '360px',
-            }}
-          >
-            <div>
-              {/* WhatsApp App Bar Header */}
-              <div className="bg-[#008069] text-white px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between border-b border-black/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white border border-white/20 shadow-xs shrink-0">
-                    <AssignmentTurnedInOutlinedIcon sx={{ fontSize: 20 }} />
-                  </div>
-                  <div>
-                    <h3 className="text-[15px] sm:text-base font-semibold text-white tracking-tight leading-tight">
-                      My to-do list
-                    </h3>
-                    <span className="text-[11px] text-[#D1EBE7] font-normal leading-tight block">
-                      Your daily tasks and reminders
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="inline-flex items-center gap-1 bg-[#006653] text-[#D9FDD3] border border-white/15 px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wider shadow-inner">
-                    {tasks.filter((t) => t.completed).length}/{tasks.length}
-                  </span>
-                </div>
-              </div>
+          {/* Card 3: Executive Premium To-Do List */}
+          {(() => {
+            const completedTasksCount = tasks.filter((t) => t.completed).length;
+            const pendingTasksCount = tasks.filter((t) => !t.completed).length;
+            const totalTasksCount = tasks.length;
+            const completionPercent = totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
 
-              {/* WhatsApp Progress Indicator Line */}
-              <div className="w-full bg-[#005E4D] h-1.5 overflow-hidden">
-                <div
-                  className="bg-[#25D366] h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(37,211,102,0.7)]"
-                  style={{
-                    width: `${tasks.length > 0 ? (tasks.filter((t) => t.completed).length / tasks.length) * 100 : 0}%`
-                  }}
-                />
-              </div>
+            const filteredTasks = tasks.filter((task) => {
+              if (taskFilter === 'pending') return !task.completed;
+              if (taskFilter === 'completed') return task.completed;
+              return true;
+            });
 
-              {/* Chat Content Body */}
-              <div className="p-4 sm:p-5">
-                {/* WhatsApp Chat Date Chip */}
-                <div className="flex justify-center mb-3">
-                  <span className="bg-white/85 backdrop-blur-xs text-[#54656F] text-[10.5px] font-semibold px-3 py-0.5 rounded-md shadow-[0_1px_0.5px_rgba(11,20,26,0.12)] uppercase tracking-wider">
-                    Today
-                  </span>
-                </div>
+            const displayedTasks = showAllTasks ? filteredTasks : filteredTasks.slice(0, 4);
 
-                {/* Add Task Button / Composer Toggle */}
-                <button
-                  type="button"
-                  className="todo-wa-add-toggle"
-                  onClick={() => setIsAddingTask(value => !value)}
-                  aria-expanded={isAddingTask}
-                  aria-controls="add-task-form"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#00A884]/15 text-[#00A884] flex items-center justify-center font-bold text-xs leading-none">
-                      {isAddingTask ? '×' : '+'}
-                    </span>
-                    <span>{isAddingTask ? 'Cancel' : 'Add a new task...'}</span>
-                  </span>
-                  <span className="text-[11px] text-[#008069] font-semibold">
-                    {isAddingTask ? 'Close' : '+ Add task'}
-                  </span>
-                </button>
-
-                {isAddingTask && (
-                  <form id="add-task-form" className="todo-wa-add-form" onSubmit={addTask}>
-                    <label htmlFor="task-title">Task name</label>
-                    <input
-                      id="task-title"
-                      autoFocus
-                      value={taskTitle}
-                      onChange={event => setTaskTitle(event.target.value)}
-                      placeholder="What would you like to do?"
-                      maxLength={120}
-                      required
-                    />
-                    <label htmlFor="task-date">Due date <span>(optional)</span></label>
-                    <input
-                      id="task-date"
-                      type="datetime-local"
-                      value={taskDate}
-                      onChange={event => setTaskDate(event.target.value)}
-                    />
-                    <div className="flex items-center gap-2 pt-1">
-                      <button
-                        type="submit"
-                        disabled={!taskTitle.trim()}
-                        className="flex-1 py-2 px-3.5 bg-[#00A884] hover:bg-[#008069] text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
-                      >
-                        Add to my list
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsAddingTask(false)}
-                        className="py-2 px-3 bg-[#F0F2F5] hover:bg-[#E9EDEF] text-[#54656F] text-xs font-semibold rounded-xl transition-all cursor-pointer"
-                      >
-                        Cancel
-                      </button>
+            return (
+              <div className="rounded-[24px] p-5 shadow-[0_4px_24px_-2px_rgba(20,34,25,0.04)] hover:shadow-sm transition-all flex flex-col justify-between bg-[#D7EFE4] border border-[#A6DEC5] text-[#143228] md:col-span-2 xl:col-span-1">
+                <div>
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-4 border-b border-[#A6DEC5]/70">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#1C0E28] text-emerald-300 flex items-center justify-center shadow-xs shrink-0">
+                        <PlaylistAddCheckIcon sx={{ fontSize: 20 }} />
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-semibold text-[#143228] tracking-tight">
+                          My To-Do List
+                        </h3>
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-[#467362]">
+                          Daily Priorities & Tasks
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-[10.5px] text-[#667781] mt-0.5">Tasks are saved to your account.</p>
-                  </form>
-                )}
 
-                {/* Task list with WhatsApp Message Bubbles */}
-                <div className="space-y-2 pt-1">
-                  {(showAllTasks ? tasks : tasks.slice(0, 5)).map((task) => {
-                    const IconComponent = task.icon || AssignmentTurnedInOutlinedIcon;
-                    const isEditing = editingTaskId === String(task.id);
+                    {/* Completion Progress Pill */}
+                    <div className="bg-white/85 px-3 py-1 rounded-full border border-[#A6DEC5] flex items-center gap-1.5 text-xs font-bold text-[#143228] shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>{completedTasksCount}/{totalTasksCount} Done</span>
+                    </div>
+                  </div>
 
-                    if (isEditing) {
+                  {/* 3 Filter Tabs (All, Pending, Completed) matching Card 2's category grid */}
+                  <div className="grid grid-cols-3 gap-2.5 pt-4 pb-3">
+                    {[
+                      { id: 'all', label: `All (${totalTasksCount})` },
+                      { id: 'pending', label: `Pending (${pendingTasksCount})` },
+                      { id: 'completed', label: `Done (${completedTasksCount})` },
+                    ].map((tab) => {
+                      const isActive = taskFilter === tab.id;
                       return (
-                        <form
-                          key={task.id}
-                          onSubmit={(e) => saveEditTask(e, task.id)}
-                          className="todo-wa-edit-box"
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setTaskFilter(tab.id as 'all' | 'pending' | 'completed')}
+                          className={`inline-flex items-center justify-center py-1.5 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer truncate ${
+                            isActive
+                              ? 'bg-[#1C0E28] text-white shadow-xs scale-[1.02]'
+                              : 'bg-white/70 border border-[#A6DEC5] text-[#467362] hover:bg-white'
+                          }`}
                         >
-                          <div className="flex items-center justify-between text-[11px] text-[#54656F] font-semibold px-0.5">
-                            <span>Edit Task</span>
+                          <span className="truncate">{tab.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Thin High-Precision Progress Bar */}
+                  <div className="w-full bg-white/70 h-1.5 rounded-full overflow-hidden p-0.5 border border-[#A6DEC5]/60 mb-3.5">
+                    <div
+                      className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500 shadow-xs"
+                      style={{ width: `${completionPercent}%` }}
+                    />
+                  </div>
+
+                  {/* Main Card Container (Clean white card matching Card 1 and Card 2 min-height) */}
+                  <div className="rounded-2xl p-3.5 sm:p-4 bg-white/90 border border-[#A6DEC5]/80 shadow-2xs min-h-[255px] flex flex-col justify-between">
+                    <div>
+                      {/* Inline Composer (When adding new task) */}
+                      {isAddingTask && (
+                        <form onSubmit={addTask} className="mb-3 p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/80 shadow-2xs flex flex-col gap-2.5 animate-fadeIn">
+                          <div className="flex items-center justify-between text-xs font-bold text-[#143228]">
+                            <span className="flex items-center gap-1.5">
+                              <AddIcon sx={{ fontSize: 16 }} className="text-emerald-600" />
+                              <span>New Priority Task</span>
+                            </span>
                             <button
                               type="button"
-                              onClick={cancelEditing}
-                              className="text-[#8696A0] hover:text-[#111B21] transition-colors cursor-pointer"
-                              title="Cancel editing"
+                              onClick={() => setIsAddingTask(false)}
+                              className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                             >
-                              <CloseIcon sx={{ fontSize: 15 }} />
+                              <CloseIcon sx={{ fontSize: 16 }} />
                             </button>
                           </div>
+
                           <input
                             type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            maxLength={120}
-                            placeholder="Task name"
                             autoFocus
+                            value={taskTitle}
+                            onChange={(e) => setTaskTitle(e.target.value)}
+                            placeholder="What needs to be accomplished?"
+                            maxLength={120}
                             required
+                            className="w-full bg-white border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 rounded-lg px-3 py-1.5 text-xs text-[#143228] font-medium placeholder:text-slate-400 outline-none transition-all"
                           />
-                          <div className="flex items-center gap-2 pt-0.5">
+
+                          <div className="flex items-center gap-2">
                             <input
                               type="datetime-local"
-                              value={editDate}
-                              onChange={(e) => setEditDate(e.target.value)}
+                              value={taskDate}
+                              onChange={(e) => setTaskDate(e.target.value)}
+                              className="flex-1 bg-white border border-slate-200 focus:border-emerald-500 rounded-lg px-2.5 py-1 text-[11px] text-[#143228] outline-none transition-all"
                             />
                             <button
                               type="submit"
-                              disabled={!editTitle.trim() || isSubmittingEdit}
-                              className="todo-wa-edit-btn-save"
+                              disabled={!taskTitle.trim()}
+                              className="py-1 px-3 bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs font-bold rounded-lg shadow-xs transition-all cursor-pointer disabled:opacity-50"
                             >
-                              {isSubmittingEdit ? 'Saving...' : 'Save'}
+                              Save
                             </button>
                             <button
                               type="button"
-                              onClick={cancelEditing}
-                              className="todo-wa-edit-btn-cancel"
+                              onClick={() => setIsAddingTask(false)}
+                              className="py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg transition-all cursor-pointer"
                             >
                               Cancel
                             </button>
                           </div>
                         </form>
-                      );
-                    }
+                      )}
 
-                    return (
-                      <div
-                        key={task.id}
-                        className={`w-full text-left flex items-center justify-between gap-2 p-2.5 rounded-2xl transition-all group border shadow-[0_1px_1px_rgba(11,20,26,0.12)] ${
-                          task.completed
-                            ? 'bg-[#D9FDD3] border-[#B7E4C7]/70 rounded-tr-sm'
-                            : 'bg-white border-[#E9EDEF] rounded-tl-sm hover:border-[#D1D7DB]'
-                        }`}
-                      >
-                        {/* Left: Icon circle + Title & Timestamp (clickable to toggle completion) */}
+                      {/* Task List */}
+                      {displayedTasks.length === 0 ? (
+                        <div className="py-10 px-4 text-center rounded-xl bg-slate-50/50 border border-dashed border-slate-200 flex flex-col items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
+                            <CheckIcon sx={{ fontSize: 20 }} />
+                          </div>
+                          <p className="text-xs font-bold text-[#143228]">No tasks in this view</p>
+                          <p className="text-[11px] text-[#467362] mt-0.5">
+                            {taskFilter === 'completed'
+                              ? 'Complete tasks to see them archived here.'
+                              : 'You are all caught up! Click below to add a new task.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {displayedTasks.map((task) => {
+                            const IconComponent = task.icon || AssignmentTurnedInOutlinedIcon;
+                            const isEditing = editingTaskId === String(task.id);
+
+                            if (isEditing) {
+                              return (
+                                <form
+                                  key={task.id}
+                                  onSubmit={(e) => saveEditTask(e, task.id)}
+                                  className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-300 shadow-xs flex flex-col gap-2"
+                                >
+                                  <div className="flex items-center justify-between text-[11px] font-bold text-[#143228]">
+                                    <span>Edit Task</span>
+                                    <button
+                                      type="button"
+                                      onClick={cancelEditing}
+                                      className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                                    >
+                                      <CloseIcon sx={{ fontSize: 14 }} />
+                                    </button>
+                                  </div>
+
+                                  <input
+                                    type="text"
+                                    value={editTitle}
+                                    onChange={(e) => setEditTitle(e.target.value)}
+                                    maxLength={120}
+                                    placeholder="Task title"
+                                    autoFocus
+                                    required
+                                    className="w-full bg-white border border-slate-200 focus:border-emerald-500 rounded-lg px-2.5 py-1 text-xs text-[#143228] outline-none"
+                                  />
+
+                                  <div className="flex items-center gap-1.5">
+                                    <input
+                                      type="datetime-local"
+                                      value={editDate}
+                                      onChange={(e) => setEditDate(e.target.value)}
+                                      className="flex-1 bg-white border border-slate-200 focus:border-emerald-500 rounded-lg px-2 py-1 text-[11px] text-[#143228] outline-none"
+                                    />
+                                    <button
+                                      type="submit"
+                                      disabled={!editTitle.trim() || isSubmittingEdit}
+                                      className="py-1 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                    >
+                                      {isSubmittingEdit ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={cancelEditing}
+                                      className="py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                              );
+                            }
+
+                            return (
+                              <div
+                                key={task.id}
+                                className={`w-full flex items-center justify-between gap-2.5 p-2.5 rounded-xl border transition-all duration-200 group ${
+                                  task.completed
+                                    ? 'bg-slate-50/70 border-slate-200/80'
+                                    : 'bg-white hover:bg-emerald-50/30 border-slate-200/90 hover:border-emerald-300 shadow-2xs hover:shadow-xs'
+                                }`}
+                              >
+                                {/* Left: Custom Checkbox + Task Icon + Title & Time */}
+                                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                  {/* Custom Premium Checkbox */}
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleTask(task.id)}
+                                    title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                                    className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                                      task.completed
+                                        ? 'bg-emerald-500 text-white shadow-2xs scale-100'
+                                        : 'border-2 border-slate-300 group-hover:border-emerald-500 bg-white hover:scale-105'
+                                    }`}
+                                  >
+                                    {task.completed && <CheckIcon sx={{ fontSize: 13 }} className="text-white font-bold" />}
+                                  </button>
+
+                                  {/* Task Icon Badge */}
+                                  <div
+                                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                                      task.completed
+                                        ? 'bg-slate-100 text-slate-400'
+                                        : 'bg-emerald-50 text-emerald-700 group-hover:scale-105'
+                                    }`}
+                                  >
+                                    <IconComponent sx={{ fontSize: 16 }} />
+                                  </div>
+
+                                  {/* Title & Time */}
+                                  <div
+                                    className="min-w-0 flex-1 cursor-pointer"
+                                    onClick={() => toggleTask(task.id)}
+                                  >
+                                    <div
+                                      className={`text-xs sm:text-[13px] truncate transition-colors ${
+                                        task.completed
+                                          ? 'line-through text-slate-400 font-normal decoration-slate-300'
+                                          : 'font-semibold text-[#143228] group-hover:text-emerald-950'
+                                      }`}
+                                    >
+                                      {task.title}
+                                    </div>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      <span
+                                        className={`inline-flex items-center gap-1 text-[10.5px] font-medium px-1.5 py-0.2 rounded ${
+                                          task.completed
+                                            ? 'bg-slate-100 text-slate-400'
+                                            : 'bg-emerald-50 text-emerald-800'
+                                        }`}
+                                      >
+                                        <AccessTimeOutlinedIcon sx={{ fontSize: 11 }} />
+                                        <span>{task.time}</span>
+                                      </span>
+                                      {task.completed && (
+                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
+                                          Done
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Right: Actions (Edit & Delete) */}
+                                <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => startEditingTask(task, e)}
+                                    title="Edit task"
+                                    aria-label={`Edit ${task.title}`}
+                                    className="w-6 h-6 rounded-md text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer"
+                                  >
+                                    <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => deleteTask(task.id, e)}
+                                    title="Delete task"
+                                    aria-label={`Delete ${task.title}`}
+                                    className="w-6 h-6 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                                  >
+                                    <DeleteOutlineOutlinedIcon sx={{ fontSize: 15 }} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Inner Footer: View all toggle */}
+                    {filteredTasks.length > 4 && (
+                      <div className="pt-2.5 mt-2 border-t border-slate-100 flex justify-center">
                         <button
                           type="button"
-                          onClick={() => toggleTask(task.id)}
-                          className="flex items-center gap-3 flex-1 text-left min-w-0 bg-transparent border-none p-0 cursor-pointer"
+                          onClick={() => setShowAllTasks(!showAllTasks)}
+                          className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                              task.completed
-                                ? 'bg-[#C2EBB8] text-[#008069]'
-                                : 'bg-[#EFEAE2] text-[#008069] group-hover:scale-105'
-                            }`}
-                          >
-                            <IconComponent sx={{ fontSize: 18 }} />
-                          </div>
-
-                          <div className="min-w-0 pr-1">
-                            <div
-                              className={`text-xs sm:text-[13px] truncate transition-colors ${
-                                task.completed
-                                  ? 'font-medium text-[#54656F] line-through decoration-[#54656F]/60'
-                                  : 'font-semibold text-[#111B21]'
-                              }`}
-                            >
-                              {task.title}
-                            </div>
-                            <div
-                              className={`text-[11px] mt-0.5 flex items-center gap-1 ${
-                                task.completed ? 'text-[#008069] font-medium' : 'text-[#667781]'
-                              }`}
-                            >
-                              {task.completed && (
-                                <DoneAllIcon sx={{ fontSize: 14 }} className="text-[#53BDEB]" titleAccess="Completed" />
-                              )}
-                              <span>{task.time}</span>
-                            </div>
-                          </div>
+                          <span>{showAllTasks ? 'Show fewer tasks' : `View all ${filteredTasks.length} tasks`}</span>
+                          <ArrowForwardIcon sx={{ fontSize: 12 }} />
                         </button>
-
-                        {/* Right: Actions (Edit, Delete, Checkmark) */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            type="button"
-                            onClick={(e) => startEditingTask(task, e)}
-                            title="Edit task"
-                            aria-label={`Edit ${task.title}`}
-                            className="todo-wa-action-btn edit"
-                          >
-                            <EditOutlinedIcon sx={{ fontSize: 15 }} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={(e) => deleteTask(task.id, e)}
-                            title="Delete task"
-                            aria-label={`Delete ${task.title}`}
-                            className="todo-wa-action-btn delete"
-                          >
-                            <DeleteOutlineOutlinedIcon sx={{ fontSize: 16 }} />
-                          </button>
-
-                          {/* Checkmark Badge */}
-                          <button
-                            type="button"
-                            onClick={() => toggleTask(task.id)}
-                            title={task.completed ? 'Mark pending' : 'Mark completed'}
-                            aria-label={task.completed ? 'Mark pending' : 'Mark completed'}
-                            aria-pressed={task.completed}
-                            className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                              task.completed
-                                ? 'bg-[#00A884] text-white shadow-xs'
-                                : 'bg-white hover:bg-gray-50 border border-[#8696A0]'
-                            }`}
-                          >
-                            {task.completed && (
-                              <CheckIcon sx={{ fontSize: 14 }} className="text-white" />
-                            )}
-                          </button>
-                        </div>
                       </div>
-                    );
-                  })}
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Actions & Indicator (Matching Card 1 & Card 2 bottom structure) */}
+                <div className="mt-4 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingTask(value => !value)}
+                    className="w-full py-2.5 rounded-xl bg-[#1C0E28] hover:bg-[#321B44] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                  >
+                    <AddIcon sx={{ fontSize: 17 }} />
+                    <span>{isAddingTask ? 'Close Task Form' : 'Add New Task'}</span>
+                  </button>
+
+                  {/* Status footer with sync badge */}
+                  <div className="flex items-center justify-between text-[11px] text-[#467362] font-semibold mt-3 px-1">
+                    <span className="flex items-center gap-1.5">
+                      <CloudDoneOutlinedIcon sx={{ fontSize: 14 }} className="text-emerald-600" />
+                      <span>Cloud Synced</span>
+                    </span>
+                    <span className="text-[10.5px] text-[#467362]/80">
+                      {completedTasksCount} of {totalTasksCount} tasks completed
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Card Footer: View All toggle */}
-            <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 border-t border-black/[0.06] flex items-center justify-between text-[11px] bg-white/40 backdrop-blur-2xs">
-              <button
-                type="button"
-                onClick={() => setShowAllTasks(!showAllTasks)}
-                className="bg-white/90 hover:bg-white text-[#008069] hover:text-[#006653] font-semibold text-xs px-3 py-1 rounded-full shadow-[0_1px_1px_rgba(11,20,26,0.08)] border border-[#E9EDEF] transition-all flex items-center gap-1 cursor-pointer"
-              >
-                <span>{showAllTasks ? 'Show fewer tasks' : `View all (${tasks.length}) tasks`}</span>
-              </button>
-              <span className="text-[10px] text-[#667781] font-medium flex items-center gap-1">
-                🔒 Saved locally
-              </span>
-            </div>
-          </div>
+            );
+          })()}
 
         </section>
 
