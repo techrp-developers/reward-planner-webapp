@@ -117,7 +117,7 @@ export const BusHomePage = () => {
       <BusPageShell>
         {/* SEARCH */}
         <div className="relative z-10 -mt-8 md:-mt-10 lg:-mt-14 xl:-mt-20 2xl:-mt-10">
-          <BusSearchCard initial={recent[0] ? { ...recent[0], date: todayISO() } : undefined} onSearch={go} />
+          <BusSearchCard onSearch={go} />
         </div>
 
         {/* RECENT */}
