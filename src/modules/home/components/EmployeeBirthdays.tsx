@@ -86,13 +86,15 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ name, avatar, className = '', i
   const hasValidAvatar = Boolean(resolvedAvatar && !imgFailed);
 
   return (
-    <div className={`relative shrink-0 overflow-hidden rounded-full ${className}`}>
+    <div className={`relative shrink-0 overflow-hidden rounded-full aspect-square ${className}`}>
       {hasValidAvatar ? (
         <img
           src={resolvedAvatar}
           alt={name}
           onError={() => setImgFailed(true)}
-          className="w-full h-full object-cover rounded-full"
+          className={`w-full h-full rounded-full aspect-square ${
+            isToday ? 'object-cover object-[center_20%]' : 'object-cover'
+          }`}
           loading="lazy"
         />
       ) : isToday ? (
@@ -570,12 +572,14 @@ export default function EmployeeBirthdays() {
                     : `Send birthday wishes to ${featuredPerson.name}`
                 }
               >
-                <UserAvatar
-                  name={featuredPerson.name}
-                  avatar={featuredPerson.avatar}
-                  className="w-full h-full"
-                  isToday={true}
-                />
+                <div className="birthday-avatar-frame">
+                  <UserAvatar
+                    name={featuredPerson.name}
+                    avatar={featuredPerson.avatar}
+                    className="w-full h-full"
+                    isToday={true}
+                  />
+                </div>
               </button>
               <div className="birthday-feature-details">
                 <h4 title={featuredPerson.name}>{featuredPerson.name}</h4>
@@ -603,7 +607,9 @@ export default function EmployeeBirthdays() {
                 className="birthday-feature-photo birthday-feature-photo--empty"
                 aria-label="No birthdays today"
               >
-                <EmptyProfileAvatar className="w-full h-full" />
+                <div className="birthday-avatar-frame">
+                  <EmptyProfileAvatar className="w-full h-full" />
+                </div>
               </div>
               <div className="birthday-feature-details">
                 <h4>No Birthday Today</h4>
