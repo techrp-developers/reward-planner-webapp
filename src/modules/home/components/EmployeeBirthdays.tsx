@@ -542,7 +542,7 @@ export default function EmployeeBirthdays() {
       )}
       <div
         className="birthday-banner"
-        style={{ '--birthday-art': `url(${bdyBgCard})` } as React.CSSProperties}
+        style={{ '--birthday-art': `url(${bdyBgCard}?v=20261105)` } as React.CSSProperties}
       >
         <div className="birthday-art" aria-hidden="true" />
 
