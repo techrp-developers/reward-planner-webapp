@@ -14,11 +14,6 @@ import {
   isCompanyMatch,
   getCompanyFromUser,
 } from '../../../services/celebrationService';
-import {
-  INITIAL_COMPANY_EMPLOYEES,
-  findEmployeeDirectoryInfo,
-  getDeterministicUpcomingDob,
-} from '../../../data/companyEmployeesData';
 
 /**
  * Elegant default placeholder for when no colleague has a birthday today.
@@ -356,11 +351,6 @@ export default function EmployeeBirthdays() {
 
   // Compute the combined dynamic birthday list strictly for current user's company ONLY
   const birthdayList = useMemo<BirthdayPerson[]>(() => {
-    const activeCompanyName =
-      getCompanyFromUser(activeUser) ||
-      backendCompanyName ||
-      (activeUser ? '' : 'MPS Global');
-
     let candidatePool: any[] = [];
 
     if (backendBirthdays && backendBirthdays.length > 0) {
@@ -375,40 +365,10 @@ export default function EmployeeBirthdays() {
     if (Array.isArray(activeUser?.upcoming_birthdays) && activeUser.upcoming_birthdays.length > 0) {
       activeUser.upcoming_birthdays.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
     }
-    if (Array.isArray(activeUser?.company?.employees) && activeUser.company.employees.length > 0) {
-      activeUser.company.employees.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
-    }
-    if (Array.isArray(activeUser?.company_users) && activeUser.company_users.length > 0) {
-      activeUser.company_users.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
-    }
-    if (Array.isArray(activeUser?.employees) && activeUser.employees.length > 0) {
-      activeUser.employees.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
-    }
-    if (Array.isArray(activeUser?.colleagues) && activeUser.colleagues.length > 0) {
-      activeUser.colleagues.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
-    }
-    if (Array.isArray(activeUser?.team) && activeUser.team.length > 0) {
-      activeUser.team.forEach((b: any) => candidatePool.push({ ...b, fromLiveBackend: true }));
-    }
 
-    try {
-      localStorage.removeItem('rp_custom_company_employees');
-      localStorage.removeItem('rp_company_employees');
-      const safeComp = (companyId || activeCompanyName || 'company').toString().replace(/[^a-z0-9]/gi, '_');
-      const sessionStored = sessionStorage.getItem(`rp_company_employees_${safeComp}`);
-      if (sessionStored) {
-        const parsed = JSON.parse(sessionStored);
-        if (Array.isArray(parsed) && parsed.length > 0) candidatePool.push(...parsed);
-      }
-    } catch {}
-
-    // Only fallback to mock employees if no backend company employees were found
+    // NO MOCK FALLBACK - Candidate pool strictly contains real employees from live backend/database!
     if (candidatePool.length === 0) {
-      const targetMatchName = activeCompanyName || 'MPS Global';
-      const companyMatches = INITIAL_COMPANY_EMPLOYEES.filter((emp) =>
-        isCompanyMatch(emp.company, targetMatchName)
-      );
-      candidatePool.push(...(companyMatches.length > 0 ? companyMatches : INITIAL_COMPANY_EMPLOYEES));
+      return [];
     }
 
     const dynamicList: BirthdayPerson[] = [];
@@ -417,30 +377,6 @@ export default function EmployeeBirthdays() {
 
     candidatePool.forEach((emp: any) => {
       if (!emp) return;
-
-      const isLiveBackend = Boolean(emp.fromLiveBackend);
-
-      if (!isLiveBackend) {
-        const empCompanyId = emp.company_id || emp.companyId || emp.company?.id;
-        if (companyId && empCompanyId && String(empCompanyId) !== String(companyId)) {
-          return;
-        }
-
-        const empCompany =
-          getCompanyFromUser(emp) ||
-          (typeof emp.company === 'string' ? emp.company : emp.company?.name) ||
-          emp.companyName ||
-          emp.employer ||
-          emp.company_name;
-
-        if (activeCompanyName && empCompany && !isCompanyMatch(empCompany, activeCompanyName)) {
-          return;
-        }
-
-        if (!empCompany && !empCompanyId && activeCompanyName) {
-          return;
-        }
-      }
 
       const id = emp.id || emp.employee_id || emp.employeeId || emp.userId;
       const cleanName = (emp.name || emp.fullName || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -451,20 +387,7 @@ export default function EmployeeBirthdays() {
       if (id) seenIds.add(id);
       if (cleanName) seenNames.add(cleanName);
 
-      const dirMatch = findEmployeeDirectoryInfo(id, emp.name);
-
-      let dob =
-        emp.dob ||
-        emp.date_of_birth ||
-        emp.birthday ||
-        emp.birth_date ||
-        emp.employeeInfo?.date_of_birth ||
-        dirMatch?.dob;
-
-      if (!dob && !isLiveBackend) {
-        dob = getDeterministicUpcomingDob(id || emp.name);
-      }
-
+      const dob = emp.dob || emp.date_of_birth || emp.birthday || emp.birth_date;
       const meta = getBirthdayMeta(dob, emp.dateStr);
 
       const isToday = Boolean(
@@ -485,15 +408,6 @@ export default function EmployeeBirthdays() {
         daysUntil = meta.daysUntil;
       }
 
-      if (!isToday && daysUntil === 9999 && !isLiveBackend) {
-        return;
-      }
-
-      const now = new Date();
-      const currentMonthName = MONTH_NAMES[now.getMonth()];
-      const currentDayNum = now.getDate();
-      const todayFormatted = `${currentMonthName} ${currentDayNum}`;
-
       let formattedDate = '';
       if (emp.dateStr && emp.dateStr !== 'Upcoming' && emp.dateStr !== 'Birthday today') {
         formattedDate = emp.dateStr;
@@ -501,26 +415,13 @@ export default function EmployeeBirthdays() {
         formattedDate = meta.formattedDate;
       } else if (meta.month && meta.day) {
         formattedDate = `${MONTH_NAMES[meta.month - 1]} ${meta.day}`;
-      } else if (isToday) {
-        formattedDate = todayFormatted;
-      } else if (emp.dateStr === 'Upcoming') {
-        formattedDate = 'Upcoming';
-      } else if (typeof daysUntil === 'number' && daysUntil < 365) {
-        const targetDate = new Date();
-        targetDate.setDate(targetDate.getDate() + daysUntil);
-        formattedDate = `${MONTH_NAMES[targetDate.getMonth()]} ${targetDate.getDate()}`;
       } else {
         formattedDate = 'Upcoming';
       }
 
       const dateStr = isToday ? `Today • ${formattedDate}` : formattedDate;
-
-      let role = emp.role || emp.designation || emp.title || dirMatch?.role || '';
-      if (!role || role === 'Team Member') {
-        role = dirMatch?.role || emp.department || dirMatch?.department || 'Team Member';
-      }
-
-      const department = emp.department || dirMatch?.department || '';
+      const role = emp.role || emp.designation || emp.title || emp.department || 'Colleague';
+      const department = emp.department || '';
 
       const rawAvatar =
         emp.avatar ||
@@ -528,16 +429,15 @@ export default function EmployeeBirthdays() {
         emp.photo ||
         emp.userImage ||
         emp.user_image ||
-        dirMatch?.avatar ||
         '';
       const cleanAvatar = resolveAvatarUrl(rawAvatar);
 
       dynamicList.push({
         id,
-        name: emp.name || emp.fullName || dirMatch?.name || 'Colleague',
+        name: emp.name || emp.fullName || 'Colleague',
         role,
         department,
-        email: emp.email || dirMatch?.email || '',
+        email: emp.email || '',
         phone: emp.phone || emp.contact || '',
         dob,
         avatar: cleanAvatar,
@@ -557,7 +457,7 @@ export default function EmployeeBirthdays() {
       if (diff !== 0) return diff;
       return (a.name || '').localeCompare(b.name || '');
     });
-  }, [activeUser, backendBirthdays, backendCompanyName, companyId]);
+  }, [activeUser, backendBirthdays]);
 
   // Synchronize wish states from local storage so wishes survive refreshes
   useEffect(() => {
