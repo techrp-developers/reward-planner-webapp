@@ -14,8 +14,7 @@ import {
   fetchRecommendations,
 } from '../../api/productApi';
 import ProductCard from '../../components/product/ProductCard';
-import { EcommerceDiwaliBanner } from './components/EcommerceDiwaliBanner';
-import { EcommerceDiwaliPosters } from './components/EcommerceDiwaliPosters';
+import EcommerceAdBannerCarousel from './components/EcommerceAdBannerCarousel';
 import EcommerceCategoriesGrid from './components/EcommerceCategoriesGrid';
 import EcommerceFlashSale from './components/EcommerceFlashSale';
 import EcommerceHorizontalSection from './components/EcommerceHorizontalSection';
@@ -372,10 +371,6 @@ export const ProductListingPage = () => {
                 <ArrowLeft size={16} className="text-gray-500 group-hover:text-gray-900 transition-colors" />
                 <span>Back to Dashboard</span>
               </button>
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-800 border border-amber-300/60 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                Festive Season Offers
-              </span>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -406,11 +401,8 @@ export const ProductListingPage = () => {
             </div>
           </div>
 
-          {/* DIWALI FESTIVE HERO BANNER */}
-          <EcommerceDiwaliBanner onClick={() => handleSelectCategory('all')} />
-
-          {/* DIWALI OFFER POSTERS */}
-          <EcommerceDiwaliPosters onClick={() => handleSelectCategory('all')} />
+          {/* ADVERTISEMENT HERO BANNER CAROUSEL (SCROLLING CARDS) */}
+          <EcommerceAdBannerCarousel onSelectCategory={handleSelectCategory} />
 
           {/* 1. CATEGORIES SECTION (WITH 3D PEDESTAL ICONS) */}
           <EcommerceCategoriesGrid
